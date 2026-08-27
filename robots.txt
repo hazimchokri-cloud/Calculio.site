@@ -1,0 +1,7 @@
+# Robots.txt for Calculio (https://calculio.site)
+User-agent: *
+Allow: /
+
+# Direct sitemap index reference for Google Search Console & search engine crawlers
+Sitemap: https://calculio.site/sitemap.xml
+
