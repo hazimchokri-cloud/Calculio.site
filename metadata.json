@@ -1,0 +1,8 @@
+{
+  "name": "Calculio - Free Online Calculators",
+  "description": "Professional clean orange and white calculator platform featuring financial, health, math, conversion, and business calculators with interactive breakdowns.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
