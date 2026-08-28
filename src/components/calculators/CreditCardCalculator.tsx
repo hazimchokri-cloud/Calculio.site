@@ -162,7 +162,7 @@ Savings by following plan: ${formatCurrency(calculations.interestSaved, currency
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Card Balance</span>
-              <span className="text-rose-600 font-mono">{formatCurrency(balance, currencySymbol)}</span>
+              <span className="text-rose-600 font-mono">{formatCurrency(numBalance, currencySymbol)}</span>
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
@@ -239,7 +239,7 @@ Savings by following plan: ${formatCurrency(calculations.interestSaved, currency
               <div className="space-y-1 pt-1">
                 <label className="text-xs font-semibold text-slate-600 flex justify-between">
                   <span>Your Monthly Payment Budget</span>
-                  <span className="text-rose-600 font-mono">{formatCurrency(fixedMonthlyPayment, currencySymbol)}/mo</span>
+                  <span className="text-rose-600 font-mono">{formatCurrency(numFixedMonthly, currencySymbol)}/mo</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
@@ -258,7 +258,7 @@ Savings by following plan: ${formatCurrency(calculations.interestSaved, currency
               <div className="space-y-1 pt-1">
                 <label className="text-xs font-semibold text-slate-600 flex justify-between">
                   <span>Target Payoff Timeline</span>
-                  <span className="text-rose-600 font-mono">{targetMonths} Months ({(targetMonths / 12).toFixed(1)} yrs)</span>
+                  <span className="text-rose-600 font-mono">{numTargetMonths} Months ({(numTargetMonths / 12).toFixed(1)} yrs)</span>
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {[12, 24, 36, 48].map(mo => (

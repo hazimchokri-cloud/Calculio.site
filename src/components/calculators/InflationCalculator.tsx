@@ -4,6 +4,7 @@ import { formatCurrency, formatNumber, copyToClipboard } from '../../utils/forma
 
 interface InflationProps {
   currencySymbol?: string;
+  onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
 }
 
 export const InflationCalculator: React.FC<InflationProps> = ({ currencySymbol = '$' }) => {

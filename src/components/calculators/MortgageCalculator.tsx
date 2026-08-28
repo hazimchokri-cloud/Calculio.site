@@ -612,55 +612,67 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
 
         {showAmortization === 'yearly' && (
           <div className="overflow-x-auto max-h-96 overflow-y-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
-                <tr>
-                  <th className="py-3 px-3.5">Year</th>
-                  <th className="py-3 px-3.5">Principal Paid</th>
-                  <th className="py-3 px-3.5">Interest Paid</th>
-                  <th className="py-3 px-3.5">Total Payment</th>
-                  <th className="py-3 px-3.5 text-right">Ending Balance</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-mono-numbers">
-                {calculation.yearlySchedule.map((row) => (
-                  <tr key={row.year} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3 px-3.5 font-semibold text-slate-900">Year {row.year}</td>
-                    <td className="py-3 px-3.5 text-orange-600 font-medium">{formatCurrency(row.principalPaid + row.extraPaid, currencySymbol)}</td>
-                    <td className="py-3 px-3.5 text-rose-600 font-medium">{formatCurrency(row.interestPaid, currencySymbol)}</td>
-                    <td className="py-3 px-3.5 text-slate-700">{formatCurrency(row.totalPayment, currencySymbol)}</td>
-                    <td className="py-3 px-3.5 text-right font-bold text-slate-900">{formatCurrency(row.endBalance, currencySymbol)}</td>
+            {calculation && calculation.yearlySchedule ? (
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-50 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+                  <tr>
+                    <th className="py-3 px-3.5">Year</th>
+                    <th className="py-3 px-3.5">Principal Paid</th>
+                    <th className="py-3 px-3.5">Interest Paid</th>
+                    <th className="py-3 px-3.5">Total Payment</th>
+                    <th className="py-3 px-3.5 text-right">Ending Balance</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-mono-numbers">
+                  {calculation.yearlySchedule.map((row) => (
+                    <tr key={row.year} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-3 px-3.5 font-semibold text-slate-900">Year {row.year}</td>
+                      <td className="py-3 px-3.5 text-orange-600 font-medium">{formatCurrency(row.principalPaid + row.extraPaid, currencySymbol)}</td>
+                      <td className="py-3 px-3.5 text-rose-600 font-medium">{formatCurrency(row.interestPaid, currencySymbol)}</td>
+                      <td className="py-3 px-3.5 text-slate-700">{formatCurrency(row.totalPayment, currencySymbol)}</td>
+                      <td className="py-3 px-3.5 text-right font-bold text-slate-900">{formatCurrency(row.endBalance, currencySymbol)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="p-8 text-center text-sm text-slate-500">
+                Please enter valid parameters above to view the amortization schedule.
+              </div>
+            )}
           </div>
         )}
 
         {showAmortization === 'monthly' && (
           <div className="overflow-x-auto max-h-96 overflow-y-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
-                <tr>
-                  <th className="py-3 px-3.5">Month</th>
-                  <th className="py-3 px-3.5">Principal</th>
-                  <th className="py-3 px-3.5">Interest</th>
-                  <th className="py-3 px-3.5">Payment</th>
-                  <th className="py-3 px-3.5 text-right">Balance</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-mono-numbers">
-                {calculation.schedule.slice(0, 24).map((row) => (
-                  <tr key={row.month} className="hover:bg-slate-50/80">
-                    <td className="py-3 px-3.5 font-semibold text-slate-900">Month {row.month}</td>
-                    <td className="py-3 px-3.5 text-orange-600">{formatCurrency(row.principalPaid + row.extraPaid, currencySymbol)}</td>
-                    <td className="py-3 px-3.5 text-rose-600">{formatCurrency(row.interestPaid, currencySymbol)}</td>
-                    <td className="py-3 px-3.5 text-slate-700">{formatCurrency(row.totalPayment, currencySymbol)}</td>
-                    <td className="py-3 px-3.5 text-right font-bold text-slate-900">{formatCurrency(row.remainingBalance, currencySymbol)}</td>
+            {calculation && calculation.schedule ? (
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-50 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+                  <tr>
+                    <th className="py-3 px-3.5">Month</th>
+                    <th className="py-3 px-3.5">Principal</th>
+                    <th className="py-3 px-3.5">Interest</th>
+                    <th className="py-3 px-3.5">Payment</th>
+                    <th className="py-3 px-3.5 text-right">Balance</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-mono-numbers">
+                  {calculation.schedule.slice(0, 24).map((row) => (
+                    <tr key={row.month} className="hover:bg-slate-50/80">
+                      <td className="py-3 px-3.5 font-semibold text-slate-900">Month {row.month}</td>
+                      <td className="py-3 px-3.5 text-orange-600">{formatCurrency(row.principalPaid + row.extraPaid, currencySymbol)}</td>
+                      <td className="py-3 px-3.5 text-rose-600">{formatCurrency(row.interestPaid, currencySymbol)}</td>
+                      <td className="py-3 px-3.5 text-slate-700">{formatCurrency(row.totalPayment, currencySymbol)}</td>
+                      <td className="py-3 px-3.5 text-right font-bold text-slate-900">{formatCurrency(row.remainingBalance, currencySymbol)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="p-8 text-center text-sm text-slate-500">
+                Please enter valid parameters above to view the amortization schedule.
+              </div>
+            )}
           </div>
         )}
       </div>

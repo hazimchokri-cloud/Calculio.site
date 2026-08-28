@@ -207,6 +207,7 @@ export const UnitConverter: React.FC = () => {
           {(Object.keys(CONVERSION_CATEGORIES) as CategoryKey[]).map(cat => (
             <button
               key={cat}
+              type="button"
               onClick={() => handleCategoryChange(cat)}
               className={`px-3.5 py-1.5 text-xs font-bold rounded-xl whitespace-nowrap transition-all cursor-pointer ${
                 activeCategory === cat
@@ -219,6 +220,7 @@ export const UnitConverter: React.FC = () => {
           ))}
         </div>
         <button
+          type="button"
           onClick={handleReset}
           className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors whitespace-nowrap"
         >
@@ -261,6 +263,7 @@ export const UnitConverter: React.FC = () => {
         {/* Swap Button */}
         <div className="lg:col-span-2 flex justify-center">
           <button
+            type="button"
             onClick={handleSwap}
             className="p-3 bg-orange-100 hover:bg-orange-200 text-orange-800 rounded-full border border-orange-300 shadow-2xs hover:rotate-180 transition-all duration-300 cursor-pointer"
             title="Swap Units"
@@ -275,6 +278,7 @@ export const UnitConverter: React.FC = () => {
             <label className="text-xs font-bold uppercase tracking-wider text-orange-900">To (Result)</label>
             {convertedValue !== null && (
               <button
+                type="button"
                 onClick={handleCopy}
                 className="text-xs text-orange-800 hover:text-orange-950 flex items-center gap-1 font-semibold cursor-pointer"
               >

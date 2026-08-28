@@ -293,7 +293,7 @@ Payoff Duration: ${calculations.actualMonths} Months (${(calculations.actualMont
                   <th className="p-3">Payment</th>
                   <th className="p-3">Principal</th>
                   <th className="p-3">Interest</th>
-                  {extraPaymentMonthly > 0 && <th className="p-3">Extra</th>}
+                  {numExtraPaymentMonthly > 0 && <th className="p-3">Extra</th>}
                   <th className="p-3">Balance</th>
                 </tr>
               </thead>
@@ -304,7 +304,7 @@ Payoff Duration: ${calculations.actualMonths} Months (${(calculations.actualMont
                     <td className="p-3">{formatCurrency(row.payment, currencySymbol)}</td>
                     <td className="p-3 text-orange-600">{formatCurrency(row.principal, currencySymbol)}</td>
                     <td className="p-3 text-amber-600">{formatCurrency(row.interest, currencySymbol)}</td>
-                    {extraPaymentMonthly > 0 && <td className="p-3 text-blue-600">{formatCurrency(row.extra, currencySymbol)}</td>}
+                    {numExtraPaymentMonthly > 0 && <td className="p-3 text-blue-600">{formatCurrency(row.extra, currencySymbol)}</td>}
                     <td className="p-3 font-bold text-slate-900">{formatCurrency(row.balance, currencySymbol)}</td>
                   </tr>
                 ))}

@@ -243,7 +243,7 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
                   type="number"
                   min="0"
                   value={favorableOutcomes}
-                  onChange={(e) => setFavorableOutcomes(Math.max(0, parseInt(e.target.value) || 0))}
+                  onChange={(e) => setFavorableOutcomes(e.target.value === '' ? '' : Math.max(0, parseInt(e.target.value)))}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -253,7 +253,7 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
                   type="number"
                   min="1"
                   value={totalOutcomes}
-                  onChange={(e) => setTotalOutcomes(Math.max(1, parseInt(e.target.value) || 1))}
+                  onChange={(e) => setTotalOutcomes(e.target.value === '' ? '' : Math.max(1, parseInt(e.target.value)))}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -298,7 +298,7 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
                     min="0"
                     max="1"
                     value={probA}
-                    onChange={(e) => setProbA(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setProbA(e.target.value === '' ? '' : Math.max(0, Math.min(1, parseFloat(e.target.value))))}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
@@ -310,7 +310,7 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
                     min="0"
                     max="1"
                     value={probB}
-                    onChange={(e) => setProbB(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setProbB(e.target.value === '' ? '' : Math.max(0, Math.min(1, parseFloat(e.target.value))))}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
@@ -361,7 +361,7 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
                     min="1"
                     max="100"
                     value={nVal}
-                    onChange={(e) => setNVal(parseInt(e.target.value) || 0)}
+                    onChange={(e) => setNVal(e.target.value === '' ? '' : Math.max(1, parseInt(e.target.value)))}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
@@ -370,9 +370,9 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
                   <input
                     type="number"
                     min="0"
-                    max={nVal}
+                    max={typeof nVal === 'number' ? nVal : 100}
                     value={rVal}
-                    onChange={(e) => setRVal(parseInt(e.target.value) || 0)}
+                    onChange={(e) => setRVal(e.target.value === '' ? '' : Math.max(0, parseInt(e.target.value)))}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>

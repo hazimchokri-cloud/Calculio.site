@@ -360,105 +360,107 @@ export const DateCalculator: React.FC<DateCalculatorProps> = ({ onSaveCalculatio
 
         {/* Results Column */}
         <div className="lg:col-span-6 space-y-4">
-          <div className={`bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative transition-transform ${pulse ? 'scale-[1.01]' : ''}`}>
-            {mode === 'difference' && diffResult && (
-              <div className="space-y-4">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300">
-                    Total Elapsed Time
-                  </span>
-                  <div className="text-4xl sm:text-5xl font-black tracking-tight text-white mt-1 font-mono">
-                    {diffResult.totalDays}
-                    <span className="text-lg font-normal text-slate-300 ml-2">Days</span>
+          {((mode === 'difference' && diffResult) || (mode === 'add-subtract' && addResult)) && (
+            <div className={`bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative transition-transform ${pulse ? 'scale-[1.01]' : ''}`}>
+              {mode === 'difference' && diffResult && (
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300">
+                      Total Elapsed Time
+                    </span>
+                    <div className="text-4xl sm:text-5xl font-black tracking-tight text-white mt-1 font-mono">
+                      {diffResult.totalDays}
+                      <span className="text-lg font-normal text-slate-300 ml-2">Days</span>
+                    </div>
+                    <p className="text-xs text-indigo-300 mt-1">
+                      Equivalent to {diffResult.weeks} weeks and {diffResult.remainingDays} days
+                    </p>
                   </div>
-                  <p className="text-xs text-indigo-300 mt-1">
-                    Equivalent to {diffResult.weeks} weeks and {diffResult.remainingDays} days
-                  </p>
-                </div>
 
-                {/* Business vs Weekend distribution bar */}
-                <div className="space-y-1.5 pt-2">
-                  <div className="flex justify-between text-xs text-slate-300">
-                    <span className="flex items-center gap-1"><Briefcase className="w-3.5 h-3.5 text-orange-400" /> Business: {diffResult.businessDays}d</span>
-                    <span className="text-amber-300">Weekend: {diffResult.weekendDays}d</span>
+                  {/* Business vs Weekend distribution bar */}
+                  <div className="space-y-1.5 pt-2">
+                    <div className="flex justify-between text-xs text-slate-300">
+                      <span className="flex items-center gap-1"><Briefcase className="w-3.5 h-3.5 text-orange-400" /> Business: {diffResult.businessDays}d</span>
+                      <span className="text-amber-300">Weekend: {diffResult.weekendDays}d</span>
+                    </div>
+                    <div className="h-3 bg-white/10 rounded-full overflow-hidden flex">
+                      <div
+                        className="h-full bg-orange-500"
+                        style={{ width: `${diffResult.businessRatio}%` }}
+                        title={`Business days: ${diffResult.businessDays}`}
+                      />
+                      <div
+                        className="h-full bg-amber-500"
+                        style={{ width: `${100 - diffResult.businessRatio}%` }}
+                        title={`Weekend days: ${diffResult.weekendDays}`}
+                      />
+                    </div>
                   </div>
-                  <div className="h-3 bg-white/10 rounded-full overflow-hidden flex">
-                    <div
-                      className="h-full bg-orange-500"
-                      style={{ width: `${diffResult.businessRatio}%` }}
-                      title={`Business days: ${diffResult.businessDays}`}
-                    />
-                    <div
-                      className="h-full bg-amber-500"
-                      style={{ width: `${100 - diffResult.businessRatio}%` }}
-                      title={`Weekend days: ${diffResult.weekendDays}`}
-                    />
+
+                  {/* Breakdown Grid */}
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-indigo-900/60 text-xs">
+                    <div className="bg-white/10 rounded-xl p-2.5 backdrop-blur-xs">
+                      <span className="text-[10px] text-slate-300 uppercase font-bold block">Business Working Days</span>
+                      <span className="text-base font-bold text-orange-300 font-mono">{diffResult.businessDays} days</span>
+                    </div>
+                    <div className="bg-white/10 rounded-xl p-2.5 backdrop-blur-xs">
+                      <span className="text-[10px] text-slate-300 uppercase font-bold block">Weekend Days</span>
+                      <span className="text-base font-bold text-amber-300 font-mono">{diffResult.weekendDays} days</span>
+                    </div>
+                    <div className="bg-white/10 rounded-xl p-2.5 backdrop-blur-xs">
+                      <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Hours</span>
+                      <span className="text-sm font-bold text-white font-mono">{formatNumber(diffResult.totalHours)} hrs</span>
+                    </div>
+                    <div className="bg-white/10 rounded-xl p-2.5 backdrop-blur-xs">
+                      <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Minutes</span>
+                      <span className="text-sm font-bold text-white font-mono">{formatNumber(diffResult.totalMinutes)} mins</span>
+                    </div>
                   </div>
                 </div>
-
-                {/* Breakdown Grid */}
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-indigo-900/60 text-xs">
-                  <div className="bg-white/10 rounded-xl p-2.5 backdrop-blur-xs">
-                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Business Working Days</span>
-                    <span className="text-base font-bold text-orange-300 font-mono">{diffResult.businessDays} days</span>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-2.5 backdrop-blur-xs">
-                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Weekend Days</span>
-                    <span className="text-base font-bold text-amber-300 font-mono">{diffResult.weekendDays} days</span>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-2.5 backdrop-blur-xs">
-                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Hours</span>
-                    <span className="text-sm font-bold text-white font-mono">{formatNumber(diffResult.totalHours)} hrs</span>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-2.5 backdrop-blur-xs">
-                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Minutes</span>
-                    <span className="text-sm font-bold text-white font-mono">{formatNumber(diffResult.totalMinutes)} mins</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {mode === 'add-subtract' && addResult && (
-              <div className="space-y-4">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300">
-                    Calculated Result Date
-                  </span>
-                  <div className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-1">
-                    {addResult.formatted}
-                  </div>
-                  <span className="inline-block mt-2 px-3 py-1 bg-indigo-500/30 border border-indigo-400/40 rounded-lg text-xs font-mono font-bold text-indigo-200">
-                    ISO: {addResult.iso} • {addResult.dayOfWeek}
-                  </span>
-                </div>
-
-                <div className="p-3.5 bg-white/10 rounded-xl text-xs text-slate-200 border border-white/10 space-y-1">
-                  <span className="text-[10px] text-indigo-300 uppercase font-bold block">Offset Summary</span>
-                  <div>{addOp === 'add' ? 'Added' : 'Subtracted'} {numDays} days, {numWeeks} weeks, {numMonths} months from {baseDate}.</div>
-                </div>
-              </div>
-            )}
-
-            {/* Action Bar */}
-            <div className="flex items-center gap-2 pt-4 border-t border-indigo-900/60">
-              <button
-                onClick={handleCopy}
-                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Copied' : 'Copy Result'}</span>
-              </button>
-              {onSaveCalculation && (
-                <button
-                  onClick={handleSave}
-                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-                >
-                  <Bookmark className="w-3.5 h-3.5" />
-                  <span>{saved ? 'Saved' : 'Save'}</span>
-                </button>
               )}
+
+              {mode === 'add-subtract' && addResult && (
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300">
+                      Calculated Result Date
+                    </span>
+                    <div className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-1">
+                      {addResult.formatted}
+                    </div>
+                    <span className="inline-block mt-2 px-3 py-1 bg-indigo-500/30 border border-indigo-400/40 rounded-lg text-xs font-mono font-bold text-indigo-200">
+                      ISO: {addResult.iso} • {addResult.dayOfWeek}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-white/10 rounded-xl text-xs text-slate-200 border border-white/10 space-y-1">
+                    <span className="text-[10px] text-indigo-300 uppercase font-bold block">Offset Summary</span>
+                    <div>{addOp === 'add' ? 'Added' : 'Subtracted'} {numDays} days, {numWeeks} weeks, {numMonths} months from {baseDate}.</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Bar */}
+              <div className="flex items-center gap-2 pt-4 border-t border-indigo-900/60">
+                <button
+                  onClick={handleCopy}
+                  className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? 'Copied' : 'Copy Result'}</span>
+                </button>
+                {onSaveCalculation && (
+                  <button
+                    onClick={handleSave}
+                    className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  >
+                    <Bookmark className="w-3.5 h-3.5" />
+                    <span>{saved ? 'Saved' : 'Save'}</span>
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

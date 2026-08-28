@@ -97,7 +97,8 @@ Required Exam Score: ${results.requiredScore}% (${results.difficultyStatus})`;
               max="150"
               step="0.5"
               value={currentGrade}
-              onChange={(e) => setCurrentGrade(Number(e.target.value) || 0)}
+              onChange={(e) => setCurrentGrade(e.target.value === '' ? '' : Number(e.target.value))}
+              placeholder="85"
               className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
             />
           </div>
@@ -131,7 +132,8 @@ Required Exam Score: ${results.requiredScore}% (${results.difficultyStatus})`;
               max="100"
               step="0.5"
               value={targetGrade}
-              onChange={(e) => setTargetGrade(Number(e.target.value) || 0)}
+              onChange={(e) => setTargetGrade(e.target.value === '' ? '' : Number(e.target.value))}
+              placeholder="90"
               className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
             />
           </div>
@@ -144,7 +146,8 @@ Required Exam Score: ${results.requiredScore}% (${results.difficultyStatus})`;
               max="100"
               step="1"
               value={finalWeight}
-              onChange={(e) => setFinalWeight(Number(e.target.value) || 0)}
+              onChange={(e) => setFinalWeight(e.target.value === '' ? '' : Number(e.target.value))}
+              placeholder="25"
               className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
             />
             <span className="text-[10px] text-slate-500 mt-1 block">What percent of your whole grade is the final exam worth?</span>
@@ -152,44 +155,46 @@ Required Exam Score: ${results.requiredScore}% (${results.difficultyStatus})`;
         </div>
 
         {/* Results Card */}
-        <div className="bg-gradient-to-br from-orange-50 to-teal-50/60 p-6 rounded-2xl border border-orange-200 flex flex-col justify-between space-y-4">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-orange-200">
-              <span className="text-xs font-bold uppercase tracking-wider text-orange-900">Required Final Exam Score</span>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${results.difficultyColor}`}>
-                {results.difficultyStatus}
-              </span>
+        {results && (
+          <div className="bg-gradient-to-br from-orange-50 to-teal-50/60 p-6 rounded-2xl border border-orange-200 flex flex-col justify-between space-y-4">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-orange-200">
+                <span className="text-xs font-bold uppercase tracking-wider text-orange-900">Required Final Exam Score</span>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${results.difficultyColor}`}>
+                  {results.difficultyStatus}
+                </span>
+              </div>
+
+              <div className="p-5 bg-white rounded-xl border border-orange-200 shadow-2xs text-center space-y-1">
+                <span className="text-[11px] font-bold text-slate-500 uppercase">You Need To Score:</span>
+                <div className="text-4xl font-black text-orange-950 font-mono-numbers">
+                  {results.requiredScore}%
+                </div>
+                <p className="text-xs text-slate-600 font-medium pt-1">
+                  To achieve your target grade of <strong>{targetGrade}%</strong> overall.
+                </p>
+              </div>
+
+              <div className="bg-white p-3.5 rounded-xl border border-orange-100 space-y-1.5 text-xs text-slate-700">
+                <span className="font-bold text-slate-900 block">Calculation Formula:</span>
+                <div className="font-mono text-[11px] p-2 bg-slate-50 rounded-lg text-slate-800">
+                  Score = [Target - Current × (1 - Weight)] ÷ Weight
+                </div>
+              </div>
             </div>
 
-            <div className="p-5 bg-white rounded-xl border border-orange-200 shadow-2xs text-center space-y-1">
-              <span className="text-[11px] font-bold text-slate-500 uppercase">You Need To Score:</span>
-              <div className="text-4xl font-black text-orange-950 font-mono-numbers">
-                {results.requiredScore}%
-              </div>
-              <p className="text-xs text-slate-600 font-medium pt-1">
-                To achieve your target grade of <strong>{targetGrade}%</strong> overall.
-              </p>
-            </div>
-
-            <div className="bg-white p-3.5 rounded-xl border border-orange-100 space-y-1.5 text-xs text-slate-700">
-              <span className="font-bold text-slate-900 block">Calculation Formula:</span>
-              <div className="font-mono text-[11px] p-2 bg-slate-50 rounded-lg text-slate-800">
-                Score = [Target - Current × (1 - Weight)] ÷ Weight
-              </div>
+            <div className="pt-3 border-t border-orange-200">
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="w-full py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-orange-600" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copied ? 'Copied Result' : 'Copy Grade Target'}</span>
+              </button>
             </div>
           </div>
-
-          <div className="pt-3 border-t border-orange-200">
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="w-full py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-orange-600" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied Result' : 'Copy Grade Target'}</span>
-            </button>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

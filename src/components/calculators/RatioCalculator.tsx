@@ -16,11 +16,11 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
   const [valD, setValD] = useState<string>(''); // Target X
 
   // Simplify Ratio
-  const [simpA, setSimpA] = useState<number>(36);
-  const [simpB, setSimpB] = useState<number>(48);
+  const [simpA, setSimpA] = useState<number | ''>(36);
+  const [simpB, setSimpB] = useState<number | ''>(48);
 
   // Divide Total by Ratio
-  const [totalAmount, setTotalAmount] = useState<number>(500);
+  const [totalAmount, setTotalAmount] = useState<number | ''>(500);
   const [ratioPartsStr, setRatioPartsStr] = useState<string>('2 : 3 : 5');
 
   const [copied, setCopied] = useState<boolean>(false);
@@ -73,8 +73,9 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
 
   // Simplify A:B
   const simplifyResults = useMemo(() => {
-    const a = Math.round(simpA);
-    const b = Math.round(simpB);
+    if (simpA === '' || simpB === '') return null;
+    const a = Math.round(Number(simpA));
+    const b = Math.round(Number(simpB));
     if (isNaN(a) || isNaN(b) || a <= 0 || b <= 0) return null;
 
     const divisor = gcd(a, b);
@@ -93,15 +94,17 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
 
   // Divide Total by Multi-Part Ratio
   const divideResults = useMemo(() => {
+    if (totalAmount === '') return null;
+    const numTotal = Number(totalAmount);
     const parts = ratioPartsStr
       .split(/[:,\s]+/)
       .map(p => parseFloat(p))
       .filter(p => !isNaN(p) && p > 0);
 
-    if (parts.length === 0 || totalAmount <= 0) return null;
+    if (parts.length === 0 || numTotal <= 0) return null;
 
     const sumParts = parts.reduce((acc, p) => acc + p, 0);
-    const unitValue = totalAmount / sumParts;
+    const unitValue = numTotal / sumParts;
 
     const shares = parts.map((part, idx) => ({
       part,
@@ -110,7 +113,7 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
     }));
 
     return {
-      totalAmount,
+      totalAmount: numTotal,
       sumParts,
       shares
     };

@@ -22,17 +22,21 @@ interface BaseCalcProps {
 
 // 1. Loan Comparison Calculator
 export const LoanComparisonCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$', onSave }) => {
-  const [loan1Amount, setLoan1Amount] = useState(250000);
-  const [loan1Rate, setLoan1Rate] = useState(6.5);
-  const [loan1Term, setLoan1Term] = useState(30);
+  const [loan1Amount, setLoan1Amount] = useState<number | ''>(250000);
+  const [loan1Rate, setLoan1Rate] = useState<number | ''>(6.5);
+  const [loan1Term, setLoan1Term] = useState<number | ''>(30);
 
-  const [loan2Amount, setLoan2Amount] = useState(250000);
-  const [loan2Rate, setLoan2Rate] = useState(5.8);
-  const [loan2Term, setLoan2Term] = useState(15);
+  const [loan2Amount, setLoan2Amount] = useState<number | ''>(250000);
+  const [loan2Rate, setLoan2Rate] = useState<number | ''>(5.8);
+  const [loan2Term, setLoan2Term] = useState<number | ''>(15);
 
   const [copied, setCopied] = useState(false);
 
-  const calcMonthly = (principal: number, annualRate: number, years: number) => {
+  const calcMonthly = (principalVal: number | '', annualRateVal: number | '', yearsVal: number | '') => {
+    const principal = typeof principalVal === 'number' ? principalVal : 0;
+    const annualRate = typeof annualRateVal === 'number' ? annualRateVal : 0;
+    const years = typeof yearsVal === 'number' ? yearsVal : 0;
+
     if (principal <= 0 || years <= 0) return { monthly: 0, total: 0, interest: 0 };
     const r = annualRate / 100 / 12;
     const n = years * 12;
@@ -97,7 +101,7 @@ Interest Difference: ${currencySymbol}${interestDiff.toFixed(2)} saved with ${ch
             <input
               type="number"
               value={loan1Amount}
-              onChange={(e) => setLoan1Amount(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setLoan1Amount(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold bg-white"
             />
           </div>
@@ -108,7 +112,7 @@ Interest Difference: ${currencySymbol}${interestDiff.toFixed(2)} saved with ${ch
                 type="number"
                 step="0.01"
                 value={loan1Rate}
-                onChange={(e) => setLoan1Rate(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setLoan1Rate(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold bg-white"
               />
             </div>
@@ -117,7 +121,7 @@ Interest Difference: ${currencySymbol}${interestDiff.toFixed(2)} saved with ${ch
               <input
                 type="number"
                 value={loan1Term}
-                onChange={(e) => setLoan1Term(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setLoan1Term(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold bg-white"
               />
             </div>
@@ -142,7 +146,7 @@ Interest Difference: ${currencySymbol}${interestDiff.toFixed(2)} saved with ${ch
             <input
               type="number"
               value={loan2Amount}
-              onChange={(e) => setLoan2Amount(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setLoan2Amount(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold bg-white"
             />
           </div>
@@ -153,7 +157,7 @@ Interest Difference: ${currencySymbol}${interestDiff.toFixed(2)} saved with ${ch
                 type="number"
                 step="0.01"
                 value={loan2Rate}
-                onChange={(e) => setLoan2Rate(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setLoan2Rate(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold bg-white"
               />
             </div>
@@ -162,7 +166,7 @@ Interest Difference: ${currencySymbol}${interestDiff.toFixed(2)} saved with ${ch
               <input
                 type="number"
                 value={loan2Term}
-                onChange={(e) => setLoan2Term(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setLoan2Term(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold bg-white"
               />
             </div>
@@ -206,25 +210,34 @@ Interest Difference: ${currencySymbol}${interestDiff.toFixed(2)} saved with ${ch
 
 // 2. Car Lease Calculator
 export const CarLeaseCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [msrp, setMsrp] = useState(35000);
-  const [negotiatedPrice, setNegotiatedPrice] = useState(32000);
-  const [downPayment, setDownPayment] = useState(2500);
-  const [tradeIn, setTradeIn] = useState(0);
-  const [leaseTerm, setLeaseTerm] = useState(36);
-  const [moneyFactor, setMoneyFactor] = useState(0.0021); // ~5% APR
-  const [residualPercent, setResidualPercent] = useState(58); // 58%
-  const [salesTaxRate, setSalesTaxRate] = useState(7.0);
+  const [msrp, setMsrp] = useState<number | ''>(35000);
+  const [negotiatedPrice, setNegotiatedPrice] = useState<number | ''>(32000);
+  const [downPayment, setDownPayment] = useState<number | ''>(2500);
+  const [tradeIn, setTradeIn] = useState<number | ''>(0);
+  const [leaseTerm, setLeaseTerm] = useState<number>(36);
+  const [moneyFactor, setMoneyFactor] = useState<number | ''>(0.0021); // ~5% APR
+  const [residualPercent, setResidualPercent] = useState<number | ''>(58); // 58%
+  const [salesTaxRate, setSalesTaxRate] = useState<number | ''>(7.0);
 
   const results = useMemo(() => {
-    const capCost = negotiatedPrice - downPayment - tradeIn;
-    const residualValue = msrp * (residualPercent / 100);
-    const depreciationFee = (capCost - residualValue) / (leaseTerm || 1);
-    const rentCharge = (capCost + residualValue) * moneyFactor;
+    const msrpVal = typeof msrp === 'number' ? msrp : 0;
+    const priceVal = typeof negotiatedPrice === 'number' ? negotiatedPrice : 0;
+    const downVal = typeof downPayment === 'number' ? downPayment : 0;
+    const tradeVal = typeof tradeIn === 'number' ? tradeIn : 0;
+    const mfVal = typeof moneyFactor === 'number' ? moneyFactor : 0;
+    const resVal = typeof residualPercent === 'number' ? residualPercent : 0;
+    const taxVal = typeof salesTaxRate === 'number' ? salesTaxRate : 0;
+
+    const capCost = priceVal - downVal - tradeVal;
+    const residualValue = msrpVal * (resVal / 100);
+    const term = leaseTerm > 0 ? leaseTerm : 36;
+    const depreciationFee = (capCost - residualValue) / term;
+    const rentCharge = (capCost + residualValue) * mfVal;
     const baseMonthlyPayment = Math.max(0, depreciationFee + rentCharge);
-    const taxAmount = baseMonthlyPayment * (salesTaxRate / 100);
+    const taxAmount = baseMonthlyPayment * (taxVal / 100);
     const totalMonthlyPayment = baseMonthlyPayment + taxAmount;
-    const totalLeaseCost = (totalMonthlyPayment * leaseTerm) + downPayment;
-    const equivalentApr = moneyFactor * 2400;
+    const totalLeaseCost = (totalMonthlyPayment * term) + downVal;
+    const equivalentApr = mfVal * 2400;
 
     return {
       totalMonthlyPayment,
@@ -248,7 +261,7 @@ export const CarLeaseCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
               <input
                 type="number"
                 value={msrp}
-                onChange={(e) => setMsrp(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setMsrp(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -257,7 +270,7 @@ export const CarLeaseCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
               <input
                 type="number"
                 value={negotiatedPrice}
-                onChange={(e) => setNegotiatedPrice(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setNegotiatedPrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -269,7 +282,7 @@ export const CarLeaseCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
               <input
                 type="number"
                 value={downPayment}
-                onChange={(e) => setDownPayment(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setDownPayment(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -294,7 +307,7 @@ export const CarLeaseCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
               <input
                 type="number"
                 value={residualPercent}
-                onChange={(e) => setResidualPercent(Number(e.target.value))}
+                onChange={(e) => setResidualPercent(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -304,7 +317,7 @@ export const CarLeaseCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
                 type="number"
                 step="0.0001"
                 value={moneyFactor}
-                onChange={(e) => setMoneyFactor(Number(e.target.value))}
+                onChange={(e) => setMoneyFactor(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -314,7 +327,7 @@ export const CarLeaseCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
                 type="number"
                 step="0.1"
                 value={salesTaxRate}
-                onChange={(e) => setSalesTaxRate(Number(e.target.value))}
+                onChange={(e) => setSalesTaxRate(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -365,11 +378,12 @@ export const CarLeaseCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
 
 // 3. Down Payment & LTV Calculator
 export const DownPaymentCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [homePrice, setHomePrice] = useState(400000);
-  const [downPaymentPercent, setDownPaymentPercent] = useState(20);
+  const [homePrice, setHomePrice] = useState<number | ''>(400000);
+  const [downPaymentPercent, setDownPaymentPercent] = useState<number>(20);
 
-  const downPaymentAmount = (homePrice * downPaymentPercent) / 100;
-  const loanAmount = homePrice - downPaymentAmount;
+  const hp = typeof homePrice === 'number' ? homePrice : 0;
+  const downPaymentAmount = (hp * downPaymentPercent) / 100;
+  const loanAmount = hp - downPaymentAmount;
   const ltv = 100 - downPaymentPercent;
   const requiresPmi = ltv > 80;
 
@@ -383,7 +397,7 @@ export const DownPaymentCalculator: React.FC<BaseCalcProps> = ({ currencySymbol 
             <input
               type="number"
               value={homePrice}
-              onChange={(e) => setHomePrice(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setHomePrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
             />
           </div>
@@ -442,18 +456,25 @@ export const DownPaymentCalculator: React.FC<BaseCalcProps> = ({ currencySymbol 
 
 // 4. Emergency Fund Calculator
 export const EmergencyFundCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [rentMortgage, setRentMortgage] = useState(1800);
-  const [utilities, setUtilities] = useState(300);
-  const [foodGroceries, setFoodGroceries] = useState(600);
-  const [insuranceDebt, setInsuranceDebt] = useState(400);
-  const [otherEssentials, setOtherEssentials] = useState(300);
-  const [targetMonths, setTargetMonths] = useState(6);
-  const [currentSavings, setCurrentSavings] = useState(5000);
+  const [rentMortgage, setRentMortgage] = useState<number | ''>(1800);
+  const [utilities, setUtilities] = useState<number | ''>(300);
+  const [foodGroceries, setFoodGroceries] = useState<number | ''>(600);
+  const [insuranceDebt, setInsuranceDebt] = useState<number | ''>(400);
+  const [otherEssentials, setOtherEssentials] = useState<number | ''>(300);
+  const [targetMonths, setTargetMonths] = useState<number>(6);
+  const [currentSavings, setCurrentSavings] = useState<number | ''>(5000);
 
-  const monthlyEssentialTotal = rentMortgage + utilities + foodGroceries + insuranceDebt + otherEssentials;
+  const rm = typeof rentMortgage === 'number' ? rentMortgage : 0;
+  const ut = typeof utilities === 'number' ? utilities : 0;
+  const fg = typeof foodGroceries === 'number' ? foodGroceries : 0;
+  const id = typeof insuranceDebt === 'number' ? insuranceDebt : 0;
+  const oe = typeof otherEssentials === 'number' ? otherEssentials : 0;
+  const cs = typeof currentSavings === 'number' ? currentSavings : 0;
+
+  const monthlyEssentialTotal = rm + ut + fg + id + oe;
   const targetFund = monthlyEssentialTotal * targetMonths;
-  const shortfall = Math.max(0, targetFund - currentSavings);
-  const percentFunded = targetFund > 0 ? Math.min(100, (currentSavings / targetFund) * 100) : 100;
+  const shortfall = Math.max(0, targetFund - cs);
+  const percentFunded = targetFund > 0 ? Math.min(100, (cs / targetFund) * 100) : 100;
 
   return (
     <div className="space-y-6">
@@ -466,7 +487,7 @@ export const EmergencyFundCalculator: React.FC<BaseCalcProps> = ({ currencySymbo
               <input
                 type="number"
                 value={rentMortgage}
-                onChange={(e) => setRentMortgage(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setRentMortgage(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -475,7 +496,7 @@ export const EmergencyFundCalculator: React.FC<BaseCalcProps> = ({ currencySymbo
               <input
                 type="number"
                 value={utilities}
-                onChange={(e) => setUtilities(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setUtilities(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -484,7 +505,7 @@ export const EmergencyFundCalculator: React.FC<BaseCalcProps> = ({ currencySymbo
               <input
                 type="number"
                 value={foodGroceries}
-                onChange={(e) => setFoodGroceries(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setFoodGroceries(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -493,7 +514,7 @@ export const EmergencyFundCalculator: React.FC<BaseCalcProps> = ({ currencySymbo
               <input
                 type="number"
                 value={insuranceDebt}
-                onChange={(e) => setInsuranceDebt(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setInsuranceDebt(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -518,7 +539,7 @@ export const EmergencyFundCalculator: React.FC<BaseCalcProps> = ({ currencySymbo
               <input
                 type="number"
                 value={currentSavings}
-                onChange={(e) => setCurrentSavings(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setCurrentSavings(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -555,17 +576,19 @@ export const EmergencyFundCalculator: React.FC<BaseCalcProps> = ({ currencySymbo
 
 // 5. CD (Certificate of Deposit) Calculator
 export const CdCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [deposit, setDeposit] = useState(10000);
-  const [apy, setApy] = useState(4.85);
-  const [termMonths, setTermMonths] = useState(12);
-  const [compoundFreq, setCompoundFreq] = useState(12); // monthly
+  const [deposit, setDeposit] = useState<number | ''>(10000);
+  const [apy, setApy] = useState<number | ''>(4.85);
+  const [termMonths, setTermMonths] = useState<number>(12);
+  const [compoundFreq, setCompoundFreq] = useState<number>(12); // monthly
 
   const results = useMemo(() => {
-    const r = apy / 100;
+    const dep = typeof deposit === 'number' ? deposit : 0;
+    const apyVal = typeof apy === 'number' ? apy : 0;
+    const r = apyVal / 100;
     const t = termMonths / 12;
     const n = compoundFreq;
-    const endingBalance = deposit * Math.pow(1 + r / n, n * t);
-    const totalInterest = endingBalance - deposit;
+    const endingBalance = dep * Math.pow(1 + r / n, n * t);
+    const totalInterest = endingBalance - dep;
 
     return {
       endingBalance,
@@ -583,7 +606,7 @@ export const CdCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) 
             <input
               type="number"
               value={deposit}
-              onChange={(e) => setDeposit(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setDeposit(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
             />
           </div>
@@ -594,7 +617,7 @@ export const CdCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) 
                 type="number"
                 step="0.01"
                 value={apy}
-                onChange={(e) => setApy(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setApy(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -631,7 +654,7 @@ export const CdCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) 
             </div>
             <div className="flex justify-between">
               <span>Effective Yield:</span>
-              <span className="font-bold">{((results.totalInterest / (deposit || 1)) * 100).toFixed(2)}%</span>
+              <span className="font-bold">{(((results.totalInterest / ((typeof deposit === 'number' && deposit > 0) ? deposit : 1))) * 100).toFixed(2)}%</span>
             </div>
           </div>
         </div>
@@ -642,24 +665,33 @@ export const CdCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) 
 
 // 6. 401(k) Growth & Employer Match Calculator
 export const FourOhOneKCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [currentAge, setCurrentAge] = useState(30);
-  const [retirementAge, setRetirementAge] = useState(65);
-  const [currentBalance, setCurrentBalance] = useState(45000);
-  const [salary, setSalary] = useState(85000);
-  const [employeeContributionPercent, setEmployeeContributionPercent] = useState(8);
-  const [employerMatchPercent, setEmployerMatchPercent] = useState(50); // 50% match
-  const [employerMatchLimit, setEmployerMatchLimit] = useState(6); // up to 6%
-  const [expectedReturn, setExpectedReturn] = useState(7.5);
+  const [currentAge, setCurrentAge] = useState<number | ''>(30);
+  const [retirementAge, setRetirementAge] = useState<number | ''>(65);
+  const [currentBalance, setCurrentBalance] = useState<number | ''>(45000);
+  const [salary, setSalary] = useState<number | ''>(85000);
+  const [employeeContributionPercent, setEmployeeContributionPercent] = useState<number | ''>(8);
+  const [employerMatchPercent, setEmployerMatchPercent] = useState<number | ''>(50); // 50% match
+  const [employerMatchLimit, setEmployerMatchLimit] = useState<number | ''>(6); // up to 6%
+  const [expectedReturn, setExpectedReturn] = useState<number | ''>(7.5);
 
   const results = useMemo(() => {
-    const years = Math.max(1, retirementAge - currentAge);
-    const employeeAnnual = salary * (employeeContributionPercent / 100);
-    const matchedSalaryPercent = Math.min(employeeContributionPercent, employerMatchLimit);
-    const employerAnnual = salary * (matchedSalaryPercent / 100) * (employerMatchPercent / 100);
+    const cAge = typeof currentAge === 'number' ? currentAge : 30;
+    const rAge = typeof retirementAge === 'number' ? retirementAge : 65;
+    const cBal = typeof currentBalance === 'number' ? currentBalance : 0;
+    const sal = typeof salary === 'number' ? salary : 0;
+    const ecPct = typeof employeeContributionPercent === 'number' ? employeeContributionPercent : 0;
+    const emPct = typeof employerMatchPercent === 'number' ? employerMatchPercent : 0;
+    const emLim = typeof employerMatchLimit === 'number' ? employerMatchLimit : 0;
+    const expRet = typeof expectedReturn === 'number' ? expectedReturn : 0;
+
+    const years = Math.max(1, rAge - cAge);
+    const employeeAnnual = sal * (ecPct / 100);
+    const matchedSalaryPercent = Math.min(ecPct, emLim);
+    const employerAnnual = sal * (matchedSalaryPercent / 100) * (emPct / 100);
     const totalAnnualContribution = employeeAnnual + employerAnnual;
 
-    const r = expectedReturn / 100;
-    let balance = currentBalance;
+    const r = expRet / 100;
+    let balance = cBal;
     let totalEmployeeContributed = 0;
     let totalEmployerContributed = 0;
 
@@ -669,7 +701,7 @@ export const FourOhOneKCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
       totalEmployerContributed += employerAnnual;
     }
 
-    const totalGrowth = balance - currentBalance - totalEmployeeContributed - totalEmployerContributed;
+    const totalGrowth = balance - cBal - totalEmployeeContributed - totalEmployerContributed;
 
     return {
       balance,
@@ -691,7 +723,7 @@ export const FourOhOneKCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
               <input
                 type="number"
                 value={currentAge}
-                onChange={(e) => setCurrentAge(Number(e.target.value))}
+                onChange={(e) => setCurrentAge(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -700,7 +732,7 @@ export const FourOhOneKCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
               <input
                 type="number"
                 value={retirementAge}
-                onChange={(e) => setRetirementAge(Number(e.target.value))}
+                onChange={(e) => setRetirementAge(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -712,7 +744,7 @@ export const FourOhOneKCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
               <input
                 type="number"
                 value={salary}
-                onChange={(e) => setSalary(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setSalary(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -721,7 +753,7 @@ export const FourOhOneKCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
               <input
                 type="number"
                 value={currentBalance}
-                onChange={(e) => setCurrentBalance(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setCurrentBalance(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -733,7 +765,7 @@ export const FourOhOneKCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
               <input
                 type="number"
                 value={employeeContributionPercent}
-                onChange={(e) => setEmployeeContributionPercent(Number(e.target.value))}
+                onChange={(e) => setEmployeeContributionPercent(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -742,7 +774,7 @@ export const FourOhOneKCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
               <input
                 type="number"
                 value={employerMatchPercent}
-                onChange={(e) => setEmployerMatchPercent(Number(e.target.value))}
+                onChange={(e) => setEmployerMatchPercent(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -751,7 +783,7 @@ export const FourOhOneKCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
               <input
                 type="number"
                 value={employerMatchLimit}
-                onChange={(e) => setEmployerMatchLimit(Number(e.target.value))}
+                onChange={(e) => setEmployerMatchLimit(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>

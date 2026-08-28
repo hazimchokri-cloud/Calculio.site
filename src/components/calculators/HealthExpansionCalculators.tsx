@@ -9,33 +9,37 @@ interface BaseCalcProps {
 
 // 1. Running & Walking Pace Calculator
 export const PaceCalculator: React.FC<BaseCalcProps> = () => {
-  const [distance, setDistance] = useState(5);
+  const [distance, setDistance] = useState<number | ''>(5);
   const [distanceUnit, setDistanceUnit] = useState<'km' | 'miles'>('km');
-  const [hours, setHours] = useState(0);
-  const [minutes, setMinutes] = useState(28);
-  const [seconds, setSeconds] = useState(30);
+  const [hours, setHours] = useState<number | ''>(0);
+  const [minutes, setMinutes] = useState<number | ''>(28);
+  const [seconds, setSeconds] = useState<number | ''>(30);
 
   const results = useMemo(() => {
-    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-    if (totalSeconds <= 0 || distance <= 0) return null;
+    const d = typeof distance === 'number' ? distance : 0;
+    const h = typeof hours === 'number' ? hours : 0;
+    const m = typeof minutes === 'number' ? minutes : 0;
+    const s = typeof seconds === 'number' ? seconds : 0;
 
-    const totalMinutes = totalSeconds / 60;
-    const pacePerUnitSec = totalSeconds / distance;
+    const totalSeconds = h * 3600 + m * 60 + s;
+    if (totalSeconds <= 0 || d <= 0) return null;
+
+    const pacePerUnitSec = totalSeconds / d;
     const paceMin = Math.floor(pacePerUnitSec / 60);
     const paceSec = Math.round(pacePerUnitSec % 60);
 
     // Speed in units/hr
-    const speed = (distance / (totalSeconds / 3600)).toFixed(2);
+    const speed = (d / (totalSeconds / 3600)).toFixed(2);
 
     // Common race predictions based on this pace
-    const distKm = distanceUnit === 'km' ? distance : distance * 1.60934;
+    const distKm = distanceUnit === 'km' ? d : d * 1.60934;
     const paceSecPerKm = totalSeconds / distKm;
 
     const formatTime = (sec: number) => {
-      const h = Math.floor(sec / 3600);
-      const m = Math.floor((sec % 3600) / 60);
-      const s = Math.round(sec % 60);
-      return `${h > 0 ? h + 'h ' : ''}${m}m ${s < 10 ? '0' : ''}${s}s`;
+      const hh = Math.floor(sec / 3600);
+      const mm = Math.floor((sec % 3600) / 60);
+      const ss = Math.round(sec % 60);
+      return `${hh > 0 ? hh + 'h ' : ''}${mm}m ${ss < 10 ? '0' : ''}${ss}s`;
     };
 
     return {
@@ -60,7 +64,7 @@ export const PaceCalculator: React.FC<BaseCalcProps> = () => {
                 type="number"
                 step="0.1"
                 value={distance}
-                onChange={(e) => setDistance(Math.max(0.1, Number(e.target.value)))}
+                onChange={(e) => setDistance(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -85,7 +89,7 @@ export const PaceCalculator: React.FC<BaseCalcProps> = () => {
                 <input
                   type="number"
                   value={hours}
-                  onChange={(e) => setHours(Math.max(0, Number(e.target.value)))}
+                  onChange={(e) => setHours(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                   className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
                 />
               </div>
@@ -94,7 +98,7 @@ export const PaceCalculator: React.FC<BaseCalcProps> = () => {
                 <input
                   type="number"
                   value={minutes}
-                  onChange={(e) => setMinutes(Math.max(0, Math.min(59, Number(e.target.value))))}
+                  onChange={(e) => setMinutes(e.target.value === '' ? '' : Math.max(0, Math.min(59, Number(e.target.value))))}
                   className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
                 />
               </div>
@@ -103,7 +107,7 @@ export const PaceCalculator: React.FC<BaseCalcProps> = () => {
                 <input
                   type="number"
                   value={seconds}
-                  onChange={(e) => setSeconds(Math.max(0, Math.min(59, Number(e.target.value))))}
+                  onChange={(e) => setSeconds(e.target.value === '' ? '' : Math.max(0, Math.min(59, Number(e.target.value))))}
                   className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
                 />
               </div>
@@ -117,7 +121,7 @@ export const PaceCalculator: React.FC<BaseCalcProps> = () => {
             <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
               {results ? results.paceFormatted : '--:--'}
             </div>
-            <span className="text-xs text-orange-700 font-semibold">Speed: {results?.speedFormatted}</span>
+            <span className="text-xs text-orange-700 font-semibold">Speed: {results ? results.speedFormatted : '--'}</span>
           </div>
 
           {results && (
@@ -139,16 +143,17 @@ export const PaceCalculator: React.FC<BaseCalcProps> = () => {
 
 // 2. One Rep Max (1RM) Calculator
 export const OneRepMaxCalculator: React.FC<BaseCalcProps> = () => {
-  const [weightLifted, setWeightLifted] = useState(185);
+  const [weightLifted, setWeightLifted] = useState<number | ''>(185);
   const [reps, setReps] = useState(6);
   const [unit, setUnit] = useState<'lbs' | 'kg'>('lbs');
 
   const results = useMemo(() => {
-    if (weightLifted <= 0 || reps <= 0) return null;
+    const w = typeof weightLifted === 'number' ? weightLifted : 0;
+    if (w <= 0 || reps <= 0) return null;
     // Brzycki formula: 1RM = Weight / (1.0278 - (0.0278 * Reps))
-    const brzycki = weightLifted / (1.0278 - (0.0278 * Math.min(reps, 15)));
+    const brzycki = w / (1.0278 - (0.0278 * Math.min(reps, 15)));
     // Epley formula: 1RM = Weight * (1 + 0.0333 * Reps)
-    const epley = weightLifted * (1 + 0.0333 * reps);
+    const epley = w * (1 + 0.0333 * reps);
     // Consensus avg
     const oneRm = Math.round((brzycki + epley) / 2);
 
@@ -175,7 +180,7 @@ export const OneRepMaxCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={weightLifted}
-                onChange={(e) => setWeightLifted(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setWeightLifted(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -217,7 +222,7 @@ export const OneRepMaxCalculator: React.FC<BaseCalcProps> = () => {
             <div className="text-3xl font-black text-purple-950 font-mono-numbers mt-1">
               {results ? results.oneRm : '--'} {unit}
             </div>
-            <span className="text-xs text-purple-700">Brzycki: {results?.brzycki}{unit} • Epley: {results?.epley}{unit}</span>
+            <span className="text-xs text-purple-700">Brzycki: {results?.brzycki || '--'}{unit} • Epley: {results?.epley || '--'}{unit}</span>
           </div>
 
           {results && (
@@ -241,11 +246,14 @@ export const OneRepMaxCalculator: React.FC<BaseCalcProps> = () => {
 
 // 3. Waist-to-Hip Ratio (WHR) Calculator
 export const WaistToHipCalculator: React.FC<BaseCalcProps> = () => {
-  const [waist, setWaist] = useState(32);
-  const [hip, setHip] = useState(40);
+  const [waist, setWaist] = useState<number | ''>(32);
+  const [hip, setHip] = useState<number | ''>(40);
   const [gender, setGender] = useState<'female' | 'male'>('female');
 
-  const whr = hip > 0 ? (waist / hip) : 0;
+  const w = typeof waist === 'number' ? waist : 0;
+  const h = typeof hip === 'number' ? hip : 0;
+
+  const whr = h > 0 ? (w / h) : 0;
   
   let risk = 'Low Risk';
   let badgeColor = 'bg-orange-100 text-orange-800';
@@ -285,7 +293,7 @@ export const WaistToHipCalculator: React.FC<BaseCalcProps> = () => {
                 type="number"
                 step="0.5"
                 value={waist}
-                onChange={(e) => setWaist(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setWaist(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -295,7 +303,7 @@ export const WaistToHipCalculator: React.FC<BaseCalcProps> = () => {
                 type="number"
                 step="0.5"
                 value={hip}
-                onChange={(e) => setHip(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setHip(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -452,19 +460,23 @@ export const SleepCycleCalculator: React.FC<BaseCalcProps> = () => {
 
 // 5. Alcohol Units & Calorie Burn Calculator
 export const AlcoholCaloriesCalculator: React.FC<BaseCalcProps> = () => {
-  const [beers, setBeers] = useState(2); // 12oz regular beer
-  const [wineGlasses, setWineGlasses] = useState(1); // 5oz wine
-  const [cocktails, setCocktails] = useState(0); // mixed drink
+  const [beers, setBeers] = useState<number | ''>(2); // 12oz regular beer
+  const [wineGlasses, setWineGlasses] = useState<number | ''>(1); // 5oz wine
+  const [cocktails, setCocktails] = useState<number | ''>(0); // mixed drink
 
   const results = useMemo(() => {
-    const beerCal = beers * 150;
-    const wineCal = wineGlasses * 125;
-    const cocktailCal = cocktails * 220;
+    const b = typeof beers === 'number' ? beers : 0;
+    const w = typeof wineGlasses === 'number' ? wineGlasses : 0;
+    const c = typeof cocktails === 'number' ? cocktails : 0;
+
+    const beerCal = b * 150;
+    const wineCal = w * 125;
+    const cocktailCal = c * 220;
     const totalCal = beerCal + wineCal + cocktailCal;
 
-    const beerUnits = beers * 1.5;
-    const wineUnits = wineGlasses * 2.1;
-    const cocktailUnits = cocktails * 2.0;
+    const beerUnits = b * 1.5;
+    const wineUnits = w * 2.1;
+    const cocktailUnits = c * 2.0;
     const totalUnits = beerUnits + wineUnits + cocktailUnits;
 
     // Running at 100 cal/mile -> miles
@@ -484,7 +496,7 @@ export const AlcoholCaloriesCalculator: React.FC<BaseCalcProps> = () => {
             <input
               type="number"
               value={beers}
-              onChange={(e) => setBeers(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setBeers(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -493,7 +505,7 @@ export const AlcoholCaloriesCalculator: React.FC<BaseCalcProps> = () => {
             <input
               type="number"
               value={wineGlasses}
-              onChange={(e) => setWineGlasses(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setWineGlasses(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -502,7 +514,7 @@ export const AlcoholCaloriesCalculator: React.FC<BaseCalcProps> = () => {
             <input
               type="number"
               value={cocktails}
-              onChange={(e) => setCocktails(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setCocktails(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -536,26 +548,29 @@ export const AlcoholCaloriesCalculator: React.FC<BaseCalcProps> = () => {
 
 // 6. Lean Body Mass (LBM) Calculator
 export const LeanBodyMassCalculator: React.FC<BaseCalcProps> = () => {
-  const [weightKg, setWeightKg] = useState(75);
-  const [heightCm, setHeightCm] = useState(178);
+  const [weightKg, setWeightKg] = useState<number | ''>(75);
+  const [heightCm, setHeightCm] = useState<number | ''>(178);
   const [gender, setGender] = useState<'male' | 'female'>('male');
 
   const results = useMemo(() => {
-    if (weightKg <= 0 || heightCm <= 0) return null;
+    const w = typeof weightKg === 'number' ? weightKg : 0;
+    const h = typeof heightCm === 'number' ? heightCm : 0;
+
+    if (w <= 0 || h <= 0) return null;
     let boerLbm = 0;
     let jamesLbm = 0;
 
     if (gender === 'male') {
-      boerLbm = (0.407 * weightKg) + (0.267 * heightCm) - 19.2;
-      jamesLbm = (1.1 * weightKg) - 128 * Math.pow(weightKg / heightCm, 2);
+      boerLbm = (0.407 * w) + (0.267 * h) - 19.2;
+      jamesLbm = (1.1 * w) - 128 * Math.pow(w / h, 2);
     } else {
-      boerLbm = (0.252 * weightKg) + (0.473 * heightCm) - 48.3;
-      jamesLbm = (1.07 * weightKg) - 148 * Math.pow(weightKg / heightCm, 2);
+      boerLbm = (0.252 * w) + (0.473 * h) - 48.3;
+      jamesLbm = (1.07 * w) - 148 * Math.pow(w / h, 2);
     }
 
     const avgLbm = Math.max(1, (boerLbm + jamesLbm) / 2);
-    const fatMass = Math.max(0, weightKg - avgLbm);
-    const fatPercentage = (fatMass / weightKg) * 100;
+    const fatMass = Math.max(0, w - avgLbm);
+    const fatPercentage = (fatMass / w) * 100;
 
     return {
       lbmKg: avgLbm.toFixed(1),
@@ -576,7 +591,7 @@ export const LeanBodyMassCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={weightKg}
-                onChange={(e) => setWeightKg(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setWeightKg(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -585,7 +600,7 @@ export const LeanBodyMassCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={heightCm}
-                onChange={(e) => setHeightCm(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setHeightCm(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -615,19 +630,19 @@ export const LeanBodyMassCalculator: React.FC<BaseCalcProps> = () => {
           <div>
             <span className="text-xs font-bold text-teal-900 uppercase tracking-wider">Lean Body Mass (LBM)</span>
             <div className="text-3xl font-black text-teal-950 font-mono-numbers mt-1">
-              {results?.lbmKg} kg
-              <span className="text-sm font-normal text-teal-700 ml-2">({results?.lbmLbs} lbs)</span>
+              {results ? results.lbmKg : '--'} kg
+              <span className="text-sm font-normal text-teal-700 ml-2">({results ? results.lbmLbs : '--'} lbs)</span>
             </div>
           </div>
 
           <div className="bg-white p-3 rounded-lg border border-teal-100 text-xs text-slate-700 space-y-1">
             <div className="flex justify-between">
               <span>Estimated Fat Mass:</span>
-              <span className="font-bold">{results?.fatMassKg} kg</span>
+              <span className="font-bold">{results ? results.fatMassKg : '--'} kg</span>
             </div>
             <div className="flex justify-between">
               <span>Implied Body Fat:</span>
-              <span className="font-bold text-teal-800">{results?.fatPercentage}%</span>
+              <span className="font-bold text-teal-800">{results ? results.fatPercentage : '--'}%</span>
             </div>
           </div>
         </div>

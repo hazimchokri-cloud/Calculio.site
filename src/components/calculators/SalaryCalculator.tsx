@@ -153,8 +153,8 @@ export const SalaryCalculator: React.FC<SalaryCalcProps> = ({
                 onChange={(e) => {
                   const freq = e.target.value as any;
                   setPayFrequency(freq);
-                  if (freq === 'hourly' && payAmount > 500) setPayAmount(35);
-                  if (freq === 'annual' && payAmount < 500) setPayAmount(75000);
+                  if (freq === 'hourly' && typeof payAmount === 'number' && payAmount > 500) setPayAmount(35);
+                  if (freq === 'annual' && typeof payAmount === 'number' && payAmount < 500) setPayAmount(75000);
                 }}
                 className="w-full px-3 py-2.5 text-xs font-semibold border border-slate-200 rounded-lg bg-slate-50"
               >

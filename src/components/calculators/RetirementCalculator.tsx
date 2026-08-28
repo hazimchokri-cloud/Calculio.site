@@ -174,7 +174,7 @@ Status: ${calculations.isOnTrack ? 'ON TRACK (Surplus: ' + formatCurrency(calcul
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Current Retirement Savings</span>
-              <span className="text-orange-600 font-mono">{formatCurrency(currentSavings, currencySymbol)}</span>
+              <span className="text-orange-600 font-mono">{formatCurrency(numCurrentSavings, currencySymbol)}</span>
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
@@ -194,7 +194,7 @@ Status: ${calculations.isOnTrack ? 'ON TRACK (Surplus: ' + formatCurrency(calcul
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Annual Contribution (401k / IRA)</span>
-              <span className="text-orange-600 font-mono">{formatCurrency(annualSavings, currencySymbol)}/yr</span>
+              <span className="text-orange-600 font-mono">{formatCurrency(numAnnualSavings, currencySymbol)}/yr</span>
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
@@ -214,7 +214,7 @@ Status: ${calculations.isOnTrack ? 'ON TRACK (Surplus: ' + formatCurrency(calcul
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Desired Annual Retirement Budget</span>
-              <span className="text-orange-600 font-mono">{formatCurrency(desiredAnnualIncome, currencySymbol)}/yr</span>
+              <span className="text-orange-600 font-mono">{formatCurrency(numDesiredAnnualIncome, currencySymbol)}/yr</span>
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
@@ -233,60 +233,62 @@ Status: ${calculations.isOnTrack ? 'ON TRACK (Surplus: ' + formatCurrency(calcul
 
         {/* Right Output */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
-                    Projected Nest Egg at Age {retirementAge}
-                  </span>
-                  {calculations.isOnTrack ? (
-                    <span className="text-[10px] bg-orange-500/20 text-orange-300 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" /> On Track
+          {calculations && (
+            <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+                      Projected Nest Egg at Age {retirementAge}
                     </span>
-                  ) : (
-                    <span className="text-[10px] bg-rose-500/20 text-rose-300 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" /> Shortfall
-                    </span>
+                    {calculations.isOnTrack ? (
+                      <span className="text-[10px] bg-orange-500/20 text-orange-300 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" /> On Track
+                      </span>
+                    ) : (
+                      <span className="text-[10px] bg-rose-500/20 text-rose-300 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3" /> Shortfall
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1">
+                    {formatCurrency(calculations.nestEggAtRetirement, currencySymbol)}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-700">
+                  <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
+                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Target Required Nest Egg</span>
+                    <span className="text-base font-bold text-white font-mono">{formatCurrency(calculations.neededNestEgg, currencySymbol)}</span>
+                  </div>
+                  <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
+                    <span className="text-[10px] text-slate-300 uppercase font-bold block">4% Rule Safe Income</span>
+                    <span className="text-base font-bold text-orange-300 font-mono">{formatCurrency(calculations.safeWithdrawalIncome, currencySymbol)}/yr</span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2 pt-2">
+                  <button
+                    onClick={handleCopy}
+                    className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copied ? 'Copied' : 'Copy Summary'}</span>
+                  </button>
+                  {onSaveCalculation && (
+                    <button
+                      onClick={handleSave}
+                      className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                    >
+                      <Bookmark className="w-3.5 h-3.5" />
+                      <span>{saved ? 'Saved' : 'Save'}</span>
+                    </button>
                   )}
                 </div>
-                <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1">
-                  {formatCurrency(calculations.nestEggAtRetirement, currencySymbol)}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-700">
-                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
-                  <span className="text-[10px] text-slate-300 uppercase font-bold block">Target Required Nest Egg</span>
-                  <span className="text-base font-bold text-white font-mono">{formatCurrency(calculations.neededNestEgg, currencySymbol)}</span>
-                </div>
-                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
-                  <span className="text-[10px] text-slate-300 uppercase font-bold block">4% Rule Safe Income</span>
-                  <span className="text-base font-bold text-orange-300 font-mono">{formatCurrency(calculations.safeWithdrawalIncome, currencySymbol)}/yr</span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 pt-2">
-                <button
-                  onClick={handleCopy}
-                  className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? 'Copied' : 'Copy Summary'}</span>
-                </button>
-                {onSaveCalculation && (
-                  <button
-                    onClick={handleSave}
-                    className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-                  >
-                    <Bookmark className="w-3.5 h-3.5" />
-                    <span>{saved ? 'Saved' : 'Save'}</span>
-                  </button>
-                )}
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

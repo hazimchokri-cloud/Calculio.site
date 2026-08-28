@@ -217,300 +217,339 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Calculator Main Body */}
-        <div className="lg:col-span-8 bg-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-800 space-y-6">
+        <div className="lg:col-span-8 bg-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-800 space-y-5">
           
-          {/* LCD Display */}
-          <div className="bg-slate-950/80 rounded-2xl p-5 sm:p-6 border border-slate-800 shadow-inner flex flex-col justify-end min-h-[120px] text-right">
-            <div className="text-slate-400 text-xs sm:text-sm font-mono-numbers h-6 truncate">
-              {expression || ' '}
+          {/* Top: DEG/RAD toggle + display screen */}
+          <div className="bg-slate-950 rounded-2xl p-5 sm:p-6 border border-slate-800 shadow-inner flex flex-col justify-between min-h-[130px]">
+            {/* Top Bar inside Display */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsRad(!isRad)}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold tracking-wider transition-all border cursor-pointer ${
+                    isRad
+                      ? 'bg-indigo-600 border-indigo-500 text-white shadow-xs'
+                      : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'
+                  }`}
+                  title="Click to toggle Angle Unit (DEG / RAD)"
+                >
+                  {isRad ? 'RAD' : 'DEG'}
+                </button>
+                {memory !== 0 && (
+                  <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[10px] font-bold">
+                    M ({Number(memory.toFixed(4))})
+                  </span>
+                )}
+              </div>
+              <div className="text-slate-400 text-xs sm:text-sm font-mono-numbers h-5 truncate text-right">
+                {expression || ' '}
+              </div>
             </div>
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-[11px] font-bold tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-400">
-                {isRad ? 'RAD' : 'DEG'}
-              </span>
+
+            {/* Main Number Readout */}
+            <div className="text-right mt-2">
               <div className="text-3xl sm:text-5xl font-black font-mono-numbers tracking-tight text-white truncate max-w-full">
                 {display}
               </div>
             </div>
           </div>
 
-          {/* Top Mode Bar */}
-          <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-3 text-xs font-semibold">
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setIsRad(!isRad)}
-                className={`px-3 py-1 rounded-lg border transition-all ${
-                  isRad ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-300'
-                }`}
-              >
-                {isRad ? 'Rad' : 'Deg'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsInv(!isInv)}
-                className={`px-3 py-1 rounded-lg border transition-all ${
-                  isInv ? 'bg-amber-600 border-amber-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-300'
-                }`}
-              >
-                Inv
-              </button>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setMemory(0)}
-                className="px-2.5 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-[11px]"
-              >
-                MC
-              </button>
-              <button
-                type="button"
-                onClick={() => setDisplay(memory.toString())}
-                className="px-2.5 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-[11px]"
-              >
-                MR
-              </button>
-              <button
-                type="button"
-                onClick={() => setMemory(m => m + parseFloat(display || '0'))}
-                className="px-2.5 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-[11px]"
-              >
-                M+
-              </button>
-              <button
-                type="button"
-                onClick={() => setMemory(m => m - parseFloat(display || '0'))}
-                className="px-2.5 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-[11px]"
-              >
-                M-
-              </button>
-            </div>
+          {/* Memory Row: MC, MR, M+, M- */}
+          <div className="grid grid-cols-4 gap-2 sm:gap-2.5">
+            <button
+              type="button"
+              onClick={() => setMemory(0)}
+              className="h-10 sm:h-11 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 text-slate-300 text-xs sm:text-sm font-semibold flex items-center justify-center transition-all cursor-pointer select-none active:scale-95"
+            >
+              MC
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setDisplay(memory.toString());
+                setJustCalculated(false);
+              }}
+              className="h-10 sm:h-11 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 text-slate-300 text-xs sm:text-sm font-semibold flex items-center justify-center transition-all cursor-pointer select-none active:scale-95"
+            >
+              MR
+            </button>
+            <button
+              type="button"
+              onClick={() => setMemory(m => m + parseFloat(display || '0'))}
+              className="h-10 sm:h-11 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 text-slate-300 text-xs sm:text-sm font-semibold flex items-center justify-center transition-all cursor-pointer select-none active:scale-95"
+            >
+              M+
+            </button>
+            <button
+              type="button"
+              onClick={() => setMemory(m => m - parseFloat(display || '0'))}
+              className="h-10 sm:h-11 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 text-slate-300 text-xs sm:text-sm font-semibold flex items-center justify-center transition-all cursor-pointer select-none active:scale-95"
+            >
+              M-
+            </button>
           </div>
 
-          {/* Keypad Grid */}
-          <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-2.5 text-sm sm:text-base font-semibold">
-            {/* Row 1 */}
+          {/* Unified 5-Column Grid */}
+          <div className="grid grid-cols-5 gap-2 sm:gap-2.5">
+            {/* Trig Row: sin, cos, tan, ln, log */}
             <button
+              type="button"
               onClick={() => handleScientificFunction('sin')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
-              {isInv ? 'sin⁻¹' : 'sin'}
+              sin
             </button>
             <button
+              type="button"
               onClick={() => handleScientificFunction('cos')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
-              {isInv ? 'cos⁻¹' : 'cos'}
+              cos
             </button>
             <button
+              type="button"
               onClick={() => handleScientificFunction('tan')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
-              {isInv ? 'tan⁻¹' : 'tan'}
+              tan
             </button>
             <button
+              type="button"
               onClick={() => handleScientificFunction('ln')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
               ln
             </button>
             <button
+              type="button"
               onClick={() => handleScientificFunction('log')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
               log
             </button>
+
+            {/* Science Row 1: AC, π, e, √x, x² */}
             <button
+              type="button"
               onClick={handleClear}
-              className="py-3 bg-rose-600/30 text-rose-300 border border-rose-500/40 hover:bg-rose-600/50 active:scale-95 rounded-xl transition-all font-bold"
+              className="h-12 sm:h-13 bg-red-600/30 text-red-300 border border-red-500/40 hover:bg-red-600/50 active:scale-95 rounded-xl transition-all text-xs sm:text-sm font-bold flex items-center justify-center cursor-pointer select-none"
             >
               AC
             </button>
-
-            {/* Row 2 */}
             <button
+              type="button"
               onClick={() => handleScientificFunction('pi')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
               π
             </button>
             <button
+              type="button"
               onClick={() => handleScientificFunction('e')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
               e
             </button>
             <button
+              type="button"
               onClick={() => handleScientificFunction('sqrt')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
               √x
             </button>
             <button
+              type="button"
               onClick={() => handleScientificFunction('sqr')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
               x²
             </button>
+
+            {/* Science Row 2: x!, ⌫, 1/x, xʸ, x³ */}
             <button
+              type="button"
               onClick={() => handleScientificFunction('fact')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
               x!
             </button>
             <button
+              type="button"
               onClick={handleBackspace}
-              className="py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 active:scale-95 rounded-xl transition-all flex items-center justify-center"
+              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 border border-slate-700 rounded-xl transition-all flex items-center justify-center cursor-pointer select-none"
+              title="Backspace"
             >
               <Delete className="w-5 h-5" />
             </button>
-
-            {/* Row 3 */}
             <button
+              type="button"
               onClick={() => handleScientificFunction('inv')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
               1/x
             </button>
             <button
-              onClick={() => handleDigit('7')}
-              className="py-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-xl transition-all font-mono-numbers text-lg"
-            >
-              7
-            </button>
-            <button
-              onClick={() => handleDigit('8')}
-              className="py-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-xl transition-all font-mono-numbers text-lg"
-            >
-              8
-            </button>
-            <button
-              onClick={() => handleDigit('9')}
-              className="py-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-xl transition-all font-mono-numbers text-lg"
-            >
-              9
-            </button>
-            <button
-              onClick={() => handleOperator('÷')}
-              className="py-3 bg-amber-600/30 text-amber-300 border border-amber-500/40 hover:bg-amber-600/50 active:scale-95 rounded-xl transition-all text-xl"
-            >
-              ÷
-            </button>
-            <button
-              onClick={() => handleScientificFunction('percent')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
-            >
-              %
-            </button>
-
-            {/* Row 4 */}
-            <button
-              onClick={() => handleScientificFunction('exp')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
-            >
-              eˣ
-            </button>
-            <button
-              onClick={() => handleDigit('4')}
-              className="py-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-xl transition-all font-mono-numbers text-lg"
-            >
-              4
-            </button>
-            <button
-              onClick={() => handleDigit('5')}
-              className="py-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-xl transition-all font-mono-numbers text-lg"
-            >
-              5
-            </button>
-            <button
-              onClick={() => handleDigit('6')}
-              className="py-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-xl transition-all font-mono-numbers text-lg"
-            >
-              6
-            </button>
-            <button
-              onClick={() => handleOperator('×')}
-              className="py-3 bg-amber-600/30 text-amber-300 border border-amber-500/40 hover:bg-amber-600/50 active:scale-95 rounded-xl transition-all text-xl"
-            >
-              ×
-            </button>
-            <button
+              type="button"
               onClick={() => handleOperator('^')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
               xʸ
             </button>
-
-            {/* Row 5 */}
             <button
-              onClick={handleToggleSign}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 rounded-xl transition-all"
-            >
-              ±
-            </button>
-            <button
-              onClick={() => handleDigit('1')}
-              className="py-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-xl transition-all font-mono-numbers text-lg"
-            >
-              1
-            </button>
-            <button
-              onClick={() => handleDigit('2')}
-              className="py-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-xl transition-all font-mono-numbers text-lg"
-            >
-              2
-            </button>
-            <button
-              onClick={() => handleDigit('3')}
-              className="py-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-xl transition-all font-mono-numbers text-lg"
-            >
-              3
-            </button>
-            <button
-              onClick={() => handleOperator('-')}
-              className="py-3 bg-amber-600/30 text-amber-300 border border-amber-500/40 hover:bg-amber-600/50 active:scale-95 rounded-xl transition-all text-xl"
-            >
-              −
-            </button>
-            <button
+              type="button"
               onClick={() => handleScientificFunction('cube')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
               x³
             </button>
 
-            {/* Row 6 */}
+            {/* Number Row 1: 7, 8, 9, ÷, % */}
             <button
+              type="button"
+              onClick={() => handleDigit('7')}
+              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white border border-slate-700/60 rounded-xl transition-all font-mono-numbers text-base sm:text-lg font-bold flex items-center justify-center cursor-pointer select-none"
+            >
+              7
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDigit('8')}
+              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white border border-slate-700/60 rounded-xl transition-all font-mono-numbers text-base sm:text-lg font-bold flex items-center justify-center cursor-pointer select-none"
+            >
+              8
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDigit('9')}
+              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white border border-slate-700/60 rounded-xl transition-all font-mono-numbers text-base sm:text-lg font-bold flex items-center justify-center cursor-pointer select-none"
+            >
+              9
+            </button>
+            <button
+              type="button"
+              onClick={() => handleOperator('÷')}
+              className="h-12 sm:h-13 bg-amber-600/30 text-amber-300 border border-amber-500/40 hover:bg-amber-600/50 active:scale-95 rounded-xl transition-all text-xl font-bold flex items-center justify-center cursor-pointer select-none"
+            >
+              ÷
+            </button>
+            <button
+              type="button"
+              onClick={() => handleScientificFunction('percent')}
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
+            >
+              %
+            </button>
+
+            {/* Number Row 2: 4, 5, 6, ×, eˣ */}
+            <button
+              type="button"
+              onClick={() => handleDigit('4')}
+              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white border border-slate-700/60 rounded-xl transition-all font-mono-numbers text-base sm:text-lg font-bold flex items-center justify-center cursor-pointer select-none"
+            >
+              4
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDigit('5')}
+              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white border border-slate-700/60 rounded-xl transition-all font-mono-numbers text-base sm:text-lg font-bold flex items-center justify-center cursor-pointer select-none"
+            >
+              5
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDigit('6')}
+              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white border border-slate-700/60 rounded-xl transition-all font-mono-numbers text-base sm:text-lg font-bold flex items-center justify-center cursor-pointer select-none"
+            >
+              6
+            </button>
+            <button
+              type="button"
+              onClick={() => handleOperator('×')}
+              className="h-12 sm:h-13 bg-amber-600/30 text-amber-300 border border-amber-500/40 hover:bg-amber-600/50 active:scale-95 rounded-xl transition-all text-xl font-bold flex items-center justify-center cursor-pointer select-none"
+            >
+              ×
+            </button>
+            <button
+              type="button"
+              onClick={() => handleScientificFunction('exp')}
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-indigo-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
+            >
+              eˣ
+            </button>
+
+            {/* Number Row 3: 1, 2, 3, −, ± */}
+            <button
+              type="button"
+              onClick={() => handleDigit('1')}
+              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white border border-slate-700/60 rounded-xl transition-all font-mono-numbers text-base sm:text-lg font-bold flex items-center justify-center cursor-pointer select-none"
+            >
+              1
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDigit('2')}
+              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white border border-slate-700/60 rounded-xl transition-all font-mono-numbers text-base sm:text-lg font-bold flex items-center justify-center cursor-pointer select-none"
+            >
+              2
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDigit('3')}
+              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white border border-slate-700/60 rounded-xl transition-all font-mono-numbers text-base sm:text-lg font-bold flex items-center justify-center cursor-pointer select-none"
+            >
+              3
+            </button>
+            <button
+              type="button"
+              onClick={() => handleOperator('-')}
+              className="h-12 sm:h-13 bg-amber-600/30 text-amber-300 border border-amber-500/40 hover:bg-amber-600/50 active:scale-95 rounded-xl transition-all text-xl font-bold flex items-center justify-center cursor-pointer select-none"
+            >
+              −
+            </button>
+            <button
+              type="button"
+              onClick={handleToggleSign}
+              className="h-12 sm:h-13 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-slate-300 border border-slate-700/50 rounded-xl transition-all text-xs sm:text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
+            >
+              ±
+            </button>
+
+            {/* Number Row 4: (, 0, ., +, = */}
+            <button
+              type="button"
               onClick={() => handleDigit('(')}
-              className="py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 rounded-xl transition-all"
+              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 border border-slate-700/50 rounded-xl transition-all text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
             >
               (
             </button>
             <button
+              type="button"
               onClick={() => handleDigit('0')}
-              className="py-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-xl transition-all font-mono-numbers text-lg"
+              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white border border-slate-700/60 rounded-xl transition-all font-mono-numbers text-base sm:text-lg font-bold flex items-center justify-center cursor-pointer select-none"
             >
               0
             </button>
             <button
+              type="button"
               onClick={handleDecimal}
-              className="py-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-xl transition-all font-mono-numbers text-lg"
+              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white border border-slate-700/60 rounded-xl transition-all font-mono-numbers text-lg font-bold flex items-center justify-center cursor-pointer select-none"
             >
               .
             </button>
             <button
-              onClick={handleEqual}
-              className="py-3 bg-orange-600 hover:bg-orange-500 active:scale-95 text-white rounded-xl transition-all font-black text-xl shadow-md col-span-2"
-            >
-              =
-            </button>
-            <button
+              type="button"
               onClick={() => handleOperator('+')}
-              className="py-3 bg-amber-600/30 text-amber-300 border border-amber-500/40 hover:bg-amber-600/50 active:scale-95 rounded-xl transition-all text-xl"
+              className="h-12 sm:h-13 bg-amber-600/30 text-amber-300 border border-amber-500/40 hover:bg-amber-600/50 active:scale-95 rounded-xl transition-all text-xl font-bold flex items-center justify-center cursor-pointer select-none"
             >
               +
+            </button>
+            <button
+              type="button"
+              onClick={handleEqual}
+              className="h-12 sm:h-13 bg-orange-600 hover:bg-orange-500 active:scale-95 text-white rounded-xl transition-all font-black text-xl sm:text-2xl flex items-center justify-center cursor-pointer select-none shadow-lg shadow-orange-950/50 border border-orange-500"
+            >
+              =
             </button>
           </div>
         </div>
@@ -524,8 +563,9 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
             </div>
             {history.length > 0 && (
               <button
+                type="button"
                 onClick={() => setHistory([])}
-                className="text-[11px] text-slate-700 hover:text-slate-900"
+                className="text-[11px] text-slate-700 hover:text-slate-900 cursor-pointer"
               >
                 Clear
               </button>
@@ -561,8 +601,9 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
 
           <div className="pt-2 border-t border-slate-100">
             <button
+              type="button"
               onClick={handleCopy}
-              className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-all"
+              className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
             >
               {copied ? <Check className="w-4 h-4 text-orange-600" /> : <Copy className="w-4 h-4 text-slate-700" />}
               {copied ? 'Result Copied!' : 'Copy Current Result'}

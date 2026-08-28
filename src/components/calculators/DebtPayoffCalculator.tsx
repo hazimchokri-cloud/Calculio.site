@@ -279,7 +279,7 @@ Total Repayment: ${formatCurrency(calculations.totalPaid, currencySymbol)}`;
                 <Zap className="w-3.5 h-3.5" />
                 Extra Monthly Payment Accelerator
               </span>
-              <span className="text-orange-600 font-mono">+{formatCurrency(extraMonthly, currencySymbol)}/mo</span>
+              <span className="text-orange-600 font-mono">+{formatCurrency(numExtraMonthly, currencySymbol)}/mo</span>
             </label>
             <input
               type="number"

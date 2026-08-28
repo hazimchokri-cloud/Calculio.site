@@ -147,8 +147,8 @@ export const ExponentCalculator: React.FC<ExponentCalculatorProps> = ({ onSaveCa
 
         {/* Right Output */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-gradient-to-br from-slate-900 via-amber-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
-            {exponentResults ? (
+          {exponentResults && (
+            <div className="bg-gradient-to-br from-slate-900 via-amber-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
               <div className="space-y-4">
                 <div>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300">
@@ -170,32 +170,27 @@ export const ExponentCalculator: React.FC<ExponentCalculatorProps> = ({ onSaveCa
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="py-8 text-center space-y-2">
-                <p className="text-amber-300 font-semibold text-sm">Please enter a value.</p>
-                <p className="text-slate-400 text-xs">Enter a base and exponent power.</p>
-              </div>
-            )}
 
-            <div className="flex items-center gap-2 pt-4 border-t border-amber-900/60">
-              <button
-                onClick={handleCopy}
-                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Copied' : 'Copy Result'}</span>
-              </button>
-              {onSaveCalculation && (
+              <div className="flex items-center gap-2 pt-4 border-t border-amber-900/60">
                 <button
-                  onClick={handleSave}
-                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  onClick={handleCopy}
+                  className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                 >
-                  <Bookmark className="w-3.5 h-3.5" />
-                  <span>{saved ? 'Saved' : 'Save'}</span>
+                  {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? 'Copied' : 'Copy Result'}</span>
                 </button>
-              )}
+                {onSaveCalculation && (
+                  <button
+                    onClick={handleSave}
+                    className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  >
+                    <Bookmark className="w-3.5 h-3.5" />
+                    <span>{saved ? 'Saved' : 'Save'}</span>
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

@@ -10,20 +10,24 @@ interface BaseCalcProps {
 // 1. Density, Mass & Volume Calculator (ρ = m / V)
 export const DensityCalculator: React.FC<BaseCalcProps> = () => {
   const [solveFor, setSolveFor] = useState<'density' | 'mass' | 'volume'>('density');
-  const [mass, setMass] = useState(500); // grams
-  const [volume, setVolume] = useState(250); // cm³ or mL
-  const [density, setDensity] = useState(2.0); // g/cm³
+  const [mass, setMass] = useState<number | ''>(500); // grams
+  const [volume, setVolume] = useState<number | ''>(250); // cm³ or mL
+  const [density, setDensity] = useState<number | ''>(2.0); // g/cm³
 
   const results = useMemo(() => {
+    const m = typeof mass === 'number' ? mass : 0;
+    const v = typeof volume === 'number' ? volume : 0;
+    const d = typeof density === 'number' ? density : 0;
+
     if (solveFor === 'density') {
-      const d = volume > 0 ? mass / volume : 0;
-      return { output: d.toFixed(3), unit: 'g/cm³ (or kg/L)', label: 'Calculated Density' };
+      const calcD = v > 0 ? m / v : 0;
+      return { output: calcD.toFixed(3), unit: 'g/cm³ (or kg/L)', label: 'Calculated Density' };
     } else if (solveFor === 'mass') {
-      const m = density * volume;
-      return { output: m.toFixed(2), unit: 'grams', label: 'Calculated Mass' };
+      const calcM = d * v;
+      return { output: calcM.toFixed(2), unit: 'grams', label: 'Calculated Mass' };
     } else {
-      const v = density > 0 ? mass / density : 0;
-      return { output: v.toFixed(2), unit: 'cm³ (mL)', label: 'Calculated Volume' };
+      const calcV = d > 0 ? m / d : 0;
+      return { output: calcV.toFixed(2), unit: 'cm³ (mL)', label: 'Calculated Volume' };
     }
   }, [solveFor, mass, volume, density]);
 
@@ -38,7 +42,7 @@ export const DensityCalculator: React.FC<BaseCalcProps> = () => {
                 key={mode}
                 type="button"
                 onClick={() => setSolveFor(mode)}
-                className={`py-1.5 text-xs font-bold rounded-lg border capitalize transition-colors ${solveFor === mode ? 'bg-blue-600 border-blue-600 text-white' : 'bg-slate-50 border-slate-200 text-slate-700'}`}
+                className={`py-1.5 text-xs font-bold rounded-lg border capitalize transition-colors ${solveFor === mode ? 'bg-orange-600 border-orange-600 text-white' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'}`}
               >
                 {mode}
               </button>
@@ -52,7 +56,7 @@ export const DensityCalculator: React.FC<BaseCalcProps> = () => {
                 <input
                   type="number"
                   value={mass}
-                  onChange={(e) => setMass(Math.max(0, Number(e.target.value)))}
+                  onChange={(e) => setMass(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                   className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
                 />
               </div>
@@ -63,7 +67,7 @@ export const DensityCalculator: React.FC<BaseCalcProps> = () => {
                 <input
                   type="number"
                   value={volume}
-                  onChange={(e) => setVolume(Math.max(0, Number(e.target.value)))}
+                  onChange={(e) => setVolume(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                   className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
                 />
               </div>
@@ -74,7 +78,7 @@ export const DensityCalculator: React.FC<BaseCalcProps> = () => {
                 <input
                   type="number"
                   value={density}
-                  onChange={(e) => setDensity(Math.max(0, Number(e.target.value)))}
+                  onChange={(e) => setDensity(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                   className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
                 />
               </div>
@@ -97,12 +101,16 @@ export const DensityCalculator: React.FC<BaseCalcProps> = () => {
 
 // 2. Kinetic & Potential Energy Calculator
 export const EnergyCalculator: React.FC<BaseCalcProps> = () => {
-  const [massKg, setMassKg] = useState(10);
-  const [velocityMs, setVelocityMs] = useState(15);
-  const [heightM, setHeightM] = useState(20);
+  const [massKg, setMassKg] = useState<number | ''>(10);
+  const [velocityMs, setVelocityMs] = useState<number | ''>(15);
+  const [heightM, setHeightM] = useState<number | ''>(20);
 
-  const kineticEnergyJoules = 0.5 * massKg * Math.pow(velocityMs, 2);
-  const potentialEnergyJoules = massKg * 9.80665 * heightM;
+  const m = typeof massKg === 'number' ? massKg : 0;
+  const v = typeof velocityMs === 'number' ? velocityMs : 0;
+  const h = typeof heightM === 'number' ? heightM : 0;
+
+  const kineticEnergyJoules = 0.5 * m * Math.pow(v, 2);
+  const potentialEnergyJoules = m * 9.80665 * h;
   const totalMechanicalJoules = kineticEnergyJoules + potentialEnergyJoules;
 
   return (
@@ -115,7 +123,7 @@ export const EnergyCalculator: React.FC<BaseCalcProps> = () => {
             <input
               type="number"
               value={massKg}
-              onChange={(e) => setMassKg(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setMassKg(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -125,7 +133,7 @@ export const EnergyCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={velocityMs}
-                onChange={(e) => setVelocityMs(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setVelocityMs(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -134,7 +142,7 @@ export const EnergyCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={heightM}
-                onChange={(e) => setHeightM(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setHeightM(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -167,10 +175,13 @@ export const EnergyCalculator: React.FC<BaseCalcProps> = () => {
 
 // 3. Pressure & Force Calculator (P = F / A)
 export const PressureCalculator: React.FC<BaseCalcProps> = () => {
-  const [forceN, setForceN] = useState(500); // Newtons
-  const [areaM2, setAreaM2] = useState(0.05); // m²
+  const [forceN, setForceN] = useState<number | ''>(500); // Newtons
+  const [areaM2, setAreaM2] = useState<number | ''>(0.05); // m²
 
-  const pressurePascals = areaM2 > 0 ? forceN / areaM2 : 0;
+  const f = typeof forceN === 'number' ? forceN : 0;
+  const a = typeof areaM2 === 'number' ? areaM2 : 0;
+
+  const pressurePascals = a > 0 ? f / a : 0;
   const pressurePsi = pressurePascals * 0.000145038;
   const pressureBar = pressurePascals / 100000;
   const pressureAtm = pressurePascals / 101325;
@@ -185,7 +196,7 @@ export const PressureCalculator: React.FC<BaseCalcProps> = () => {
             <input
               type="number"
               value={forceN}
-              onChange={(e) => setForceN(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setForceN(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -195,7 +206,7 @@ export const PressureCalculator: React.FC<BaseCalcProps> = () => {
               type="number"
               step="0.001"
               value={areaM2}
-              onChange={(e) => setAreaM2(Math.max(0.0001, Number(e.target.value)))}
+              onChange={(e) => setAreaM2(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -222,13 +233,16 @@ export const PressureCalculator: React.FC<BaseCalcProps> = () => {
 
 // 4. Speed of Sound & Mach Calculator
 export const SpeedOfSoundCalculator: React.FC<BaseCalcProps> = () => {
-  const [temperatureC, setTemperatureC] = useState(20);
-  const [objectSpeedKmh, setObjectSpeedKmh] = useState(1235);
+  const [temperatureC, setTemperatureC] = useState<number | ''>(20);
+  const [objectSpeedKmh, setObjectSpeedKmh] = useState<number | ''>(1235);
 
-  const speedOfSoundMs = 331.3 * Math.sqrt(1 + temperatureC / 273.15);
+  const tc = typeof temperatureC === 'number' ? temperatureC : 0;
+  const osk = typeof objectSpeedKmh === 'number' ? objectSpeedKmh : 0;
+
+  const speedOfSoundMs = 331.3 * Math.sqrt(Math.max(0, 1 + tc / 273.15));
   const speedOfSoundKmh = speedOfSoundMs * 3.6;
   const speedOfSoundMph = speedOfSoundKmh * 0.621371;
-  const machNumber = speedOfSoundKmh > 0 ? objectSpeedKmh / speedOfSoundKmh : 0;
+  const machNumber = speedOfSoundKmh > 0 ? osk / speedOfSoundKmh : 0;
 
   return (
     <div className="space-y-6">
@@ -240,7 +254,7 @@ export const SpeedOfSoundCalculator: React.FC<BaseCalcProps> = () => {
             <input
               type="number"
               value={temperatureC}
-              onChange={(e) => setTemperatureC(Number(e.target.value))}
+              onChange={(e) => setTemperatureC(e.target.value === '' ? '' : Number(e.target.value))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -249,7 +263,7 @@ export const SpeedOfSoundCalculator: React.FC<BaseCalcProps> = () => {
             <input
               type="number"
               value={objectSpeedKmh}
-              onChange={(e) => setObjectSpeedKmh(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setObjectSpeedKmh(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -257,7 +271,7 @@ export const SpeedOfSoundCalculator: React.FC<BaseCalcProps> = () => {
 
         <div className="bg-gradient-to-br from-sky-50 to-indigo-50 p-5 rounded-xl border border-sky-200 flex flex-col justify-between space-y-4">
           <div>
-            <span className="text-xs font-bold text-sky-900 uppercase tracking-wider">Speed of Sound at {temperatureC}°C</span>
+            <span className="text-xs font-bold text-sky-900 uppercase tracking-wider">Speed of Sound at {typeof temperatureC === 'number' ? temperatureC : 0}°C</span>
             <div className="text-3xl font-black text-sky-950 font-mono-numbers mt-1">
               {speedOfSoundMs.toFixed(1)} m/s
             </div>
@@ -278,18 +292,25 @@ export const SpeedOfSoundCalculator: React.FC<BaseCalcProps> = () => {
 
 // 5. Work Hours & Time Card Calculator
 export const TimeCardCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [hourlyWage, setHourlyWage] = useState(25);
-  const [hoursMon, setHoursMon] = useState(8);
-  const [hoursTue, setHoursTue] = useState(8);
-  const [hoursWed, setHoursWed] = useState(8);
-  const [hoursThu, setHoursThu] = useState(8.5);
-  const [hoursFri, setHoursFri] = useState(9);
+  const [hourlyWage, setHourlyWage] = useState<number | ''>(25);
+  const [hoursMon, setHoursMon] = useState<number | ''>(8);
+  const [hoursTue, setHoursTue] = useState<number | ''>(8);
+  const [hoursWed, setHoursWed] = useState<number | ''>(8);
+  const [hoursThu, setHoursThu] = useState<number | ''>(8.5);
+  const [hoursFri, setHoursFri] = useState<number | ''>(9);
 
-  const totalHours = hoursMon + hoursTue + hoursWed + hoursThu + hoursFri;
+  const hw = typeof hourlyWage === 'number' ? hourlyWage : 0;
+  const hM = typeof hoursMon === 'number' ? hoursMon : 0;
+  const hTu = typeof hoursTue === 'number' ? hoursTue : 0;
+  const hW = typeof hoursWed === 'number' ? hoursWed : 0;
+  const hTh = typeof hoursThu === 'number' ? hoursThu : 0;
+  const hF = typeof hoursFri === 'number' ? hoursFri : 0;
+
+  const totalHours = hM + hTu + hW + hTh + hF;
   const regularHours = Math.min(40, totalHours);
   const overtimeHours = Math.max(0, totalHours - 40);
-  const regularPay = regularHours * hourlyWage;
-  const overtimePay = overtimeHours * (hourlyWage * 1.5);
+  const regularPay = regularHours * hw;
+  const overtimePay = overtimeHours * (hw * 1.5);
   const totalGrossPay = regularPay + overtimePay;
 
   return (
@@ -298,14 +319,20 @@ export const TimeCardCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
         <div className="space-y-3.5">
           <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Daily Clocked Hours</h4>
           <div className="grid grid-cols-5 gap-1.5">
-            {[['Mon', hoursMon, setHoursMon], ['Tue', hoursTue, setHoursTue], ['Wed', hoursWed, setHoursWed], ['Thu', hoursThu, setHoursThu], ['Fri', hoursFri, setHoursFri]].map(([day, val, setter]: any) => (
+            {[
+              ['Mon', hoursMon, setHoursMon],
+              ['Tue', hoursTue, setHoursTue],
+              ['Wed', hoursWed, setHoursWed],
+              ['Thu', hoursThu, setHoursThu],
+              ['Fri', hoursFri, setHoursFri]
+            ].map(([day, val, setter]: any) => (
               <div key={day}>
                 <label className="block text-[10px] text-slate-500 text-center">{day}</label>
                 <input
                   type="number"
                   step="0.5"
                   value={val}
-                  onChange={(e) => setter(Math.max(0, Number(e.target.value)))}
+                  onChange={(e) => setter(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                   className="w-full p-1 border rounded text-center text-xs font-bold"
                 />
               </div>
@@ -316,7 +343,7 @@ export const TimeCardCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
             <input
               type="number"
               value={hourlyWage}
-              onChange={(e) => setHourlyWage(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setHourlyWage(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -332,7 +359,7 @@ export const TimeCardCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
           </div>
 
           <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between"><span>Regular Pay ({regularHours} hrs @ {currencySymbol}{hourlyWage}):</span><span>{currencySymbol}{regularPay.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span>Regular Pay ({regularHours} hrs @ {currencySymbol}{hw}):</span><span>{currencySymbol}{regularPay.toFixed(2)}</span></div>
             <div className="flex justify-between"><span>Overtime Pay ({overtimeHours} hrs @ 1.5x):</span><span className="font-bold text-orange-700">+{currencySymbol}{overtimePay.toFixed(2)}</span></div>
           </div>
         </div>
@@ -343,12 +370,14 @@ export const TimeCardCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
 
 // 6. Exact Age in Seconds, Hours & Days
 export const ExactAgeCalculator: React.FC<BaseCalcProps> = () => {
-  const [birthYear, setBirthYear] = useState(1995);
-  const [birthMonth, setBirthMonth] = useState(6);
-  const [birthDay, setBirthDay] = useState(15);
+  const [birthYear, setBirthYear] = useState<number | ''>(1995);
+  const [birthMonth, setBirthMonth] = useState<number>(6);
+  const [birthDay, setBirthDay] = useState<number | ''>(15);
 
   const results = useMemo(() => {
-    const birth = new Date(birthYear, birthMonth - 1, birthDay);
+    const by = typeof birthYear === 'number' ? birthYear : 1995;
+    const bd = typeof birthDay === 'number' ? birthDay : 15;
+    const birth = new Date(by, birthMonth - 1, bd);
     const now = new Date();
     const diffMs = Math.max(0, now.getTime() - birth.getTime());
 
@@ -385,7 +414,7 @@ export const ExactAgeCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={birthDay}
-                onChange={(e) => setBirthDay(Math.max(1, Math.min(31, Number(e.target.value))))}
+                onChange={(e) => setBirthDay(e.target.value === '' ? '' : Math.max(1, Math.min(31, Number(e.target.value))))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -394,7 +423,7 @@ export const ExactAgeCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={birthYear}
-                onChange={(e) => setBirthYear(Number(e.target.value))}
+                onChange={(e) => setBirthYear(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -423,8 +452,8 @@ export const ExactAgeCalculator: React.FC<BaseCalcProps> = () => {
 
 // 7. Time Zone Difference & Meeting Planner
 export const TimeZoneCalculator: React.FC<BaseCalcProps> = () => {
-  const [baseTimeHour, setBaseTimeHour] = useState(14); // 2 PM
-  const [originZoneOffset, setOriginZoneOffset] = useState(-5); // UTC-5 EST
+  const [baseTimeHour, setBaseTimeHour] = useState<number | ''>(14); // 2 PM
+  const [originZoneOffset, setOriginZoneOffset] = useState<number>(-5); // UTC-5 EST
 
   const zones = [
     { name: 'US Pacific (PST/PDT)', offset: -8 },
@@ -437,6 +466,8 @@ export const TimeZoneCalculator: React.FC<BaseCalcProps> = () => {
     { name: 'Sydney (AEST)', offset: 10 }
   ];
 
+  const bHour = typeof baseTimeHour === 'number' ? baseTimeHour : 12;
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
@@ -447,7 +478,7 @@ export const TimeZoneCalculator: React.FC<BaseCalcProps> = () => {
             <input
               type="number"
               value={baseTimeHour}
-              onChange={(e) => setBaseTimeHour(Math.max(0, Math.min(23, Number(e.target.value))))}
+              onChange={(e) => setBaseTimeHour(e.target.value === '' ? '' : Math.max(0, Math.min(23, Number(e.target.value))))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -470,7 +501,7 @@ export const TimeZoneCalculator: React.FC<BaseCalcProps> = () => {
           <div className="space-y-1.5 text-xs">
             {zones.map((z) => {
               const diff = z.offset - originZoneOffset;
-              let targetHour = (baseTimeHour + diff) % 24;
+              let targetHour = (bHour + diff) % 24;
               if (targetHour < 0) targetHour += 24;
               const formatted = `${Math.floor(targetHour)}:${(targetHour % 1 === 0.5 ? '30' : '00')}`;
               return (
@@ -489,18 +520,28 @@ export const TimeZoneCalculator: React.FC<BaseCalcProps> = () => {
 
 // 8. Personal Net Worth Tracker Calculator
 export const NetWorthCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [cashChecking, setCashChecking] = useState(25000);
-  const [investments, setInvestments] = useState(85000);
-  const [realEstateVal, setRealEstateVal] = useState(350000);
-  const [vehiclesOther, setVehiclesOther] = useState(20000);
+  const [cashChecking, setCashChecking] = useState<number | ''>(25000);
+  const [investments, setInvestments] = useState<number | ''>(85000);
+  const [realEstateVal, setRealEstateVal] = useState<number | ''>(350000);
+  const [vehiclesOther, setVehiclesOther] = useState<number | ''>(20000);
 
-  const [mortgageDebt, setMortgageDebt] = useState(260000);
-  const [studentDebt, setStudentDebt] = useState(15000);
-  const [carLoans, setCarLoans] = useState(8000);
-  const [creditCardDebt, setCreditCardDebt] = useState(2000);
+  const [mortgageDebt, setMortgageDebt] = useState<number | ''>(260000);
+  const [studentDebt, setStudentDebt] = useState<number | ''>(15000);
+  const [carLoans, setCarLoans] = useState<number | ''>(8000);
+  const [creditCardDebt, setCreditCardDebt] = useState<number | ''>(2000);
 
-  const totalAssets = cashChecking + investments + realEstateVal + vehiclesOther;
-  const totalLiabilities = mortgageDebt + studentDebt + carLoans + creditCardDebt;
+  const cc = typeof cashChecking === 'number' ? cashChecking : 0;
+  const inv = typeof investments === 'number' ? investments : 0;
+  const re = typeof realEstateVal === 'number' ? realEstateVal : 0;
+  const vo = typeof vehiclesOther === 'number' ? vehiclesOther : 0;
+
+  const md = typeof mortgageDebt === 'number' ? mortgageDebt : 0;
+  const sd = typeof studentDebt === 'number' ? studentDebt : 0;
+  const cl = typeof carLoans === 'number' ? carLoans : 0;
+  const ccd = typeof creditCardDebt === 'number' ? creditCardDebt : 0;
+
+  const totalAssets = cc + inv + re + vo;
+  const totalLiabilities = md + sd + cl + ccd;
   const netWorth = totalAssets - totalLiabilities;
 
   return (
@@ -508,22 +549,46 @@ export const NetWorthCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-4">
           <div className="space-y-2 p-3 bg-orange-50/50 rounded-xl border border-orange-100">
-            <span className="text-xs font-bold text-orange-800 uppercase tracking-wider block">Assets</span>
+            <span className="text-xs font-bold text-orange-800 uppercase tracking-wider block">Assets ({currencySymbol})</span>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <input type="number" value={cashChecking} onChange={(e) => setCashChecking(Number(e.target.value))} placeholder="Cash" className="p-1.5 border rounded bg-white" />
-              <input type="number" value={investments} onChange={(e) => setInvestments(Number(e.target.value))} placeholder="Investments" className="p-1.5 border rounded bg-white" />
-              <input type="number" value={realEstateVal} onChange={(e) => setRealEstateVal(Number(e.target.value))} placeholder="Real Estate" className="p-1.5 border rounded bg-white" />
-              <input type="number" value={vehiclesOther} onChange={(e) => setVehiclesOther(Number(e.target.value))} placeholder="Vehicles" className="p-1.5 border rounded bg-white" />
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-0.5">Cash / Checking</label>
+                <input type="number" value={cashChecking} onChange={(e) => setCashChecking(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Cash" className="w-full p-1.5 border rounded bg-white font-bold" />
+              </div>
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-0.5">Investments / Stocks</label>
+                <input type="number" value={investments} onChange={(e) => setInvestments(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Investments" className="w-full p-1.5 border rounded bg-white font-bold" />
+              </div>
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-0.5">Real Estate</label>
+                <input type="number" value={realEstateVal} onChange={(e) => setRealEstateVal(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Real Estate" className="w-full p-1.5 border rounded bg-white font-bold" />
+              </div>
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-0.5">Vehicles / Other</label>
+                <input type="number" value={vehiclesOther} onChange={(e) => setVehiclesOther(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Vehicles" className="w-full p-1.5 border rounded bg-white font-bold" />
+              </div>
             </div>
           </div>
 
           <div className="space-y-2 p-3 bg-red-50/50 rounded-xl border border-red-100">
-            <span className="text-xs font-bold text-red-800 uppercase tracking-wider block">Liabilities</span>
+            <span className="text-xs font-bold text-red-800 uppercase tracking-wider block">Liabilities ({currencySymbol})</span>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <input type="number" value={mortgageDebt} onChange={(e) => setMortgageDebt(Number(e.target.value))} placeholder="Mortgage" className="p-1.5 border rounded bg-white" />
-              <input type="number" value={studentDebt} onChange={(e) => setStudentDebt(Number(e.target.value))} placeholder="Student Loans" className="p-1.5 border rounded bg-white" />
-              <input type="number" value={carLoans} onChange={(e) => setCarLoans(Number(e.target.value))} placeholder="Auto Loan" className="p-1.5 border rounded bg-white" />
-              <input type="number" value={creditCardDebt} onChange={(e) => setCreditCardDebt(Number(e.target.value))} placeholder="Credit Cards" className="p-1.5 border rounded bg-white" />
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-0.5">Mortgage</label>
+                <input type="number" value={mortgageDebt} onChange={(e) => setMortgageDebt(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Mortgage" className="w-full p-1.5 border rounded bg-white font-bold" />
+              </div>
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-0.5">Student Loans</label>
+                <input type="number" value={studentDebt} onChange={(e) => setStudentDebt(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Student Loans" className="w-full p-1.5 border rounded bg-white font-bold" />
+              </div>
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-0.5">Auto Loans</label>
+                <input type="number" value={carLoans} onChange={(e) => setCarLoans(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Auto Loan" className="w-full p-1.5 border rounded bg-white font-bold" />
+              </div>
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-0.5">Credit Cards</label>
+                <input type="number" value={creditCardDebt} onChange={(e) => setCreditCardDebt(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Credit Cards" className="w-full p-1.5 border rounded bg-white font-bold" />
+              </div>
             </div>
           </div>
         </div>
@@ -548,15 +613,16 @@ export const NetWorthCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
 
 // 9. Dog Years to Human Years Calculator
 export const DogAgeCalculator: React.FC<BaseCalcProps> = () => {
-  const [dogAge, setDogAge] = useState(4);
+  const [dogAge, setDogAge] = useState<number | ''>(4);
   const [dogSize, setDogSize] = useState<'small' | 'medium' | 'large' | 'giant'>('medium');
 
   const humanAge = useMemo(() => {
-    if (dogAge <= 0) return 0;
-    if (dogAge === 1) return 15;
-    if (dogAge === 2) return 24;
+    const da = typeof dogAge === 'number' ? dogAge : 0;
+    if (da <= 0) return 0;
+    if (da === 1) return 15;
+    if (da === 2) return 24;
 
-    const remainingYears = dogAge - 2;
+    const remainingYears = da - 2;
     let multiplier = 4;
     if (dogSize === 'small') multiplier = 4;
     else if (dogSize === 'medium') multiplier = 5;
@@ -575,8 +641,9 @@ export const DogAgeCalculator: React.FC<BaseCalcProps> = () => {
             <label className="block text-xs font-semibold text-slate-600 mb-1">Dog Age (Calendar Years)</label>
             <input
               type="number"
+              step="0.5"
               value={dogAge}
-              onChange={(e) => setDogAge(Math.max(0.5, Number(e.target.value)))}
+              onChange={(e) => setDogAge(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -613,14 +680,15 @@ export const DogAgeCalculator: React.FC<BaseCalcProps> = () => {
 
 // 10. Cooking & Kitchen Ratio Converter
 export const CookingConverterCalculator: React.FC<BaseCalcProps> = () => {
-  const [cups, setCups] = useState(1);
+  const [cups, setCups] = useState<number | ''>(1);
   const [ingredient, setIngredient] = useState<'flour' | 'sugar' | 'butter' | 'liquid'>('flour');
 
   const conversions = useMemo(() => {
-    const tablespoons = cups * 16;
-    const teaspoons = cups * 48;
-    const fluidOunces = cups * 8;
-    const milliliters = cups * 236.588;
+    const c = typeof cups === 'number' ? cups : 0;
+    const tablespoons = c * 16;
+    const teaspoons = c * 48;
+    const fluidOunces = c * 8;
+    const milliliters = c * 236.588;
 
     // Weight in grams depends on ingredient density
     let gramsPerCup = 120; // all-purpose flour
@@ -628,7 +696,7 @@ export const CookingConverterCalculator: React.FC<BaseCalcProps> = () => {
     else if (ingredient === 'butter') gramsPerCup = 227; // 2 sticks
     else if (ingredient === 'liquid') gramsPerCup = 240; // water/milk
 
-    const grams = cups * gramsPerCup;
+    const grams = c * gramsPerCup;
 
     return { tablespoons, teaspoons, fluidOunces, milliliters: milliliters.toFixed(1), grams: grams.toFixed(0) };
   }, [cups, ingredient]);
@@ -644,7 +712,7 @@ export const CookingConverterCalculator: React.FC<BaseCalcProps> = () => {
               type="number"
               step="0.25"
               value={cups}
-              onChange={(e) => setCups(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setCups(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -685,17 +753,21 @@ export const CookingConverterCalculator: React.FC<BaseCalcProps> = () => {
 
 // 11. Crypto DCA (Dollar Cost Averaging) Simulator
 export const CryptoDcaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [monthlyDeposit, setMonthlyDeposit] = useState(250);
-  const [months, setMonths] = useState(24);
-  const [expectedAnnualGrowth, setExpectedAnnualGrowth] = useState(25);
+  const [monthlyDeposit, setMonthlyDeposit] = useState<number | ''>(250);
+  const [months, setMonths] = useState<number | ''>(24);
+  const [expectedAnnualGrowth, setExpectedAnnualGrowth] = useState<number | ''>(25);
 
   const results = useMemo(() => {
-    const totalInvested = monthlyDeposit * months;
-    const monthlyRate = expectedAnnualGrowth / 100 / 12;
+    const md = typeof monthlyDeposit === 'number' ? monthlyDeposit : 0;
+    const mo = typeof months === 'number' ? months : 0;
+    const eag = typeof expectedAnnualGrowth === 'number' ? expectedAnnualGrowth : 0;
+
+    const totalInvested = md * mo;
+    const monthlyRate = eag / 100 / 12;
     let portfolioValue = 0;
 
-    for (let m = 0; m < months; m++) {
-      portfolioValue = (portfolioValue + monthlyDeposit) * (1 + monthlyRate);
+    for (let m = 0; m < mo; m++) {
+      portfolioValue = (portfolioValue + md) * (1 + monthlyRate);
     }
 
     const profit = portfolioValue - totalInvested;
@@ -715,7 +787,7 @@ export const CryptoDcaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
               <input
                 type="number"
                 value={monthlyDeposit}
-                onChange={(e) => setMonthlyDeposit(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setMonthlyDeposit(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -724,7 +796,7 @@ export const CryptoDcaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
               <input
                 type="number"
                 value={months}
-                onChange={(e) => setMonths(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setMonths(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -734,7 +806,7 @@ export const CryptoDcaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
             <input
               type="number"
               value={expectedAnnualGrowth}
-              onChange={(e) => setExpectedAnnualGrowth(Number(e.target.value))}
+              onChange={(e) => setExpectedAnnualGrowth(e.target.value === '' ? '' : Number(e.target.value))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -760,13 +832,17 @@ export const CryptoDcaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
 
 // 12. Crypto Staking APY & Rewards Calculator
 export const StakingRewardsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [stakedAmount, setStakedAmount] = useState(5000);
-  const [apyPercent, setApyPercent] = useState(6.5);
-  const [stakingDays, setStakingDays] = useState(365);
+  const [stakedAmount, setStakedAmount] = useState<number | ''>(5000);
+  const [apyPercent, setApyPercent] = useState<number | ''>(6.5);
+  const [stakingDays, setStakingDays] = useState<number | ''>(365);
 
-  const dailyRate = apyPercent / 100 / 365;
-  const endingAmount = stakedAmount * Math.pow(1 + dailyRate, stakingDays);
-  const rewardEarned = endingAmount - stakedAmount;
+  const sa = typeof stakedAmount === 'number' ? stakedAmount : 0;
+  const apy = typeof apyPercent === 'number' ? apyPercent : 0;
+  const sd = typeof stakingDays === 'number' ? stakingDays : 0;
+
+  const dailyRate = apy / 100 / 365;
+  const endingAmount = sa * Math.pow(1 + dailyRate, sd);
+  const rewardEarned = endingAmount - sa;
 
   return (
     <div className="space-y-6">
@@ -778,7 +854,7 @@ export const StakingRewardsCalculator: React.FC<BaseCalcProps> = ({ currencySymb
             <input
               type="number"
               value={stakedAmount}
-              onChange={(e) => setStakedAmount(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setStakedAmount(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -789,7 +865,7 @@ export const StakingRewardsCalculator: React.FC<BaseCalcProps> = ({ currencySymb
                 type="number"
                 step="0.1"
                 value={apyPercent}
-                onChange={(e) => setApyPercent(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setApyPercent(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -798,7 +874,7 @@ export const StakingRewardsCalculator: React.FC<BaseCalcProps> = ({ currencySymb
               <input
                 type="number"
                 value={stakingDays}
-                onChange={(e) => setStakingDays(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setStakingDays(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -821,16 +897,19 @@ export const StakingRewardsCalculator: React.FC<BaseCalcProps> = ({ currencySymb
 
 // 13. Impermanent Loss Calculator
 export const ImpermanentLossCalculator: React.FC<BaseCalcProps> = () => {
-  const [priceChangeA, setPriceChangeA] = useState(100); // 100% up (2x)
-  const [priceChangeB, setPriceChangeB] = useState(0); // 0% stable
+  const [priceChangeA, setPriceChangeA] = useState<number | ''>(100); // 100% up (2x)
+  const [priceChangeB, setPriceChangeB] = useState<number | ''>(0); // 0% stable
 
   const results = useMemo(() => {
-    // Relative price ratio change k
-    const ratioA = 1 + priceChangeA / 100;
-    const ratioB = 1 + priceChangeB / 100;
-    const k = ratioA / ratioB;
+    const pca = typeof priceChangeA === 'number' ? priceChangeA : 0;
+    const pcb = typeof priceChangeB === 'number' ? priceChangeB : 0;
 
-    if (k <= 0) return { ilPct: 0, holdValue: 0, poolValue: 0 };
+    // Relative price ratio change k
+    const ratioA = 1 + pca / 100;
+    const ratioB = 1 + pcb / 100;
+    const k = ratioB !== 0 ? ratioA / ratioB : 1;
+
+    if (k <= 0) return { ilPct: '0.00' };
     // Standard AMM Impermanent Loss formula: IL = (2 * sqrt(k)) / (1 + k) - 1
     const ilFactor = (2 * Math.sqrt(k)) / (1 + k) - 1;
     const ilPct = Math.abs(ilFactor * 100);
@@ -848,7 +927,7 @@ export const ImpermanentLossCalculator: React.FC<BaseCalcProps> = () => {
             <input
               type="number"
               value={priceChangeA}
-              onChange={(e) => setPriceChangeA(Number(e.target.value))}
+              onChange={(e) => setPriceChangeA(e.target.value === '' ? '' : Number(e.target.value))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -857,7 +936,7 @@ export const ImpermanentLossCalculator: React.FC<BaseCalcProps> = () => {
             <input
               type="number"
               value={priceChangeB}
-              onChange={(e) => setPriceChangeB(Number(e.target.value))}
+              onChange={(e) => setPriceChangeB(e.target.value === '' ? '' : Number(e.target.value))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>

@@ -164,7 +164,7 @@ Interest Earned (HYSA): ${formatCurrency(calculations.totalInterestEarned, curre
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 flex justify-between">
                 <span>Savings Goal Target</span>
-                <span className="text-orange-600 font-mono">{formatCurrency(savingsGoal, currencySymbol)}</span>
+                <span className="text-orange-600 font-mono">{formatCurrency(numSavingsGoal, currencySymbol)}</span>
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
@@ -183,7 +183,7 @@ Interest Earned (HYSA): ${formatCurrency(calculations.totalInterestEarned, curre
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 flex justify-between">
                 <span>Monthly Deposit</span>
-                <span className="text-orange-600 font-mono">{formatCurrency(monthlyContribution, currencySymbol)}/mo</span>
+                <span className="text-orange-600 font-mono">{formatCurrency(numMonthlyContribution, currencySymbol)}/mo</span>
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
@@ -204,7 +204,7 @@ Interest Earned (HYSA): ${formatCurrency(calculations.totalInterestEarned, curre
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Initial Savings Deposit</span>
-              <span className="text-orange-600 font-mono">{formatCurrency(initialSavings, currencySymbol)}</span>
+              <span className="text-orange-600 font-mono">{formatCurrency(numInitialSavings, currencySymbol)}</span>
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
@@ -224,7 +224,7 @@ Interest Earned (HYSA): ${formatCurrency(calculations.totalInterestEarned, curre
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Timeframe</span>
-              <span className="text-orange-600 font-mono">{timeYears} Years ({timeYears * 12} Months)</span>
+              <span className="text-orange-600 font-mono">{numTimeYears} Years ({numTimeYears * 12} Months)</span>
             </label>
             <div className="grid grid-cols-4 gap-2">
               {[1, 3, 5, 10].map(y => (

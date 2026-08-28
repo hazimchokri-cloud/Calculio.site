@@ -167,7 +167,7 @@ ${adjustInflation ? `Inflation-Adjusted Purchasing Power: ${formatCurrency(calcu
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Starting Capital</span>
-              <span className="text-orange-600 font-mono">{formatCurrency(initialInvestment, currencySymbol)}</span>
+              <span className="text-orange-600 font-mono">{formatCurrency(numInitialInvestment, currencySymbol)}</span>
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
@@ -187,7 +187,7 @@ ${adjustInflation ? `Inflation-Adjusted Purchasing Power: ${formatCurrency(calcu
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Monthly Additional Deposit</span>
-              <span className="text-orange-600 font-mono">{formatCurrency(monthlyContribution, currencySymbol)}/mo</span>
+              <span className="text-orange-600 font-mono">{formatCurrency(numMonthlyContribution, currencySymbol)}/mo</span>
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
@@ -272,78 +272,82 @@ ${adjustInflation ? `Inflation-Adjusted Purchasing Power: ${formatCurrency(calcu
 
         {/* Right Output Results */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-gradient-to-br from-slate-900 via-orange-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
-            <div className="space-y-4">
-              <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-orange-300">
-                  Projected Portfolio Value
-                </span>
-                <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1">
-                  {formatCurrency(calculations.nominalFinalValue, currencySymbol)}
-                </div>
-                {adjustInflation && (
-                  <div className="text-xs font-medium text-amber-300 mt-1">
-                    Today's Purchasing Power: {formatCurrency(calculations.realFinalValue, currencySymbol)}
+          {calculations && (
+            <>
+              <div className="bg-gradient-to-br from-slate-900 via-orange-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-orange-300">
+                      Projected Portfolio Value
+                    </span>
+                    <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1">
+                      {formatCurrency(calculations.nominalFinalValue, currencySymbol)}
+                    </div>
+                    {adjustInflation && (
+                      <div className="text-xs font-medium text-amber-300 mt-1">
+                        Today's Purchasing Power: {formatCurrency(calculations.realFinalValue, currencySymbol)}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-orange-900/60">
-                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
-                  <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Capital Invested</span>
-                  <span className="text-base font-bold text-white font-mono">{formatCurrency(calculations.totalContributed, currencySymbol)}</span>
+                  <div className="grid grid-cols-2 gap-3 pt-3 border-t border-orange-900/60">
+                    <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
+                      <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Capital Invested</span>
+                      <span className="text-base font-bold text-white font-mono">{formatCurrency(calculations.totalContributed, currencySymbol)}</span>
+                    </div>
+                    <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
+                      <span className="text-[10px] text-orange-300 uppercase font-bold block">Total Investment Gains</span>
+                      <span className="text-base font-bold text-orange-300 font-mono">{formatCurrency(calculations.totalInterest, currencySymbol)}</span>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-2 pt-2">
+                    <button
+                      onClick={handleCopy}
+                      className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                    >
+                      {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copied ? 'Copied' : 'Copy Summary'}</span>
+                    </button>
+                    {onSaveCalculation && (
+                      <button
+                        onClick={handleSave}
+                        className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                      >
+                        <Bookmark className="w-3.5 h-3.5" />
+                        <span>{saved ? 'Saved' : 'Save'}</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
-                  <span className="text-[10px] text-orange-300 uppercase font-bold block">Total Investment Gains</span>
-                  <span className="text-base font-bold text-orange-300 font-mono">{formatCurrency(calculations.totalInterest, currencySymbol)}</span>
+              </div>
+
+              {/* Breakdown percentage bar */}
+              <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs space-y-3">
+                <div className="flex justify-between text-xs font-bold text-slate-700">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-700 inline-block"></span>
+                    Principal Contributions ({Math.round((calculations.totalContributed / calculations.nominalFinalValue) * 100 || 0)}%)
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span>
+                    Compound Returns ({Math.round((calculations.totalInterest / calculations.nominalFinalValue) * 100 || 0)}%)
+                  </span>
+                </div>
+                <div className="w-full h-3 rounded-full bg-slate-100 overflow-hidden flex">
+                  <div 
+                    className="bg-slate-700 h-full"
+                    style={{ width: `${(calculations.totalContributed / calculations.nominalFinalValue) * 100}%` }}
+                  />
+                  <div 
+                    className="bg-orange-500 h-full"
+                    style={{ width: `${(calculations.totalInterest / calculations.nominalFinalValue) * 100}%` }}
+                  />
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 pt-2">
-                <button
-                  onClick={handleCopy}
-                  className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? 'Copied' : 'Copy Summary'}</span>
-                </button>
-                {onSaveCalculation && (
-                  <button
-                    onClick={handleSave}
-                    className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-                  >
-                    <Bookmark className="w-3.5 h-3.5" />
-                    <span>{saved ? 'Saved' : 'Save'}</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Breakdown percentage bar */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs space-y-3">
-            <div className="flex justify-between text-xs font-bold text-slate-700">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-700 inline-block"></span>
-                Principal Contributions ({Math.round((calculations.totalContributed / calculations.nominalFinalValue) * 100 || 0)}%)
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span>
-                Compound Returns ({Math.round((calculations.totalInterest / calculations.nominalFinalValue) * 100 || 0)}%)
-              </span>
-            </div>
-            <div className="w-full h-3 rounded-full bg-slate-100 overflow-hidden flex">
-              <div 
-                className="bg-slate-700 h-full"
-                style={{ width: `${(calculations.totalContributed / calculations.nominalFinalValue) * 100}%` }}
-              />
-              <div 
-                className="bg-orange-500 h-full"
-                style={{ width: `${(calculations.totalInterest / calculations.nominalFinalValue) * 100}%` }}
-              />
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </div>
     </div>

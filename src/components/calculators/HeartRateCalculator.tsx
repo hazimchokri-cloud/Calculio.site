@@ -212,57 +212,59 @@ Zone 5 (VO2 Max 90-100%): ${calculations.zones[4].rangeBpm}`;
 
         {/* Right Output */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="bg-gradient-to-br from-slate-900 via-rose-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-rose-300">
-                    Estimated Max Heart Rate
-                  </span>
-                  <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-0.5 font-mono">
-                    {calculations.baseMaxHr} <span className="text-base font-normal text-slate-300">BPM</span>
+          {calculations && (
+            <div className="bg-gradient-to-br from-slate-900 via-rose-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-rose-300">
+                      Estimated Max Heart Rate
+                    </span>
+                    <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-0.5 font-mono">
+                      {calculations.baseMaxHr} <span className="text-base font-normal text-slate-300">BPM</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleCopy}
-                    className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5 transition-colors border border-white/10"
-                  >
-                    {copied ? <Check className="w-4 h-4 text-orange-400" /> : <Copy className="w-4 h-4" />}
-                    <span>{copied ? 'Copied' : 'Copy'}</span>
-                  </button>
-                  {onSaveCalculation && (
+                  <div className="flex items-center gap-2">
                     <button
-                      onClick={handleSave}
+                      onClick={handleCopy}
                       className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5 transition-colors border border-white/10"
                     >
-                      <Bookmark className="w-4 h-4" />
-                      <span>{saved ? 'Saved' : 'Save'}</span>
+                      {copied ? <Check className="w-4 h-4 text-orange-400" /> : <Copy className="w-4 h-4" />}
+                      <span>{copied ? 'Copied' : 'Copy'}</span>
                     </button>
-                  )}
+                    {onSaveCalculation && (
+                      <button
+                        onClick={handleSave}
+                        className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5 transition-colors border border-white/10"
+                      >
+                        <Bookmark className="w-4 h-4" />
+                        <span>{saved ? 'Saved' : 'Save'}</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Zones Breakdown Table */}
+                <div className="space-y-1.5 pt-2 border-t border-rose-900/60">
+                  {calculations.zones.map((z, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-white/10 backdrop-blur-xs text-xs">
+                      <div>
+                        <div className="font-bold text-white flex items-center gap-1.5">
+                          <span className={`w-2 h-2 rounded-full ${idx === 1 ? 'bg-orange-400' : idx === 3 ? 'bg-amber-400' : idx === 4 ? 'bg-rose-400' : 'bg-blue-400'}`} />
+                          <span>{z.zone}</span>
+                        </div>
+                        <span className="text-[10px] text-slate-300">{z.desc}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-bold font-mono text-orange-300 text-sm block">{z.rangeBpm}</span>
+                        <span className="text-[10px] text-slate-300 font-mono">{z.pctRange}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-
-              {/* Zones Breakdown Table */}
-              <div className="space-y-1.5 pt-2 border-t border-rose-900/60">
-                {calculations.zones.map((z, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-white/10 backdrop-blur-xs text-xs">
-                    <div>
-                      <div className="font-bold text-white flex items-center gap-1.5">
-                        <span className={`w-2 h-2 rounded-full ${idx === 1 ? 'bg-orange-400' : idx === 3 ? 'bg-amber-400' : idx === 4 ? 'bg-rose-400' : 'bg-blue-400'}`} />
-                        <span>{z.zone}</span>
-                      </div>
-                      <span className="text-[10px] text-slate-300">{z.desc}</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-bold font-mono text-orange-300 text-sm block">{z.rangeBpm}</span>
-                      <span className="text-[10px] text-slate-300 font-mono">{z.pctRange}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

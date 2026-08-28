@@ -9,35 +9,45 @@ interface BaseCalcProps {
 
 // 1. Rent vs. Buy Home Calculator
 export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [homePrice, setHomePrice] = useState(400000);
-  const [monthlyRent, setMonthlyRent] = useState(2100);
-  const [stayYears, setStayYears] = useState(7);
-  const [downPaymentPct, setDownPaymentPct] = useState(20);
-  const [interestRate, setInterestRate] = useState(6.5);
-  const [homeAppreciation, setHomeAppreciation] = useState(3.5);
-  const [rentIncrease, setRentIncrease] = useState(3.0);
+  const [homePrice, setHomePrice] = useState<number | ''>(400000);
+  const [monthlyRent, setMonthlyRent] = useState<number | ''>(2100);
+  const [stayYears, setStayYears] = useState<number>(7);
+  const [downPaymentPct, setDownPaymentPct] = useState<number | ''>(20);
+  const [interestRate, setInterestRate] = useState<number | ''>(6.5);
+  const [homeAppreciation, setHomeAppreciation] = useState<number | ''>(3.5);
+  const [rentIncrease, setRentIncrease] = useState<number | ''>(3.0);
 
   const results = useMemo(() => {
-    const downPayment = homePrice * (downPaymentPct / 100);
-    const loanPrincipal = homePrice - downPayment;
-    const r = interestRate / 100 / 12;
+    const hp = typeof homePrice === 'number' ? homePrice : 0;
+    const mr = typeof monthlyRent === 'number' ? monthlyRent : 0;
+    const sy = typeof stayYears === 'number' ? stayYears : 7;
+    const dpPct = typeof downPaymentPct === 'number' ? downPaymentPct : 0;
+    const ir = typeof interestRate === 'number' ? interestRate : 0;
+    const ha = typeof homeAppreciation === 'number' ? homeAppreciation : 0;
+    const ri = typeof rentIncrease === 'number' ? rentIncrease : 0;
+
+    const downPayment = hp * (dpPct / 100);
+    const loanPrincipal = hp - downPayment;
+    const r = (ir / 100) / 12;
     const n = 30 * 12;
-    const monthlyMortgage = (loanPrincipal * (r * Math.pow(1 + r, n))) / (Math.pow(1 + r, n) - 1);
+    const monthlyMortgage = r > 0 && loanPrincipal > 0 
+      ? (loanPrincipal * (r * Math.pow(1 + r, n))) / (Math.pow(1 + r, n) - 1)
+      : (loanPrincipal > 0 ? loanPrincipal / n : 0);
     
     // Property tax & insurance (~1.5% of home price / yr)
-    const monthlyTaxAndIns = (homePrice * 0.015) / 12;
-    const monthlyMaintenance = (homePrice * 0.01) / 12;
+    const monthlyTaxAndIns = (hp * 0.015) / 12;
+    const monthlyMaintenance = (hp * 0.01) / 12;
     const totalMonthlyBuyCost = monthlyMortgage + monthlyTaxAndIns + monthlyMaintenance;
 
     let cumulativeRent = 0;
-    let currentRent = monthlyRent;
-    for (let y = 0; y < stayYears; y++) {
+    let currentRent = mr;
+    for (let y = 0; y < sy; y++) {
       cumulativeRent += currentRent * 12;
-      currentRent *= (1 + rentIncrease / 100);
+      currentRent *= (1 + ri / 100);
     }
 
-    const futureHomeVal = homePrice * Math.pow(1 + homeAppreciation / 100, stayYears);
-    const cumulativeBuyCost = (totalMonthlyBuyCost * 12 * stayYears) + downPayment;
+    const futureHomeVal = hp * Math.pow(1 + ha / 100, sy);
+    const cumulativeBuyCost = (totalMonthlyBuyCost * 12 * sy) + downPayment;
     const estimatedHomeEquity = futureHomeVal - (loanPrincipal * 0.85); // approx principal paid off
     const netCostBuying = cumulativeBuyCost - estimatedHomeEquity;
 
@@ -66,7 +76,7 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
               <input
                 type="number"
                 value={homePrice}
-                onChange={(e) => setHomePrice(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setHomePrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -75,7 +85,7 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
               <input
                 type="number"
                 value={monthlyRent}
-                onChange={(e) => setMonthlyRent(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setMonthlyRent(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -102,7 +112,7 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
                 type="number"
                 step="0.1"
                 value={interestRate}
-                onChange={(e) => setInterestRate(Number(e.target.value))}
+                onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -111,7 +121,7 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
               <input
                 type="number"
                 value={downPaymentPct}
-                onChange={(e) => setDownPaymentPct(Number(e.target.value))}
+                onChange={(e) => setDownPaymentPct(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -149,24 +159,35 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
 
 // 2. Refinance Breakeven Calculator
 export const RefinanceCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [currentBalance, setCurrentBalance] = useState(300000);
-  const [currentRate, setCurrentRate] = useState(7.0);
-  const [currentTermRemaining, setCurrentTermRemaining] = useState(27); // years
-  const [newRate, setNewRate] = useState(5.5);
-  const [newTerm, setNewTerm] = useState(30);
-  const [closingCosts, setClosingCosts] = useState(6000);
+  const [currentBalance, setCurrentBalance] = useState<number | ''>(300000);
+  const [currentRate, setCurrentRate] = useState<number | ''>(7.0);
+  const [currentTermRemaining, setCurrentTermRemaining] = useState<number | ''>(27); // years
+  const [newRate, setNewRate] = useState<number | ''>(5.5);
+  const [newTerm, setNewTerm] = useState<number | ''>(30);
+  const [closingCosts, setClosingCosts] = useState<number | ''>(6000);
 
   const results = useMemo(() => {
-    const rCurrent = currentRate / 100 / 12;
-    const nCurrent = currentTermRemaining * 12;
-    const currentMonthly = (currentBalance * (rCurrent * Math.pow(1 + rCurrent, nCurrent))) / (Math.pow(1 + rCurrent, nCurrent) - 1);
+    const cb = typeof currentBalance === 'number' ? currentBalance : 0;
+    const cr = typeof currentRate === 'number' ? currentRate : 0;
+    const ctr = typeof currentTermRemaining === 'number' ? currentTermRemaining : 0;
+    const nr = typeof newRate === 'number' ? newRate : 0;
+    const nt = typeof newTerm === 'number' ? newTerm : 0;
+    const cc = typeof closingCosts === 'number' ? closingCosts : 0;
 
-    const rNew = newRate / 100 / 12;
-    const nNew = newTerm * 12;
-    const newMonthly = (currentBalance * (rNew * Math.pow(1 + rNew, nNew))) / (Math.pow(1 + rNew, nNew) - 1);
+    const rCurrent = (cr / 100) / 12;
+    const nCurrent = ctr * 12;
+    const currentMonthly = (rCurrent > 0 && nCurrent > 0)
+      ? (cb * (rCurrent * Math.pow(1 + rCurrent, nCurrent))) / (Math.pow(1 + rCurrent, nCurrent) - 1)
+      : (nCurrent > 0 ? cb / nCurrent : 0);
+
+    const rNew = (nr / 100) / 12;
+    const nNew = nt * 12;
+    const newMonthly = (rNew > 0 && nNew > 0)
+      ? (cb * (rNew * Math.pow(1 + rNew, nNew))) / (Math.pow(1 + rNew, nNew) - 1)
+      : (nNew > 0 ? cb / nNew : 0);
 
     const monthlySavings = currentMonthly - newMonthly;
-    const breakevenMonths = monthlySavings > 0 ? Math.ceil(closingCosts / monthlySavings) : Infinity;
+    const breakevenMonths = monthlySavings > 0 ? Math.ceil(cc / monthlySavings) : Infinity;
 
     return {
       currentMonthly,
@@ -187,7 +208,7 @@ export const RefinanceCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
               <input
                 type="number"
                 value={currentBalance}
-                onChange={(e) => setCurrentBalance(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setCurrentBalance(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -196,7 +217,7 @@ export const RefinanceCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
               <input
                 type="number"
                 value={closingCosts}
-                onChange={(e) => setClosingCosts(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setClosingCosts(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -204,23 +225,23 @@ export const RefinanceCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
 
           <div className="grid grid-cols-2 gap-3">
             <div className="p-2.5 bg-slate-50 rounded-lg border space-y-1.5">
-              <span className="text-[11px] font-bold text-slate-700">Current Loan</span>
+              <span className="text-[11px] font-bold text-slate-700">Current Loan Rate (%)</span>
               <input
                 type="number"
                 step="0.1"
                 value={currentRate}
-                onChange={(e) => setCurrentRate(Number(e.target.value))}
+                onChange={(e) => setCurrentRate(e.target.value === '' ? '' : Number(e.target.value))}
                 placeholder="Rate %"
                 className="w-full p-1 border rounded text-xs font-bold bg-white"
               />
             </div>
             <div className="p-2.5 bg-orange-50 rounded-lg border border-orange-200 space-y-1.5">
-              <span className="text-[11px] font-bold text-orange-800">New Refinance Loan</span>
+              <span className="text-[11px] font-bold text-orange-800">New Refinance Loan Rate (%)</span>
               <input
                 type="number"
                 step="0.1"
                 value={newRate}
-                onChange={(e) => setNewRate(Number(e.target.value))}
+                onChange={(e) => setNewRate(e.target.value === '' ? '' : Number(e.target.value))}
                 placeholder="Rate %"
                 className="w-full p-1 border rounded text-xs font-bold bg-white"
               />
@@ -261,13 +282,18 @@ export const RefinanceCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
 
 // 3. Cash-on-Cash Return Calculator
 export const CashOnCashCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [annualCashFlow, setAnnualCashFlow] = useState(8400); // $700/mo net
-  const [downPayment, setDownPayment] = useState(60000);
-  const [closingCosts, setClosingCosts] = useState(5000);
-  const [rehabRepairs, setRehabRepairs] = useState(15000);
+  const [annualCashFlow, setAnnualCashFlow] = useState<number | ''>(8400); // $700/mo net
+  const [downPayment, setDownPayment] = useState<number | ''>(60000);
+  const [closingCosts, setClosingCosts] = useState<number | ''>(5000);
+  const [rehabRepairs, setRehabRepairs] = useState<number | ''>(15000);
 
-  const totalCashInvested = downPayment + closingCosts + rehabRepairs;
-  const cocReturn = totalCashInvested > 0 ? (annualCashFlow / totalCashInvested) * 100 : 0;
+  const acf = typeof annualCashFlow === 'number' ? annualCashFlow : 0;
+  const dp = typeof downPayment === 'number' ? downPayment : 0;
+  const cc = typeof closingCosts === 'number' ? closingCosts : 0;
+  const rr = typeof rehabRepairs === 'number' ? rehabRepairs : 0;
+
+  const totalCashInvested = dp + cc + rr;
+  const cocReturn = totalCashInvested > 0 ? (acf / totalCashInvested) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -279,7 +305,7 @@ export const CashOnCashCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
             <input
               type="number"
               value={annualCashFlow}
-              onChange={(e) => setAnnualCashFlow(Number(e.target.value))}
+              onChange={(e) => setAnnualCashFlow(e.target.value === '' ? '' : Number(e.target.value))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -289,7 +315,7 @@ export const CashOnCashCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
               <input
                 type="number"
                 value={downPayment}
-                onChange={(e) => setDownPayment(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setDownPayment(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -298,7 +324,7 @@ export const CashOnCashCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
               <input
                 type="number"
                 value={closingCosts}
-                onChange={(e) => setClosingCosts(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setClosingCosts(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -307,7 +333,7 @@ export const CashOnCashCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
               <input
                 type="number"
                 value={rehabRepairs}
-                onChange={(e) => setRehabRepairs(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setRehabRepairs(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -329,7 +355,7 @@ export const CashOnCashCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
             </div>
             <div className="flex justify-between">
               <span>Monthly Cash Flow:</span>
-              <span className="font-bold text-orange-700">{currencySymbol}{(annualCashFlow / 12).toFixed(2)} / mo</span>
+              <span className="font-bold text-orange-700">{currencySymbol}{(acf / 12).toFixed(2)} / mo</span>
             </div>
           </div>
         </div>
@@ -340,10 +366,13 @@ export const CashOnCashCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
 
 // 4. Gross Rent Multiplier (GRM) Calculator
 export const GrmCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [propertyPrice, setPropertyPrice] = useState(350000);
-  const [annualGrossRent, setAnnualGrossRent] = useState(36000);
+  const [propertyPrice, setPropertyPrice] = useState<number | ''>(350000);
+  const [annualGrossRent, setAnnualGrossRent] = useState<number | ''>(36000);
 
-  const grm = annualGrossRent > 0 ? propertyPrice / annualGrossRent : 0;
+  const pp = typeof propertyPrice === 'number' ? propertyPrice : 0;
+  const agr = typeof annualGrossRent === 'number' ? annualGrossRent : 0;
+
+  const grm = agr > 0 ? pp / agr : 0;
 
   return (
     <div className="space-y-6">
@@ -355,7 +384,7 @@ export const GrmCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
             <input
               type="number"
               value={propertyPrice}
-              onChange={(e) => setPropertyPrice(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setPropertyPrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -364,7 +393,7 @@ export const GrmCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
             <input
               type="number"
               value={annualGrossRent}
-              onChange={(e) => setAnnualGrossRent(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setAnnualGrossRent(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -386,30 +415,35 @@ export const GrmCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
 
 // 5. Capital Gains Tax Calculator
 export const CapitalGainsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [purchasePrice, setPurchasePrice] = useState(10000);
-  const [sellingPrice, setSellingPrice] = useState(25000);
-  const [holdingPeriodMonths, setHoldingPeriodMonths] = useState(18);
-  const [taxableIncome, setTaxableIncome] = useState(90000);
+  const [purchasePrice, setPurchasePrice] = useState<number | ''>(10000);
+  const [sellingPrice, setSellingPrice] = useState<number | ''>(25000);
+  const [holdingPeriodMonths, setHoldingPeriodMonths] = useState<number | ''>(18);
+  const [taxableIncome, setTaxableIncome] = useState<number | ''>(90000);
 
-  const gain = sellingPrice - purchasePrice;
-  const isLongTerm = holdingPeriodMonths >= 12;
+  const pp = typeof purchasePrice === 'number' ? purchasePrice : 0;
+  const sp = typeof sellingPrice === 'number' ? sellingPrice : 0;
+  const hpm = typeof holdingPeriodMonths === 'number' ? holdingPeriodMonths : 0;
+  const ti = typeof taxableIncome === 'number' ? taxableIncome : 0;
+
+  const gain = sp - pp;
+  const isLongTerm = hpm >= 12;
 
   // Approx US federal capital gains brackets
   let taxRate = 0;
   if (isLongTerm) {
-    if (taxableIncome > 518900) taxRate = 20;
-    else if (taxableIncome > 47025) taxRate = 15;
+    if (ti > 518900) taxRate = 20;
+    else if (ti > 47025) taxRate = 15;
     else taxRate = 0;
   } else {
     // Short term -> standard income tax bracket approximation
-    if (taxableIncome > 231250) taxRate = 35;
-    else if (taxableIncome > 100525) taxRate = 24;
-    else if (taxableIncome > 47150) taxRate = 22;
+    if (ti > 231250) taxRate = 35;
+    else if (ti > 100525) taxRate = 24;
+    else if (ti > 47150) taxRate = 22;
     else taxRate = 12;
   }
 
   const estimatedTax = gain > 0 ? (gain * taxRate) / 100 : 0;
-  const netProceeds = sellingPrice - estimatedTax;
+  const netProceeds = sp - estimatedTax;
 
   return (
     <div className="space-y-6">
@@ -422,7 +456,7 @@ export const CapitalGainsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
               <input
                 type="number"
                 value={purchasePrice}
-                onChange={(e) => setPurchasePrice(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setPurchasePrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -431,7 +465,7 @@ export const CapitalGainsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
               <input
                 type="number"
                 value={sellingPrice}
-                onChange={(e) => setSellingPrice(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setSellingPrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -443,7 +477,7 @@ export const CapitalGainsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
               <input
                 type="number"
                 value={holdingPeriodMonths}
-                onChange={(e) => setHoldingPeriodMonths(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setHoldingPeriodMonths(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -452,7 +486,7 @@ export const CapitalGainsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
               <input
                 type="number"
                 value={taxableIncome}
-                onChange={(e) => setTaxableIncome(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setTaxableIncome(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -491,12 +525,13 @@ export const CapitalGainsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
 
 // 6. Tip & Bill Splitter Calculator
 export const TipCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [billAmount, setBillAmount] = useState(84.50);
-  const [tipPercent, setTipPercent] = useState(18);
-  const [splitCount, setSplitCount] = useState(2);
+  const [billAmount, setBillAmount] = useState<number | ''>(84.50);
+  const [tipPercent, setTipPercent] = useState<number>(18);
+  const [splitCount, setSplitCount] = useState<number>(2);
 
-  const tipAmount = (billAmount * tipPercent) / 100;
-  const totalWithTip = billAmount + tipAmount;
+  const ba = typeof billAmount === 'number' ? billAmount : 0;
+  const tipAmount = (ba * tipPercent) / 100;
+  const totalWithTip = ba + tipAmount;
   const perPersonTotal = splitCount > 0 ? totalWithTip / splitCount : totalWithTip;
   const perPersonTip = splitCount > 0 ? tipAmount / splitCount : tipAmount;
 
@@ -511,7 +546,7 @@ export const TipCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
               type="number"
               step="0.01"
               value={billAmount}
-              onChange={(e) => setBillAmount(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setBillAmount(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
             />
           </div>
@@ -526,7 +561,7 @@ export const TipCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
                   key={pct}
                   type="button"
                   onClick={() => setTipPercent(pct)}
-                  className={`py-1.5 text-xs font-bold rounded-lg border transition-colors ${tipPercent === pct ? 'bg-blue-600 border-blue-600 text-white' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'}`}
+                  className={`py-1.5 text-xs font-bold rounded-lg border transition-colors ${tipPercent === pct ? 'bg-orange-600 border-orange-600 text-white' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'}`}
                 >
                   {pct}%
                 </button>
@@ -542,7 +577,7 @@ export const TipCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
               max="20"
               value={splitCount}
               onChange={(e) => setSplitCount(Number(e.target.value))}
-              className="w-full accent-blue-600 cursor-pointer"
+              className="w-full accent-orange-600 cursor-pointer"
             />
           </div>
         </div>
@@ -574,20 +609,23 @@ export const TipCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
 
 // 7. VAT & Reverse VAT Calculator
 export const VatCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [amount, setAmount] = useState(120);
-  const [vatRate, setVatRate] = useState(20); // 20% standard UK/EU
+  const [amount, setAmount] = useState<number | ''>(120);
+  const [vatRate, setVatRate] = useState<number | ''>(20); // 20% standard UK/EU
   const [mode, setMode] = useState<'add' | 'remove'>('add');
 
   const results = useMemo(() => {
-    if (amount <= 0 || vatRate < 0) return { net: 0, vat: 0, gross: 0 };
+    const a = typeof amount === 'number' ? amount : 0;
+    const vr = typeof vatRate === 'number' ? vatRate : 0;
+
+    if (a <= 0 || vr < 0) return { net: 0, vat: 0, gross: 0 };
     if (mode === 'add') {
-      const net = amount;
-      const vat = (net * vatRate) / 100;
+      const net = a;
+      const vat = (net * vr) / 100;
       const gross = net + vat;
       return { net, vat, gross };
     } else {
-      const gross = amount;
-      const net = gross / (1 + vatRate / 100);
+      const gross = a;
+      const net = gross / (1 + vr / 100);
       const vat = gross - net;
       return { net, vat, gross };
     }
@@ -602,14 +640,14 @@ export const VatCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
             <button
               type="button"
               onClick={() => setMode('add')}
-              className={`py-2 text-xs font-bold rounded-lg border transition-colors ${mode === 'add' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-slate-50 border-slate-200 text-slate-700'}`}
+              className={`py-2 text-xs font-bold rounded-lg border transition-colors ${mode === 'add' ? 'bg-orange-600 border-orange-600 text-white' : 'bg-slate-50 border-slate-200 text-slate-700'}`}
             >
               Add VAT (Net → Gross)
             </button>
             <button
               type="button"
               onClick={() => setMode('remove')}
-              className={`py-2 text-xs font-bold rounded-lg border transition-colors ${mode === 'remove' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-slate-50 border-slate-200 text-slate-700'}`}
+              className={`py-2 text-xs font-bold rounded-lg border transition-colors ${mode === 'remove' ? 'bg-orange-600 border-orange-600 text-white' : 'bg-slate-50 border-slate-200 text-slate-700'}`}
             >
               Remove VAT (Gross → Net)
             </button>
@@ -622,7 +660,7 @@ export const VatCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
             <input
               type="number"
               value={amount}
-              onChange={(e) => setAmount(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setAmount(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -633,7 +671,7 @@ export const VatCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
               type="number"
               step="0.5"
               value={vatRate}
-              onChange={(e) => setVatRate(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setVatRate(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -655,8 +693,8 @@ export const VatCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
               <span className="font-bold">{currencySymbol}{results.net.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
-              <span>VAT ({vatRate}%):</span>
-              <span className="font-bold text-blue-700">{currencySymbol}{results.vat.toFixed(2)}</span>
+              <span>VAT ({typeof vatRate === 'number' ? vatRate : 0}%):</span>
+              <span className="font-bold text-orange-700">{currencySymbol}{results.vat.toFixed(2)}</span>
             </div>
             <div className="flex justify-between border-t pt-1 font-bold text-slate-900">
               <span>Gross Total:</span>

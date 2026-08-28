@@ -3,7 +3,11 @@ import { Activity, ShieldCheck, Check, Copy } from 'lucide-react';
 import { formatNumber, copyToClipboard } from '../../utils/formatters';
 import confetti from 'canvas-confetti';
 
-export const BodyFatCalculator: React.FC = () => {
+interface BodyFatCalculatorProps {
+  onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
+}
+
+export const BodyFatCalculator: React.FC<BodyFatCalculatorProps> = ({ onSaveCalculation }) => {
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [unitSystem, setUnitSystem] = useState<'imperial' | 'metric'>('imperial');
   const [age, setAge] = useState<number | ''>(30);

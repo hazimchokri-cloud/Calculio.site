@@ -16,6 +16,7 @@ import { AffiliateOffersSection } from '../shared/AffiliateOffersSection';
 import { ShareModal } from '../shared/ShareModal';
 import { PrintReportHeader } from '../shared/PrintReportHeader';
 import { PrintReportFooter } from '../shared/PrintReportFooter';
+import { ErrorBoundary } from '../shared/ErrorBoundary';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 // Calculator components
@@ -526,14 +527,16 @@ export const CalculatorDetailView: React.FC<CalculatorDetailProps> = ({
         aria-label="Calculator Interactive Controls and Results"
         className="bg-[#FFFFFF] rounded-2xl p-4 sm:p-8 border border-[#E2E8F0] shadow-xs"
       >
-        {renderCalculatorComponent()}
+        <ErrorBoundary key={calculator.id}>
+          {renderCalculatorComponent()}
+        </ErrorBoundary>
       </section>
 
       {/* High-Stakes Categorical Disclaimer Banner */}
       {(calculator.category === 'financial' || 
         calculator.category === 'tax' || 
         calculator.category === 'real-estate' || 
-        calculator.category === 'health' || 
+        calculator.category === 'fitness-health' || 
         calculator.category === 'cryptocurrency') && (
         <div 
           id={`category-disclaimer-${calculator.category}`}
@@ -545,12 +548,12 @@ export const CalculatorDetailView: React.FC<CalculatorDetailProps> = ({
             <ShieldAlert className="w-4 h-4 text-[#F97316] shrink-0 mt-0.5" />
             <p className="text-[#475569] leading-relaxed">
               <strong className="text-[#0F172A]">
-                {calculator.category === 'health' ? 'Health & Medical Estimation Notice: ' :
+                {calculator.category === 'fitness-health' ? 'Health & Medical Estimation Notice: ' :
                  calculator.category === 'tax' ? 'Tax Estimation Notice: ' :
                  calculator.category === 'cryptocurrency' ? 'Digital Asset Notice: ' :
                  'Financial Modeling Notice: '}
               </strong>
-              {calculator.category === 'health' ? 
+              {calculator.category === 'fitness-health' ? 
                 'This tool provides generalized estimations based on population formulas and is not a substitute for professional clinical medical diagnosis or healthcare advice.' :
                calculator.category === 'tax' ?
                 'Calculations are mathematical estimations and do not constitute statutory tax or legal counsel. Consult a licensed CPA or tax professional.' :

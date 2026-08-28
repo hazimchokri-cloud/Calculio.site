@@ -158,7 +158,7 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-base font-bold text-[#0F172A]">{localizedPost.author.name}</span>
-                  <ShieldCheck className="w-4.5 h-4.5 text-[#F97316]" title="Verified Author & Subject Matter Expert" />
+                  <ShieldCheck className="w-4.5 h-4.5 text-[#F97316]" aria-label="Verified Author & Subject Matter Expert" />
                 </div>
                 <span className="text-sm text-[#475569] block">{localizedPost.author.role}</span>
                 <span className="text-xs text-[#64748B] font-medium">{localizedPost.author.credentials}</span>

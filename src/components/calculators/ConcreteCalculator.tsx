@@ -184,7 +184,7 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                   min="0.1"
                   step="0.5"
                   value={length}
-                  onChange={(e) => setLength(Number(e.target.value) || 0)}
+                  onChange={(e) => setLength(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                   className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-orange-500"
                 />
               </div>
@@ -197,7 +197,7 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                   min="0.1"
                   step="0.5"
                   value={width}
-                  onChange={(e) => setWidth(Number(e.target.value) || 0)}
+                  onChange={(e) => setWidth(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                   className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-orange-500"
                 />
               </div>
@@ -210,7 +210,7 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                   min="1"
                   step="0.5"
                   value={depth}
-                  onChange={(e) => setDepth(Number(e.target.value) || 0)}
+                  onChange={(e) => setDepth(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                   className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-orange-500"
                 />
               </div>
@@ -225,7 +225,7 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                   type="number"
                   min="1"
                   value={diameter}
-                  onChange={(e) => setDiameter(Number(e.target.value) || 0)}
+                  onChange={(e) => setDiameter(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                   className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-orange-500"
                 />
               </div>
@@ -237,7 +237,7 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                   type="number"
                   min="0.1"
                   value={height}
-                  onChange={(e) => setHeight(Number(e.target.value) || 0)}
+                  onChange={(e) => setHeight(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                   className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-orange-500"
                 />
               </div>
@@ -251,7 +251,7 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                 type="number"
                 min="1"
                 value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value) || 1)}
+                onChange={(e) => setQuantity(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
@@ -262,7 +262,7 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                 min="0"
                 max="50"
                 value={wasteMargin}
-                onChange={(e) => setWasteMargin(Number(e.target.value) || 0)}
+                onChange={(e) => setWasteMargin(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
@@ -272,7 +272,7 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                 type="number"
                 min="0"
                 value={pricePerUnit}
-                onChange={(e) => setPricePerUnit(Number(e.target.value) || 0)}
+                onChange={(e) => setPricePerUnit(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
@@ -280,72 +280,74 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
         </div>
 
         {/* Results Dashboard */}
-        <div className="bg-gradient-to-br from-orange-50/70 to-orange-100/50 p-5 rounded-2xl border border-orange-200/80 flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-orange-200/70">
-              <span className="text-xs font-bold uppercase tracking-wider text-orange-900">Total Concrete Needed</span>
-              <span className="text-[10px] font-bold bg-orange-200/80 text-orange-900 px-2 py-0.5 rounded-full">
-                Includes +{wasteMargin}% Waste
-              </span>
-            </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <div className="bg-white p-3 rounded-xl border border-orange-200 shadow-2xs">
-                <span className="text-[10px] font-semibold text-slate-500 uppercase block">Cubic Yards</span>
-                <span className="text-xl font-black text-slate-900">{results.volumeCubicYards} yd³</span>
+        {results && (
+          <div className="bg-gradient-to-br from-orange-50/70 to-orange-100/50 p-5 rounded-2xl border border-orange-200/80 flex flex-col justify-between space-y-4">
+            <div>
+              <div className="flex items-center justify-between pb-3 border-b border-orange-200/70">
+                <span className="text-xs font-bold uppercase tracking-wider text-orange-900">Total Concrete Needed</span>
+                <span className="text-[10px] font-bold bg-orange-200/80 text-orange-900 px-2 py-0.5 rounded-full">
+                  Includes +{wasteMargin}% Waste
+                </span>
               </div>
-              <div className="bg-white p-3 rounded-xl border border-orange-200 shadow-2xs">
-                <span className="text-[10px] font-semibold text-slate-500 uppercase block">Cubic Meters</span>
-                <span className="text-xl font-black text-slate-900">{results.volumeCubicMeters} m³</span>
-              </div>
-            </div>
 
-            {/* Premix Bag Breakdown */}
-            <div className="mt-3 bg-white p-3.5 rounded-xl border border-orange-200 space-y-2">
-              <span className="text-xs font-bold text-slate-900 flex items-center gap-1">
-                <Package className="w-3.5 h-3.5 text-orange-600" />
-                <span>Pre-Mix Bag Equivalents:</span>
-              </span>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="p-2 bg-slate-50 rounded-lg text-center">
-                  <span className="text-slate-500 text-[10px] block">80 lb (36 kg) Bags</span>
-                  <span className="font-extrabold text-orange-900 text-sm">{results.bags80lb} bags</span>
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="bg-white p-3 rounded-xl border border-orange-200 shadow-2xs">
+                  <span className="text-[10px] font-semibold text-slate-500 uppercase block">Cubic Yards</span>
+                  <span className="text-xl font-black text-slate-900">{results.volumeCubicYards} yd³</span>
                 </div>
-                <div className="p-2 bg-slate-50 rounded-lg text-center">
-                  <span className="text-slate-500 text-[10px] block">60 lb (27 kg) Bags</span>
-                  <span className="font-extrabold text-orange-900 text-sm">{results.bags60lb} bags</span>
+                <div className="bg-white p-3 rounded-xl border border-orange-200 shadow-2xs">
+                  <span className="text-[10px] font-semibold text-slate-500 uppercase block">Cubic Meters</span>
+                  <span className="text-xl font-black text-slate-900">{results.volumeCubicMeters} m³</span>
                 </div>
               </div>
+
+              {/* Premix Bag Breakdown */}
+              <div className="mt-3 bg-white p-3.5 rounded-xl border border-orange-200 space-y-2">
+                <span className="text-xs font-bold text-slate-900 flex items-center gap-1">
+                  <Package className="w-3.5 h-3.5 text-orange-600" />
+                  <span>Pre-Mix Bag Equivalents:</span>
+                </span>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="p-2 bg-slate-50 rounded-lg text-center">
+                    <span className="text-slate-500 text-[10px] block">80 lb (36 kg) Bags</span>
+                    <span className="font-extrabold text-orange-900 text-sm">{results.bags80lb} bags</span>
+                  </div>
+                  <div className="p-2 bg-slate-50 rounded-lg text-center">
+                    <span className="text-slate-500 text-[10px] block">60 lb (27 kg) Bags</span>
+                    <span className="font-extrabold text-orange-900 text-sm">{results.bags60lb} bags</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center justify-between p-3 bg-orange-100/70 rounded-xl border border-orange-300/80">
+                <span className="text-xs font-bold text-orange-900">Estimated Ready-Mix Cost:</span>
+                <span className="text-base font-extrabold text-orange-950 font-mono-numbers">
+                  {currencySymbol}{results.estimatedTotalCost.toLocaleString()}
+                </span>
+              </div>
             </div>
 
-            <div className="mt-3 flex items-center justify-between p-3 bg-orange-100/70 rounded-xl border border-orange-300/80">
-              <span className="text-xs font-bold text-orange-900">Estimated Ready-Mix Cost:</span>
-              <span className="text-base font-extrabold text-orange-950 font-mono-numbers">
-                {currencySymbol}{results.estimatedTotalCost.toLocaleString()}
-              </span>
+            {/* Action Row */}
+            <div className="flex items-center gap-2 pt-3 border-t border-orange-200/80">
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-orange-600" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copied ? 'Copied' : 'Copy'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleReset}
+                className="py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1 transition-all"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset</span>
+              </button>
             </div>
           </div>
-
-          {/* Action Row */}
-          <div className="flex items-center gap-2 pt-3 border-t border-orange-200/80">
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-orange-600" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied' : 'Copy'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1 transition-all"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset</span>
-            </button>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

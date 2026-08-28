@@ -38,7 +38,7 @@ export const GpaCalculator: React.FC<GpaCalculatorProps> = ({ onSaveCalculation 
   ]);
 
   const [priorGpa, setPriorGpa] = useState<number | ''>(3.5);
-  const [priorCredits, setPriorCredits] = useState<number>(30);
+  const [priorCredits, setPriorCredits] = useState<number | ''>(30);
   const [includePrior, setIncludePrior] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   const [saved, setSaved] = useState<boolean>(false);

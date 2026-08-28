@@ -9,16 +9,22 @@ interface BaseCalcProps {
 
 // 1. CAC & LTV Ratio Calculator
 export const CacLtvCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [salesMarketingCost, setSalesMarketingCost] = useState(25000);
-  const [newCustomers, setNewCustomers] = useState(100);
-  const [avgRevenuePerUser, setAvgRevenuePerUser] = useState(85); // per month
-  const [grossMarginPct, setGrossMarginPct] = useState(75);
-  const [churnRatePct, setChurnRatePct] = useState(4.0); // 4% monthly churn
+  const [salesMarketingCost, setSalesMarketingCost] = useState<number | ''>(25000);
+  const [newCustomers, setNewCustomers] = useState<number | ''>(100);
+  const [avgRevenuePerUser, setAvgRevenuePerUser] = useState<number | ''>(85); // per month
+  const [grossMarginPct, setGrossMarginPct] = useState<number | ''>(75);
+  const [churnRatePct, setChurnRatePct] = useState<number | ''>(4.0); // 4% monthly churn
 
   const results = useMemo(() => {
-    const cac = newCustomers > 0 ? salesMarketingCost / newCustomers : 0;
-    const avgLifespanMonths = churnRatePct > 0 ? 1 / (churnRatePct / 100) : 24;
-    const ltv = avgRevenuePerUser * (grossMarginPct / 100) * avgLifespanMonths;
+    const smc = typeof salesMarketingCost === 'number' ? salesMarketingCost : 0;
+    const nc = typeof newCustomers === 'number' ? newCustomers : 0;
+    const arpu = typeof avgRevenuePerUser === 'number' ? avgRevenuePerUser : 0;
+    const gm = typeof grossMarginPct === 'number' ? grossMarginPct : 0;
+    const cr = typeof churnRatePct === 'number' ? churnRatePct : 0;
+
+    const cac = nc > 0 ? smc / nc : 0;
+    const avgLifespanMonths = cr > 0 ? 1 / (cr / 100) : 24;
+    const ltv = arpu * (gm / 100) * avgLifespanMonths;
     const ltvCacRatio = cac > 0 ? ltv / cac : 0;
 
     let healthStatus = 'Healthy (3:1 to 5:1)';
@@ -49,7 +55,7 @@ export const CacLtvCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
               <input
                 type="number"
                 value={salesMarketingCost}
-                onChange={(e) => setSalesMarketingCost(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setSalesMarketingCost(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -58,7 +64,7 @@ export const CacLtvCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
               <input
                 type="number"
                 value={newCustomers}
-                onChange={(e) => setNewCustomers(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setNewCustomers(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -70,8 +76,8 @@ export const CacLtvCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
               <input
                 type="number"
                 value={avgRevenuePerUser}
-                onChange={(e) => setAvgRevenuePerUser(Math.max(0, Number(e.target.value)))}
-                className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
+                onChange={(e) => setAvgRevenuePerUser(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
@@ -79,8 +85,8 @@ export const CacLtvCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
               <input
                 type="number"
                 value={grossMarginPct}
-                onChange={(e) => setGrossMarginPct(Number(e.target.value))}
-                className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
+                onChange={(e) => setGrossMarginPct(e.target.value === '' ? '' : Number(e.target.value))}
+                className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
@@ -89,8 +95,8 @@ export const CacLtvCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
                 type="number"
                 step="0.1"
                 value={churnRatePct}
-                onChange={(e) => setChurnRatePct(Math.max(0.1, Number(e.target.value)))}
-                className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
+                onChange={(e) => setChurnRatePct(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
           </div>
@@ -131,12 +137,15 @@ export const CacLtvCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
 
 // 2. Markup vs Margin Pricing Calculator
 export const MarkupMarginCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [cost, setCost] = useState(50);
-  const [sellingPrice, setSellingPrice] = useState(80);
+  const [cost, setCost] = useState<number | ''>(50);
+  const [sellingPrice, setSellingPrice] = useState<number | ''>(80);
 
-  const profit = sellingPrice - cost;
-  const markupPct = cost > 0 ? (profit / cost) * 100 : 0;
-  const marginPct = sellingPrice > 0 ? (profit / sellingPrice) * 100 : 0;
+  const c = typeof cost === 'number' ? cost : 0;
+  const sp = typeof sellingPrice === 'number' ? sellingPrice : 0;
+
+  const profit = sp - c;
+  const markupPct = c > 0 ? (profit / c) * 100 : 0;
+  const marginPct = sp > 0 ? (profit / sp) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -149,7 +158,7 @@ export const MarkupMarginCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
               <input
                 type="number"
                 value={cost}
-                onChange={(e) => setCost(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setCost(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -158,7 +167,7 @@ export const MarkupMarginCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
               <input
                 type="number"
                 value={sellingPrice}
-                onChange={(e) => setSellingPrice(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setSellingPrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -191,12 +200,16 @@ export const MarkupMarginCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
 
 // 3. Inventory Turnover Ratio Calculator
 export const InventoryTurnoverCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [cogs, setCogs] = useState(450000);
-  const [beginningInventory, setBeginningInventory] = useState(80000);
-  const [endingInventory, setEndingInventory] = useState(100000);
+  const [cogs, setCogs] = useState<number | ''>(450000);
+  const [beginningInventory, setBeginningInventory] = useState<number | ''>(80000);
+  const [endingInventory, setEndingInventory] = useState<number | ''>(100000);
 
-  const avgInventory = (beginningInventory + endingInventory) / 2;
-  const turnoverRatio = avgInventory > 0 ? cogs / avgInventory : 0;
+  const c = typeof cogs === 'number' ? cogs : 0;
+  const bi = typeof beginningInventory === 'number' ? beginningInventory : 0;
+  const ei = typeof endingInventory === 'number' ? endingInventory : 0;
+
+  const avgInventory = (bi + ei) / 2;
+  const turnoverRatio = avgInventory > 0 ? c / avgInventory : 0;
   const daysToSell = turnoverRatio > 0 ? 365 / turnoverRatio : 0;
 
   return (
@@ -209,7 +222,7 @@ export const InventoryTurnoverCalculator: React.FC<BaseCalcProps> = ({ currencyS
             <input
               type="number"
               value={cogs}
-              onChange={(e) => setCogs(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setCogs(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -219,7 +232,7 @@ export const InventoryTurnoverCalculator: React.FC<BaseCalcProps> = ({ currencyS
               <input
                 type="number"
                 value={beginningInventory}
-                onChange={(e) => setBeginningInventory(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setBeginningInventory(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -228,7 +241,7 @@ export const InventoryTurnoverCalculator: React.FC<BaseCalcProps> = ({ currencyS
               <input
                 type="number"
                 value={endingInventory}
-                onChange={(e) => setEndingInventory(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setEndingInventory(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -261,16 +274,22 @@ export const InventoryTurnoverCalculator: React.FC<BaseCalcProps> = ({ currencyS
 
 // 4. EBITDA Calculator
 export const EbitdaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [revenue, setRevenue] = useState(1200000);
-  const [cogs, setCogs] = useState(400000);
-  const [operatingExpenses, setOperatingExpenses] = useState(350000);
-  const [depreciation, setDepreciation] = useState(45000);
-  const [amortization, setAmortization] = useState(15000);
+  const [revenue, setRevenue] = useState<number | ''>(1200000);
+  const [cogs, setCogs] = useState<number | ''>(400000);
+  const [operatingExpenses, setOperatingExpenses] = useState<number | ''>(350000);
+  const [depreciation, setDepreciation] = useState<number | ''>(45000);
+  const [amortization, setAmortization] = useState<number | ''>(15000);
 
-  const grossProfit = revenue - cogs;
-  const operatingIncome = grossProfit - operatingExpenses; // EBIT
-  const ebitda = operatingIncome + depreciation + amortization;
-  const ebitdaMargin = revenue > 0 ? (ebitda / revenue) * 100 : 0;
+  const rev = typeof revenue === 'number' ? revenue : 0;
+  const costG = typeof cogs === 'number' ? cogs : 0;
+  const opex = typeof operatingExpenses === 'number' ? operatingExpenses : 0;
+  const dep = typeof depreciation === 'number' ? depreciation : 0;
+  const amort = typeof amortization === 'number' ? amortization : 0;
+
+  const grossProfit = rev - costG;
+  const operatingIncome = grossProfit - opex; // EBIT
+  const ebitda = operatingIncome + dep + amort;
+  const ebitdaMargin = rev > 0 ? (ebitda / rev) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -283,7 +302,7 @@ export const EbitdaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
               <input
                 type="number"
                 value={revenue}
-                onChange={(e) => setRevenue(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setRevenue(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -292,7 +311,7 @@ export const EbitdaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
               <input
                 type="number"
                 value={cogs}
-                onChange={(e) => setCogs(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setCogs(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -303,7 +322,7 @@ export const EbitdaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
             <input
               type="number"
               value={operatingExpenses}
-              onChange={(e) => setOperatingExpenses(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setOperatingExpenses(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -314,7 +333,7 @@ export const EbitdaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
               <input
                 type="number"
                 value={depreciation}
-                onChange={(e) => setDepreciation(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setDepreciation(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -323,7 +342,7 @@ export const EbitdaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
               <input
                 type="number"
                 value={amortization}
-                onChange={(e) => setAmortization(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setAmortization(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -357,13 +376,17 @@ export const EbitdaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
 
 // 5. Startup Burn Rate & Runway Calculator
 export const BurnRateCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [cashBalance, setCashBalance] = useState(350000);
-  const [monthlyRevenue, setMonthlyRevenue] = useState(15000);
-  const [monthlyExpenses, setMonthlyExpenses] = useState(45000);
+  const [cashBalance, setCashBalance] = useState<number | ''>(350000);
+  const [monthlyRevenue, setMonthlyRevenue] = useState<number | ''>(15000);
+  const [monthlyExpenses, setMonthlyExpenses] = useState<number | ''>(45000);
 
-  const grossBurn = monthlyExpenses;
-  const netBurn = monthlyExpenses - monthlyRevenue;
-  const runwayMonths = netBurn > 0 ? cashBalance / netBurn : Infinity;
+  const cash = typeof cashBalance === 'number' ? cashBalance : 0;
+  const rev = typeof monthlyRevenue === 'number' ? monthlyRevenue : 0;
+  const exp = typeof monthlyExpenses === 'number' ? monthlyExpenses : 0;
+
+  const grossBurn = exp;
+  const netBurn = exp - rev;
+  const runwayMonths = netBurn > 0 ? cash / netBurn : Infinity;
 
   return (
     <div className="space-y-6">
@@ -375,7 +398,7 @@ export const BurnRateCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
             <input
               type="number"
               value={cashBalance}
-              onChange={(e) => setCashBalance(Math.max(0, Number(e.target.value)))}
+              onChange={(e) => setCashBalance(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -385,7 +408,7 @@ export const BurnRateCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
               <input
                 type="number"
                 value={monthlyExpenses}
-                onChange={(e) => setMonthlyExpenses(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setMonthlyExpenses(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -394,7 +417,7 @@ export const BurnRateCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
               <input
                 type="number"
                 value={monthlyRevenue}
-                onChange={(e) => setMonthlyRevenue(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setMonthlyRevenue(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -427,20 +450,27 @@ export const BurnRateCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
 
 // 6. Paint Coverage & Gallons Calculator
 export const PaintCalculator: React.FC<BaseCalcProps> = () => {
-  const [roomLength, setRoomLength] = useState(14);
-  const [roomWidth, setRoomWidth] = useState(12);
-  const [ceilingHeight, setCeilingHeight] = useState(9);
-  const [doors, setDoors] = useState(2);
-  const [windows, setWindows] = useState(2);
-  const [coats, setCoats] = useState(2);
+  const [roomLength, setRoomLength] = useState<number | ''>(14);
+  const [roomWidth, setRoomWidth] = useState<number | ''>(12);
+  const [ceilingHeight, setCeilingHeight] = useState<number | ''>(9);
+  const [doors, setDoors] = useState<number | ''>(2);
+  const [windows, setWindows] = useState<number | ''>(2);
+  const [coats, setCoats] = useState<number | ''>(2);
 
   const results = useMemo(() => {
-    const wallPerimeter = 2 * (roomLength + roomWidth);
-    const grossWallArea = wallPerimeter * ceilingHeight;
-    const doorDeduction = doors * 20; // ~20 sq ft per door
-    const windowDeduction = windows * 15; // ~15 sq ft per window
+    const rl = typeof roomLength === 'number' ? roomLength : 0;
+    const rw = typeof roomWidth === 'number' ? roomWidth : 0;
+    const ch = typeof ceilingHeight === 'number' ? ceilingHeight : 0;
+    const d = typeof doors === 'number' ? doors : 0;
+    const w = typeof windows === 'number' ? windows : 0;
+    const c = typeof coats === 'number' ? coats : 1;
+
+    const wallPerimeter = 2 * (rl + rw);
+    const grossWallArea = wallPerimeter * ch;
+    const doorDeduction = d * 20; // ~20 sq ft per door
+    const windowDeduction = w * 15; // ~15 sq ft per window
     const netArea = Math.max(0, grossWallArea - doorDeduction - windowDeduction);
-    const totalSqFtToPaint = netArea * coats;
+    const totalSqFtToPaint = netArea * c;
     
     // Standard 1 gallon covers approx 350-400 sq ft
     const gallonsNeeded = Math.ceil(totalSqFtToPaint / 350);
@@ -459,7 +489,7 @@ export const PaintCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={roomLength}
-                onChange={(e) => setRoomLength(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setRoomLength(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -468,7 +498,7 @@ export const PaintCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={roomWidth}
-                onChange={(e) => setRoomWidth(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setRoomWidth(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -477,7 +507,7 @@ export const PaintCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={ceilingHeight}
-                onChange={(e) => setCeilingHeight(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setCeilingHeight(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -489,7 +519,7 @@ export const PaintCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={doors}
-                onChange={(e) => setDoors(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setDoors(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -498,7 +528,7 @@ export const PaintCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={windows}
-                onChange={(e) => setWindows(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setWindows(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -507,7 +537,7 @@ export const PaintCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={coats}
-                onChange={(e) => setCoats(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setCoats(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -520,7 +550,7 @@ export const PaintCalculator: React.FC<BaseCalcProps> = () => {
             <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
               {results.gallonsNeeded} Gallons
             </div>
-            <p className="text-xs text-blue-800 mt-1">Based on {coats} coats ({results.totalSqFtToPaint} sq ft total coverage)</p>
+            <p className="text-xs text-blue-800 mt-1">Based on {coats || 1} coats ({results.totalSqFtToPaint} sq ft total coverage)</p>
           </div>
 
           <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1">
@@ -541,12 +571,15 @@ export const PaintCalculator: React.FC<BaseCalcProps> = () => {
 
 // 7. Drywall Sheets & Screws Calculator
 export const DrywallCalculator: React.FC<BaseCalcProps> = () => {
-  const [wallSqFt, setWallSqFt] = useState(600);
+  const [wallSqFt, setWallSqFt] = useState<number | ''>(600);
   const [sheetSize, setSheetSize] = useState<'4x8' | '4x12'>('4x8');
-  const [wastePct, setWastePct] = useState(10);
+  const [wastePct, setWastePct] = useState<number | ''>(10);
+
+  const wSqFt = typeof wallSqFt === 'number' ? wallSqFt : 0;
+  const waste = typeof wastePct === 'number' ? wastePct : 0;
 
   const sheetSqFt = sheetSize === '4x8' ? 32 : 48;
-  const totalSqFtWithWaste = wallSqFt * (1 + wastePct / 100);
+  const totalSqFtWithWaste = wSqFt * (1 + waste / 100);
   const sheetsNeeded = Math.ceil(totalSqFtWithWaste / sheetSqFt);
   const screwsNeeded = sheetsNeeded * 32; // ~32 screws per 4x8 sheet
   const compoundGallons = Math.ceil(sheetsNeeded * 0.05); // ~0.05 gal joint compound per sheet
@@ -561,7 +594,7 @@ export const DrywallCalculator: React.FC<BaseCalcProps> = () => {
             <input
               type="number"
               value={wallSqFt}
-              onChange={(e) => setWallSqFt(Math.max(1, Number(e.target.value)))}
+              onChange={(e) => setWallSqFt(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -582,7 +615,7 @@ export const DrywallCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={wastePct}
-                onChange={(e) => setWastePct(Number(e.target.value))}
+                onChange={(e) => setWastePct(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -615,10 +648,13 @@ export const DrywallCalculator: React.FC<BaseCalcProps> = () => {
 
 // 8. Mulch & Gravel Volume Calculator
 export const MulchGravelCalculator: React.FC<BaseCalcProps> = () => {
-  const [areaSqFt, setAreaSqFt] = useState(300);
-  const [depthInches, setDepthInches] = useState(3);
+  const [areaSqFt, setAreaSqFt] = useState<number | ''>(300);
+  const [depthInches, setDepthInches] = useState<number | ''>(3);
 
-  const cubicFeet = areaSqFt * (depthInches / 12);
+  const aSqFt = typeof areaSqFt === 'number' ? areaSqFt : 0;
+  const dInches = typeof depthInches === 'number' ? depthInches : 0;
+
+  const cubicFeet = aSqFt * (dInches / 12);
   const cubicYards = cubicFeet / 27;
   const tonsOfGravel = cubicYards * 1.4; // standard ~1.4 tons per cubic yard of gravel
   const bagsTwoCuFt = Math.ceil(cubicFeet / 2); // 2 cu ft mulch bags
@@ -633,7 +669,7 @@ export const MulchGravelCalculator: React.FC<BaseCalcProps> = () => {
             <input
               type="number"
               value={areaSqFt}
-              onChange={(e) => setAreaSqFt(Math.max(1, Number(e.target.value)))}
+              onChange={(e) => setAreaSqFt(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -643,7 +679,7 @@ export const MulchGravelCalculator: React.FC<BaseCalcProps> = () => {
               type="number"
               step="0.5"
               value={depthInches}
-              onChange={(e) => setDepthInches(Math.max(0.5, Number(e.target.value)))}
+              onChange={(e) => setDepthInches(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -676,13 +712,16 @@ export const MulchGravelCalculator: React.FC<BaseCalcProps> = () => {
 
 // 9. Decking & Board Footage Calculator
 export const DeckLumberCalculator: React.FC<BaseCalcProps> = () => {
-  const [deckLength, setDeckLength] = useState(16); // ft
-  const [deckWidth, setDeckWidth] = useState(12); // ft
-  const [boardWidthInches, setBoardWidthInches] = useState(5.5); // standard 5.5" (nominal 6")
+  const [deckLength, setDeckLength] = useState<number | ''>(16); // ft
+  const [deckWidth, setDeckWidth] = useState<number | ''>(12); // ft
+  const [boardWidthInches, setBoardWidthInches] = useState<number>(5.5); // standard 5.5" (nominal 6")
 
-  const totalDeckSqFt = deckLength * deckWidth;
+  const dL = typeof deckLength === 'number' ? deckLength : 0;
+  const dW = typeof deckWidth === 'number' ? deckWidth : 0;
+
+  const totalDeckSqFt = dL * dW;
   const boardWidthFeet = boardWidthInches / 12;
-  const linearFeetNeeded = totalDeckSqFt / boardWidthFeet;
+  const linearFeetNeeded = boardWidthFeet > 0 ? totalDeckSqFt / boardWidthFeet : 0;
   const standard16FtBoards = Math.ceil(linearFeetNeeded / 16 * 1.1); // with 10% waste
 
   return (
@@ -696,7 +735,7 @@ export const DeckLumberCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={deckLength}
-                onChange={(e) => setDeckLength(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setDeckLength(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -705,7 +744,7 @@ export const DeckLumberCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={deckWidth}
-                onChange={(e) => setDeckWidth(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setDeckWidth(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>

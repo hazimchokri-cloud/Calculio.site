@@ -116,31 +116,23 @@ Inputs: A=${numA}, B=${numB}, C=${numC}`;
         </div>
 
         {/* Results Block */}
-        <div className="bg-[#FFF7ED] p-6 rounded-2xl border border-[#FDBA74] flex flex-col justify-between space-y-4">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#FDBA74]">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#9A3412]">Computed Output</span>
-              <span className="text-[10px] font-bold bg-[#FFFFFF] text-[#9A3412] px-2 py-0.5 rounded-full border border-[#FDBA74]">
-                Real-Time
-              </span>
-            </div>
+        {results && (
+          <div className="bg-[#FFF7ED] p-6 rounded-2xl border border-[#FDBA74] flex flex-col justify-between space-y-4">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[#FDBA74]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#9A3412]">Computed Output</span>
+                <span className="text-[10px] font-bold bg-[#FFFFFF] text-[#9A3412] px-2 py-0.5 rounded-full border border-[#FDBA74]">
+                  Real-Time
+                </span>
+              </div>
 
-            <div className="p-4 bg-[#FFFFFF] rounded-xl border border-[#FDBA74] shadow-2xs text-center space-y-1 min-h-[88px] flex flex-col justify-center">
-              {results ? (
-                <>
-                  <span className="text-[11px] font-bold text-[#64748B] uppercase">Primary Computed Result</span>
-                  <div className="text-3xl font-black text-[#9A3412] font-mono">
-                    {results.primaryResult}
-                  </div>
-                </>
-              ) : (
-                <div className="text-[#EA580C] font-semibold text-xs">
-                  Please enter a valid value.
+              <div className="p-4 bg-[#FFFFFF] rounded-xl border border-[#FDBA74] shadow-2xs text-center space-y-1 min-h-[88px] flex flex-col justify-center">
+                <span className="text-[11px] font-bold text-[#64748B] uppercase">Primary Computed Result</span>
+                <div className="text-3xl font-black text-[#9A3412] font-mono">
+                  {results.primaryResult}
                 </div>
-              )}
-            </div>
+              </div>
 
-            {results && (
               <div className="bg-[#FFFFFF] p-3.5 rounded-xl border border-[#FDBA74] space-y-2 text-xs text-[#475569]">
                 <div className="flex justify-between">
                   <span>Calculated Ratio:</span>
@@ -155,10 +147,8 @@ Inputs: A=${numA}, B=${numB}, C=${numC}`;
                   <span className="font-bold text-[#0F172A] font-mono">{results.sum}</span>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
 
-          {results && (
             <div className="pt-3 border-t border-[#FDBA74]">
               <button
                 type="button"
@@ -169,8 +159,8 @@ Inputs: A=${numA}, B=${numB}, C=${numC}`;
                 <span>{copied ? 'Copied' : 'Copy Results'}</span>
               </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

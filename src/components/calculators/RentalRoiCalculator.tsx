@@ -32,30 +32,48 @@ export const RentalRoiCalculator: React.FC<RentalRoiCalculatorProps> = ({
 
   const [copied, setCopied] = useState(false);
 
+  const isInputEmpty = purchasePrice === '' || monthlyRent === '';
+
   const results = useMemo(() => {
-    const downPaymentAmount = purchasePrice * (downPaymentPercent / 100);
-    const loanAmount = purchasePrice - downPaymentAmount;
-    const totalInitialInvestment = downPaymentAmount + closingCosts + rehabCosts;
+    if (isInputEmpty) return null;
+    const numPrice = typeof purchasePrice === 'number' ? purchasePrice : 0;
+    const numDownPct = typeof downPaymentPercent === 'number' ? downPaymentPercent : 0;
+    const numRate = typeof interestRate === 'number' ? interestRate : 0;
+    const numTerm = typeof loanTermYears === 'number' ? loanTermYears : 30;
+    const numClosing = typeof closingCosts === 'number' ? closingCosts : 0;
+    const numRehab = typeof rehabCosts === 'number' ? rehabCosts : 0;
+    const numRent = typeof monthlyRent === 'number' ? monthlyRent : 0;
+    const numOtherInc = typeof otherMonthlyIncome === 'number' ? otherMonthlyIncome : 0;
+    const numTaxYr = typeof propertyTaxYearly === 'number' ? propertyTaxYearly : 0;
+    const numInsYr = typeof insuranceYearly === 'number' ? insuranceYearly : 0;
+    const numHoa = typeof hoaMonthly === 'number' ? hoaMonthly : 0;
+    const numMaintPct = typeof maintenancePercent === 'number' ? maintenancePercent : 0;
+    const numVacPct = typeof vacancyPercent === 'number' ? vacancyPercent : 0;
+    const numMgmtPct = typeof managementPercent === 'number' ? managementPercent : 0;
+
+    const downPaymentAmount = numPrice * (numDownPct / 100);
+    const loanAmount = Math.max(0, numPrice - downPaymentAmount);
+    const totalInitialInvestment = downPaymentAmount + numClosing + numRehab;
 
     // Monthly Mortgage PI
-    const monthlyRate = interestRate / 100 / 12;
-    const numPayments = loanTermYears * 12;
+    const monthlyRate = numRate / 100 / 12;
+    const numPayments = Math.max(1, numTerm * 12);
     const monthlyMortgage = monthlyRate > 0
       ? (loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numPayments))) / (Math.pow(1 + monthlyRate, numPayments) - 1)
       : loanAmount / numPayments;
 
     // Monthly Income
-    const grossMonthlyIncome = monthlyRent + otherMonthlyIncome;
+    const grossMonthlyIncome = numRent + numOtherInc;
     const annualGrossIncome = grossMonthlyIncome * 12;
 
     // Monthly Expenses
-    const monthlyTax = propertyTaxYearly / 12;
-    const monthlyInsurance = insuranceYearly / 12;
-    const monthlyMaintenance = monthlyRent * (maintenancePercent / 100);
-    const monthlyVacancy = monthlyRent * (vacancyPercent / 100);
-    const monthlyManagement = monthlyRent * (managementPercent / 100);
+    const monthlyTax = numTaxYr / 12;
+    const monthlyInsurance = numInsYr / 12;
+    const monthlyMaintenance = numRent * (numMaintPct / 100);
+    const monthlyVacancy = numRent * (numVacPct / 100);
+    const monthlyManagement = numRent * (numMgmtPct / 100);
 
-    const monthlyOperatingExpenses = monthlyTax + monthlyInsurance + hoaMonthly + monthlyMaintenance + monthlyVacancy + monthlyManagement;
+    const monthlyOperatingExpenses = monthlyTax + monthlyInsurance + numHoa + monthlyMaintenance + monthlyVacancy + monthlyManagement;
     const annualOperatingExpenses = monthlyOperatingExpenses * 12;
 
     // Net Operating Income (NOI) = Gross Income - Operating Expenses (before debt service)
@@ -67,9 +85,9 @@ export const RentalRoiCalculator: React.FC<RentalRoiCalculatorProps> = ({
     const annualCashFlow = monthlyCashFlow * 12;
 
     // Key Real Estate Metrics
-    const capRate = purchasePrice > 0 ? (annualNOI / purchasePrice) * 100 : 0;
+    const capRate = numPrice > 0 ? (annualNOI / numPrice) * 100 : 0;
     const cashOnCashReturn = totalInitialInvestment > 0 ? (annualCashFlow / totalInitialInvestment) * 100 : 0;
-    const grossRentMultiplier = annualGrossIncome > 0 ? purchasePrice / annualGrossIncome : 0;
+    const grossRentMultiplier = annualGrossIncome > 0 ? numPrice / annualGrossIncome : 0;
     const operatingExpenseRatio = annualGrossIncome > 0 ? (annualOperatingExpenses / annualGrossIncome) * 100 : 0;
 
     return {
@@ -86,6 +104,7 @@ export const RentalRoiCalculator: React.FC<RentalRoiCalculatorProps> = ({
       operatingExpenseRatio: Math.round(operatingExpenseRatio * 10) / 10
     };
   }, [
+    isInputEmpty,
     purchasePrice,
     downPaymentPercent,
     interestRate,
@@ -120,6 +139,7 @@ export const RentalRoiCalculator: React.FC<RentalRoiCalculatorProps> = ({
   };
 
   const handleCopy = () => {
+    if (!results) return;
     const text = `Real Estate Rental ROI Analysis:
 Purchase: ${currencySymbol}${purchasePrice.toLocaleString()} | Initial Cash: ${currencySymbol}${results.totalInitialInvestment.toLocaleString()}
 Net Monthly Cash Flow: ${currencySymbol}${results.monthlyCashFlow.toLocaleString()}/mo
@@ -244,62 +264,70 @@ Annual NOI: ${currencySymbol}${results.annualNOI.toLocaleString()} | GRM: ${resu
 
         {/* Results Metrics Dashboard */}
         <div className="lg:col-span-5 bg-gradient-to-br from-indigo-50/90 to-slate-50 p-6 rounded-2xl border border-indigo-200 flex flex-col justify-between space-y-5">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-indigo-200">
-              <span className="text-xs font-bold uppercase tracking-wider text-indigo-900">Rental Performance</span>
-              <span className="text-xs font-black text-indigo-800">
-                Initial: {currencySymbol}{results.totalInitialInvestment.toLocaleString()}
-              </span>
-            </div>
+          {results ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-indigo-200">
+                <span className="text-xs font-bold uppercase tracking-wider text-indigo-900">Rental Performance</span>
+                <span className="text-xs font-black text-indigo-800">
+                  Initial: {currencySymbol}{results.totalInitialInvestment.toLocaleString()}
+                </span>
+              </div>
 
-            {/* Top Primary Stat: Monthly Cash Flow */}
-            <div className="p-4 bg-white rounded-xl border border-indigo-200 shadow-2xs text-center">
-              <span className="text-[11px] font-bold text-slate-500 uppercase">Net Monthly Cash Flow</span>
-              <div className={`text-2xl sm:text-3xl font-black mt-0.5 ${results.monthlyCashFlow >= 0 ? 'text-orange-600' : 'text-rose-600'}`}>
-                {currencySymbol}{results.monthlyCashFlow.toLocaleString()}
-                <span className="text-xs text-slate-500 font-semibold ml-1">/ mo</span>
+              {/* Top Primary Stat: Monthly Cash Flow */}
+              <div className="p-4 bg-white rounded-xl border border-indigo-200 shadow-2xs text-center">
+                <span className="text-[11px] font-bold text-slate-500 uppercase">Net Monthly Cash Flow</span>
+                <div className={`text-2xl sm:text-3xl font-black mt-0.5 ${results.monthlyCashFlow >= 0 ? 'text-orange-600' : 'text-rose-600'}`}>
+                  {currencySymbol}{results.monthlyCashFlow.toLocaleString()}
+                  <span className="text-xs text-slate-500 font-semibold ml-1">/ mo</span>
+                </div>
+                <span className="text-xs text-slate-600 font-semibold mt-1 block">
+                  {currencySymbol}{results.annualCashFlow.toLocaleString()} net annual profit
+                </span>
               </div>
-              <span className="text-xs text-slate-600 font-semibold mt-1 block">
-                {currencySymbol}{results.annualCashFlow.toLocaleString()} net annual profit
-              </span>
-            </div>
 
-            {/* Metrics Grid */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white p-3 rounded-xl border border-indigo-100 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Cap Rate</span>
-                <span className="text-xl font-black text-indigo-900 block">{results.capRate}%</span>
-                <span className="text-[10px] text-slate-500">Unleveraged return</span>
+              {/* Metrics Grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white p-3 rounded-xl border border-indigo-100 shadow-2xs">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Cap Rate</span>
+                  <span className="text-xl font-black text-indigo-900 block">{results.capRate}%</span>
+                  <span className="text-[10px] text-slate-500">Unleveraged return</span>
+                </div>
+                <div className="bg-white p-3 rounded-xl border border-indigo-100 shadow-2xs">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Cash-on-Cash Return</span>
+                  <span className="text-xl font-black text-orange-700 block">{results.cashOnCashReturn}%</span>
+                  <span className="text-[10px] text-slate-500">Annual cash ROI</span>
+                </div>
               </div>
-              <div className="bg-white p-3 rounded-xl border border-indigo-100 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Cash-on-Cash Return</span>
-                <span className="text-xl font-black text-orange-700 block">{results.cashOnCashReturn}%</span>
-                <span className="text-[10px] text-slate-500">Annual cash ROI</span>
-              </div>
-            </div>
 
-            {/* NOI & GRM */}
-            <div className="bg-white p-3.5 rounded-xl border border-indigo-100 space-y-2 text-xs">
-              <div className="flex justify-between text-slate-700">
-                <span>Net Operating Income (NOI):</span>
-                <span className="font-bold text-slate-900">{currencySymbol}{results.annualNOI.toLocaleString()}/yr</span>
-              </div>
-              <div className="flex justify-between text-slate-700">
-                <span>Monthly Mortgage (P&I):</span>
-                <span className="font-bold text-slate-900">{currencySymbol}{results.monthlyMortgage.toLocaleString()}/mo</span>
-              </div>
-              <div className="flex justify-between text-slate-700">
-                <span>Gross Rent Multiplier (GRM):</span>
-                <span className="font-bold text-indigo-700">{results.grossRentMultiplier}x</span>
+              {/* NOI & GRM */}
+              <div className="bg-white p-3.5 rounded-xl border border-indigo-100 space-y-2 text-xs">
+                <div className="flex justify-between text-slate-700">
+                  <span>Net Operating Income (NOI):</span>
+                  <span className="font-bold text-slate-900">{currencySymbol}{results.annualNOI.toLocaleString()}/yr</span>
+                </div>
+                <div className="flex justify-between text-slate-700">
+                  <span>Monthly Mortgage (P&I):</span>
+                  <span className="font-bold text-slate-900">{currencySymbol}{results.monthlyMortgage.toLocaleString()}/mo</span>
+                </div>
+                <div className="flex justify-between text-slate-700">
+                  <span>Gross Rent Multiplier (GRM):</span>
+                  <span className="font-bold text-indigo-700">{results.grossRentMultiplier}x</span>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-white p-8 rounded-xl border border-indigo-100 text-center space-y-2">
+              <p className="text-orange-600 font-semibold text-sm">Please enter property price and rental income.</p>
+              <p className="text-xs text-slate-500">Enter numbers in the fields to calculate rental yields and ROI.</p>
+            </div>
+          )}
 
           <div className="flex items-center gap-2 pt-3 border-t border-indigo-200">
             <button
               type="button"
+              disabled={!results}
               onClick={handleCopy}
-              className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs"
+              className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-orange-600" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied ROI' : 'Copy Results'}</span>

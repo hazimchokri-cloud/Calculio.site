@@ -330,97 +330,101 @@ Scientific: ${conversionResults.scientific}`;
 
         {/* Right Output */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
-            {tab === 'convert' && conversionResults && (
-              <div className="space-y-4">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-300">
-                    Simplified Fraction
-                  </span>
-                  <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
-                    {conversionResults.fraction}
+          {((tab === 'convert' && conversionResults) ||
+            (tab === 'operations' && operationResults) ||
+            (tab === 'rounding' && roundingResults)) && (
+            <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
+              {tab === 'convert' && conversionResults && (
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-blue-300">
+                      Simplified Fraction
+                    </span>
+                    <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
+                      {conversionResults.fraction}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 pt-3 border-t border-blue-900/60 text-xs">
+                    <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
+                      <span className="text-[10px] text-slate-300 uppercase font-bold block">Percentage</span>
+                      <span className="text-lg font-bold text-orange-300 font-mono">{conversionResults.percentage}</span>
+                    </div>
+                    <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
+                      <span className="text-[10px] text-slate-300 uppercase font-bold block">Scientific Notation</span>
+                      <span className="text-lg font-bold text-white font-mono">{conversionResults.scientific}</span>
+                    </div>
                   </div>
                 </div>
-
-                <div className="grid grid-cols-2 gap-3 pt-3 border-t border-blue-900/60 text-xs">
-                  <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
-                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Percentage</span>
-                    <span className="text-lg font-bold text-orange-300 font-mono">{conversionResults.percentage}</span>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
-                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Scientific Notation</span>
-                    <span className="text-lg font-bold text-white font-mono">{conversionResults.scientific}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {tab === 'operations' && operationResults && (
-              <div className="space-y-4">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-300">
-                    Result ({operationResults.a} {operationResults.op} {operationResults.b})
-                  </span>
-                  <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1 font-mono">
-                    {operationResults.result}
-                  </div>
-                </div>
-
-                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs text-xs">
-                  <span className="text-[10px] text-slate-300 uppercase font-bold block">Equivalent Fraction</span>
-                  <span className="text-lg font-bold text-orange-300 font-mono">{operationResults.fraction}</span>
-                </div>
-              </div>
-            )}
-
-            {tab === 'rounding' && roundingResults && (
-              <div className="space-y-4">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-300">
-                    Standard Rounded Result
-                  </span>
-                  <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
-                    {roundingResults.fixed}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 pt-3 border-t border-blue-900/60 text-xs">
-                  <div className="bg-white/10 rounded-xl p-2.5">
-                    <span className="text-[10px] text-slate-300 block">Round Down (Floor)</span>
-                    <span className="font-bold font-mono text-white">{roundingResults.floor}</span>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-2.5">
-                    <span className="text-[10px] text-slate-300 block">Round Up (Ceil)</span>
-                    <span className="font-bold font-mono text-white">{roundingResults.ceil}</span>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-2.5">
-                    <span className="text-[10px] text-slate-300 block">Nearest Integer</span>
-                    <span className="font-bold font-mono text-white">{roundingResults.whole}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2 pt-4 border-t border-blue-900/60">
-              <button
-                onClick={handleCopy}
-                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Copied' : 'Copy Results'}</span>
-              </button>
-              {onSaveCalculation && (
-                <button
-                  onClick={handleSave}
-                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-                >
-                  <Bookmark className="w-3.5 h-3.5" />
-                  <span>{saved ? 'Saved' : 'Save'}</span>
-                </button>
               )}
+
+              {tab === 'operations' && operationResults && (
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-blue-300">
+                      Result ({operationResults.a} {operationResults.op} {operationResults.b})
+                    </span>
+                    <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1 font-mono">
+                      {operationResults.result}
+                    </div>
+                  </div>
+
+                  <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs text-xs">
+                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Equivalent Fraction</span>
+                    <span className="text-lg font-bold text-orange-300 font-mono">{operationResults.fraction}</span>
+                  </div>
+                </div>
+              )}
+
+              {tab === 'rounding' && roundingResults && (
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-blue-300">
+                      Standard Rounded Result
+                    </span>
+                    <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
+                      {roundingResults.fixed}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 pt-3 border-t border-blue-900/60 text-xs">
+                    <div className="bg-white/10 rounded-xl p-2.5">
+                      <span className="text-[10px] text-slate-300 block">Round Down (Floor)</span>
+                      <span className="font-bold font-mono text-white">{roundingResults.floor}</span>
+                    </div>
+                    <div className="bg-white/10 rounded-xl p-2.5">
+                      <span className="text-[10px] text-slate-300 block">Round Up (Ceil)</span>
+                      <span className="font-bold font-mono text-white">{roundingResults.ceil}</span>
+                    </div>
+                    <div className="bg-white/10 rounded-xl p-2.5">
+                      <span className="text-[10px] text-slate-300 block">Nearest Integer</span>
+                      <span className="font-bold font-mono text-white">{roundingResults.whole}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2 pt-4 border-t border-blue-900/60">
+                <button
+                  onClick={handleCopy}
+                  className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? 'Copied' : 'Copy Results'}</span>
+                </button>
+                {onSaveCalculation && (
+                  <button
+                    onClick={handleSave}
+                    className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  >
+                    <Bookmark className="w-3.5 h-3.5" />
+                    <span>{saved ? 'Saved' : 'Save'}</span>
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

@@ -103,7 +103,7 @@ Annualized ROI (CAGR): ${calculations.annualizedRoiPct.toFixed(2)}%/year over ${
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Initial Capital Invested</span>
-              <span className="text-orange-600 font-mono">{formatCurrency(initialInvestment, currencySymbol)}</span>
+              <span className="text-orange-600 font-mono">{formatCurrency(numInitialInvestment, currencySymbol)}</span>
             </label>
             <input
               type="number"
@@ -119,7 +119,7 @@ Annualized ROI (CAGR): ${calculations.annualizedRoiPct.toFixed(2)}%/year over ${
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Final Value Returned / Proceeds</span>
-              <span className="text-orange-600 font-mono">{formatCurrency(returnedAmount, currencySymbol)}</span>
+              <span className="text-orange-600 font-mono">{formatCurrency(numReturnedAmount, currencySymbol)}</span>
             </label>
             <input
               type="number"
@@ -152,49 +152,56 @@ Annualized ROI (CAGR): ${calculations.annualizedRoiPct.toFixed(2)}%/year over ${
         {/* Right Output */}
         <div className="lg:col-span-6 space-y-4">
           <div className="bg-gradient-to-br from-slate-900 via-orange-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
-            <div className="space-y-4">
-              <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-orange-300">
-                  Total Return on Investment (ROI)
-                </span>
-                <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
-                  {calculations.totalRoiPct >= 0 ? '+' : ''}{calculations.totalRoiPct.toFixed(2)}%
+            {calculations ? (
+              <div className="space-y-4">
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-orange-300">
+                    Total Return on Investment (ROI)
+                  </span>
+                  <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
+                    {calculations.totalRoiPct >= 0 ? '+' : ''}{calculations.totalRoiPct.toFixed(2)}%
+                  </div>
+                  <div className="text-xs font-medium text-orange-300 mt-1">
+                    Net Profit: {formatCurrency(calculations.netProfit, currencySymbol)} ({calculations.multiple.toFixed(2)}x of original)
+                  </div>
                 </div>
-                <div className="text-xs font-medium text-orange-300 mt-1">
-                  Net Profit: {formatCurrency(calculations.netProfit, currencySymbol)} ({calculations.multiple.toFixed(2)}x of original)
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-orange-900/60">
-                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
-                  <span className="text-[10px] text-slate-300 uppercase font-bold block">Annualized ROI (CAGR)</span>
-                  <span className="text-lg font-bold text-orange-300 font-mono">{calculations.annualizedRoiPct.toFixed(2)}%/yr</span>
+                <div className="grid grid-cols-2 gap-3 pt-3 border-t border-orange-900/60">
+                  <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
+                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Annualized ROI (CAGR)</span>
+                    <span className="text-lg font-bold text-orange-300 font-mono">{calculations.annualizedRoiPct.toFixed(2)}%/yr</span>
+                  </div>
+                  <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
+                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Holding Period</span>
+                    <span className="text-base font-bold text-white font-mono">{holdingPeriodYears} Years</span>
+                  </div>
                 </div>
-                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
-                  <span className="text-[10px] text-slate-300 uppercase font-bold block">Holding Period</span>
-                  <span className="text-base font-bold text-white font-mono">{holdingPeriodYears} Years</span>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2 pt-2">
-                <button
-                  onClick={handleCopy}
-                  className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? 'Copied' : 'Copy Summary'}</span>
-                </button>
-                {onSaveCalculation && (
+                <div className="flex items-center gap-2 pt-2">
                   <button
-                    onClick={handleSave}
-                    className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                    onClick={handleCopy}
+                    className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                   >
-                    <Bookmark className="w-3.5 h-3.5" />
-                    <span>{saved ? 'Saved' : 'Save'}</span>
+                    {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copied ? 'Copied' : 'Copy Summary'}</span>
                   </button>
-                )}
+                  {onSaveCalculation && (
+                    <button
+                      onClick={handleSave}
+                      className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                    >
+                      <Bookmark className="w-3.5 h-3.5" />
+                      <span>{saved ? 'Saved' : 'Save'}</span>
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="py-12 text-center space-y-2">
+                <p className="text-orange-300 text-sm font-semibold">Please enter a value.</p>
+                <p className="text-xs text-slate-400">Fill in the initial investment and returned amount to calculate ROI.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

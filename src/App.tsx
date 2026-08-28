@@ -39,6 +39,7 @@ import {
 } from './utils/seo';
 import { LanguageProvider, useLanguage } from './i18n/LanguageContext';
 import { CurrencyProvider, useCurrency } from './context/CurrencyContext';
+import { ErrorBoundary } from './components/shared/ErrorBoundary';
 
 function AppContent() {
   const { t, language, getCalculator, getCategory, getBlogPost } = useLanguage();
@@ -477,6 +478,7 @@ function AppContent() {
 
       {/* Main Content Area */}
       <main className="flex-1">
+        <ErrorBoundary>
         {/* VIEW 1: Home View */}
         {viewMode === 'home' && (
           <div>
@@ -613,6 +615,7 @@ function AppContent() {
             onGoToAllCalculators={handleGoToAllCalculators}
           />
         )}
+        </ErrorBoundary>
       </main>
 
       {/* Footer */}
