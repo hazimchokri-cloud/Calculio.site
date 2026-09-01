@@ -193,11 +193,14 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
         </header>
 
         {/* Featured Image */}
-        <div className="w-full max-w-5xl rounded-3xl overflow-hidden shadow-md border border-[#E2E8F0] relative bg-[#F1F5F9]">
+        <div className="w-full max-w-5xl rounded-3xl overflow-hidden shadow-md border border-[#E2E8F0] relative bg-[#F1F5F9] aspect-[16/9] max-h-[440px]">
           <img
             src={localizedPost.coverImage}
             alt={localizedPost.imageAlt || localizedPost.title}
-            className="w-full h-72 sm:h-96 lg:h-[440px] object-cover"
+            width={1200}
+            height={675}
+            fetchPriority="high"
+            className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
             onError={(e) => {
               const target = e.currentTarget;
@@ -579,6 +582,10 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
                   <img
                     src={relPost.coverImage}
                     alt={relPost.imageAlt || relPost.title}
+                    width={96}
+                    height={96}
+                    loading="lazy"
+                    decoding="async"
                     className="w-24 h-24 rounded-2xl object-cover shrink-0"
                     referrerPolicy="no-referrer"
                     onError={(e) => {

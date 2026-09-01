@@ -20,22 +20,25 @@ export default defineConfig(() => {
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-              return 'vendor-react';
+            if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
+              return 'vendor';
             }
-            if (id.includes('node_modules/lucide-react/')) {
-              return 'vendor-icons';
+            if (id.includes('node_modules/recharts')) {
+              return 'charts';
             }
-            if (id.includes('node_modules/motion/')) {
-              return 'vendor-motion';
+            if (id.includes('node_modules/lucide-react')) {
+              return 'icons';
             }
-            if (id.includes('node_modules/canvas-confetti/')) {
-              return 'vendor-confetti';
+            if (id.includes('node_modules/motion')) {
+              return 'motion';
+            }
+            if (id.includes('node_modules/canvas-confetti')) {
+              return 'confetti';
             }
           },
         },
       },
-      chunkSizeWarningLimit: 600,
+      chunkSizeWarningLimit: 1000,
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.

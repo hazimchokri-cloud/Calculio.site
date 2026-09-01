@@ -22,8 +22,8 @@ export const FeaturedCalculators: React.FC<FeaturedCalculatorsProps> = ({
 }) => {
   const { t, language, calculators } = useLanguage();
   
-  // 8 Popular Calculators in 4-column desktop grid
-  const popularCards = [
+  // Memoized 8 Popular Calculators in 4-column desktop grid
+  const popularCards = React.useMemo(() => [
     {
       id: 'mortgage-calculator',
       name: language === 'fr' ? 'Calculateur de Prêt Immobilier' : 'Mortgage Calculator',
@@ -96,7 +96,15 @@ export const FeaturedCalculators: React.FC<FeaturedCalculatorsProps> = ({
       icon: <ShieldCheck className="w-5 h-5" />,
       accentColor: '#F97316',
     }
-  ];
+  ], [language]);
+
+  const calcMap = React.useMemo(() => {
+    const map = new Map<string, typeof calculators[0]>();
+    for (const c of calculators) {
+      map.set(c.id, c);
+    }
+    return map;
+  }, [calculators]);
 
   return (
     <section 
@@ -123,7 +131,7 @@ export const FeaturedCalculators: React.FC<FeaturedCalculatorsProps> = ({
       {/* Grid: 4 columns desktop, 2-3 tablet, 1-2 mobile */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         {popularCards.map((calc) => {
-          const meta = calculators.find(c => c.id === calc.id);
+          const meta = calcMap.get(calc.id);
           const title = meta?.name || calc.name;
           const description = calc.description || meta?.shortDescription || meta?.description;
 

@@ -122,8 +122,11 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
                 <img
                   src={featuredPost.coverImage}
                   alt={featuredPost.imageAlt || featuredPost.title}
+                  width={800}
+                  height={450}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
+                  decoding="async"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
                     const target = e.currentTarget;
@@ -166,6 +169,10 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
                     <img 
                       src={featuredPost.author.avatar} 
                       alt={featuredPost.author.name}
+                      width={40}
+                      height={40}
+                      loading="lazy"
+                      decoding="async"
                       className="w-10 h-10 rounded-full object-cover border border-[#E2E8F0]"
                       referrerPolicy="no-referrer"
                       onError={(e) => {
@@ -304,8 +311,11 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
                   <img
                     src={post.coverImage}
                     alt={post.imageAlt || post.title}
+                    width={480}
+                    height={270}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
+                    decoding="async"
                     referrerPolicy="no-referrer"
                     onError={(e) => {
                       const target = e.currentTarget;

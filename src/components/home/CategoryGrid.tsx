@@ -101,6 +101,14 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
 }) => {
   const { t, categories, calculators } = useLanguage();
 
+  const categoryCounts = React.useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const c of calculators) {
+      counts[c.category] = (counts[c.category] || 0) + 1;
+    }
+    return counts;
+  }, [calculators]);
+
   return (
     <section id="categories-section" className="py-14 sm:py-16 px-4 sm:px-6 lg:px-8 bg-[#F8FAFC] border-t border-b border-[#E2E8F0]">
       <div className="max-w-7xl mx-auto">
@@ -125,7 +133,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 font-bold italic"
         >
           {categories.map((cat) => {
-            const count = calculators.filter(c => c.category === cat.id).length;
+            const count = categoryCounts[cat.id] || 0;
             const catColor = getCategoryColor(cat.id);
             const icon = getCategoryIcon(cat.id, catColor);
 
