@@ -5,21 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calculio - Free Online Calculators for Finance, Health, Math & More</title>
     <meta name="description" content="Explore free online calculators for mortgages, loans, BMI, calories, scientific math, percentage, unit conversions, and dates. Fast, accurate, and interactive." />
+    
+    <!-- DNS Prefetch and Preconnect -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Optimized Non-Blocking Font Loading with font-display: swap -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    </noscript>
+
     <meta property="og:title" content="Calculio - Free Online Calculators" />
     <meta property="og:description" content="Free Online Calculators for Finance, Health, Math, Conversions & More." />
     <meta property="og:type" content="website" />
     <meta name="google-site-verification" content="1wFcpFE5j4-6vvFD7Al-iNi2rURwui1cNcUC08FB3tE" />
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RwWTMC7JEJ"></script>
+    <!-- Google tag (gtag.js) - Asynchronously loaded to prevent render blocking -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-RwWTMC7JEJ');
+      gtag('config', 'G-RwWTMC7JEJ', { send_page_view: true });
+
+      (function() {
+        function loadGtag() {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-RwWTMC7JEJ';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(loadGtag, { timeout: 2500 });
+        } else {
+          window.addEventListener('load', function() {
+            setTimeout(loadGtag, 800);
+          });
+        }
+      })();
     </script>
     <!-- End Google tag (gtag.js) -->
 
@@ -28,8 +54,10 @@
       (function(l){if(l.search[1]==='/'){var decoded=l.search.slice(1).split('&').map(function(s){return s.replace(/~and~/g,'&')}).join('?');window.history.replaceState(null,null,l.pathname.slice(0,-1)+decoded+l.hash)}}(window.location))
     </script>
     <!-- End Single Page Apps for GitHub Pages -->
-    <script type="module" crossorigin src="/assets/index-C3uiAFG-.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DxIfAK5P.css">
+    <script type="module" crossorigin src="/assets/index-pORItWHc.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-react-DDwC_z6H.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-icons-op6aGYoc.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-CK5Y9EmM.css">
   </head> 
   <body class="bg-[#F8FAFC] text-[#0F172A] antialiased font-sans selection:bg-[#F97316] selection:text-white">
     <div id="root"></div>
