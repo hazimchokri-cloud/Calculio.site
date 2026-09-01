@@ -280,7 +280,7 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
         </div>
 
         {/* Results Dashboard */}
-        {results && (
+        {results ? (
           <div className="bg-gradient-to-br from-orange-50/70 to-orange-100/50 p-5 rounded-2xl border border-orange-200/80 flex flex-col justify-between space-y-4">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-orange-200/70">
@@ -346,6 +346,12 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                 <span>Reset</span>
               </button>
             </div>
+          </div>
+        ) : (
+          <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center justify-center text-center">
+            <p className="text-xs font-medium text-slate-400">
+              Enter dimensions to calculate concrete volume and pre-mix bags.
+            </p>
           </div>
         )}
       </div>

@@ -332,7 +332,7 @@ Scientific: ${conversionResults.scientific}`;
         <div className="lg:col-span-6 space-y-4">
           {((tab === 'convert' && conversionResults) ||
             (tab === 'operations' && operationResults) ||
-            (tab === 'rounding' && roundingResults)) && (
+            (tab === 'rounding' && roundingResults)) ? (
             <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
               {tab === 'convert' && conversionResults && (
                 <div className="space-y-4">
@@ -423,6 +423,10 @@ Scientific: ${conversionResults.scientific}`;
                   </button>
                 )}
               </div>
+            </div>
+          ) : (
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-slate-500 text-sm">
+              Please enter valid decimal numbers to calculate fractions, operations, or rounding.
             </div>
           )}
         </div>

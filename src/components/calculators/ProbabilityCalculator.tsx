@@ -384,91 +384,114 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
         {/* Right Output */}
         <div className="lg:col-span-6 space-y-4">
           <div className="bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
-            {tab === 'single' && singleResults && (
-              <div className="space-y-4">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-purple-300">
-                    Probability of Occurrence
-                  </span>
-                  <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
-                    {singleResults.percentage}
+            {tab === 'single' && (
+              singleResults ? (
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-purple-300">
+                      Probability of Occurrence
+                    </span>
+                    <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
+                      {singleResults.percentage}
+                    </div>
+                    <div className="text-xs text-purple-200 mt-1 font-mono">
+                      Decimal: {singleResults.prob.toFixed(4)} ({singleResults.favorableOutcomes} out of {singleResults.totalOutcomes})
+                    </div>
                   </div>
-                  <div className="text-xs text-purple-200 mt-1 font-mono">
-                    Decimal: {singleResults.prob.toFixed(4)} ({singleResults.favorableOutcomes} out of {singleResults.totalOutcomes})
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-purple-900/60 text-xs">
-                  <div className="bg-white/10 rounded-xl p-2.5">
-                    <span className="text-[10px] text-slate-300 block">Odds in Favor</span>
-                    <span className="font-bold font-mono text-white text-sm">{singleResults.oddsInFavor}</span>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-2.5">
-                    <span className="text-[10px] text-slate-300 block">Odds Against</span>
-                    <span className="font-bold font-mono text-white text-sm">{singleResults.oddsAgainst}</span>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-2.5 col-span-2">
-                    <span className="text-[10px] text-slate-300 block">Complementary Probability P(not E)</span>
-                    <span className="font-bold font-mono text-orange-300 text-sm">{singleResults.complementaryProb}</span>
+                  <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-purple-900/60 text-xs">
+                    <div className="bg-white/10 rounded-xl p-2.5">
+                      <span className="text-[10px] text-slate-300 block">Odds in Favor</span>
+                      <span className="font-bold font-mono text-white text-sm">{singleResults.oddsInFavor}</span>
+                    </div>
+                    <div className="bg-white/10 rounded-xl p-2.5">
+                      <span className="text-[10px] text-slate-300 block">Odds Against</span>
+                      <span className="font-bold font-mono text-white text-sm">{singleResults.oddsAgainst}</span>
+                    </div>
+                    <div className="bg-white/10 rounded-xl p-2.5 col-span-2">
+                      <span className="text-[10px] text-slate-300 block">Complementary Probability P(not E)</span>
+                      <span className="font-bold font-mono text-orange-300 text-sm">{singleResults.complementaryProb}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="py-8 text-center space-y-2">
+                  <p className="text-purple-300 text-sm font-semibold">Please enter valid outcomes.</p>
+                  <p className="text-xs text-slate-400">Ensure favorable outcomes do not exceed total outcomes.</p>
+                </div>
+              )
             )}
 
-            {tab === 'two-events' && twoEventsResults && (
-              <div className="space-y-4">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-purple-300">
-                    Joint Probability P(A and B)
-                  </span>
-                  <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
-                    {twoEventsResults.pAnd}
+            {tab === 'two-events' && (
+              twoEventsResults ? (
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-purple-300">
+                      Joint Probability P(A and B)
+                    </span>
+                    <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
+                      {twoEventsResults.pAnd}
+                    </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-purple-900/60 text-xs">
-                  <div className="bg-white/10 rounded-xl p-2.5">
-                    <span className="text-[10px] text-slate-300 block">Union P(A or B)</span>
-                    <span className="font-bold font-mono text-orange-300 text-sm">{twoEventsResults.pOr}</span>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-2.5">
-                    <span className="text-[10px] text-slate-300 block">P(Not A)</span>
-                    <span className="font-bold font-mono text-white text-sm">{twoEventsResults.pNotA}</span>
+                  <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-purple-900/60 text-xs">
+                    <div className="bg-white/10 rounded-xl p-2.5">
+                      <span className="text-[10px] text-slate-300 block">Union P(A or B)</span>
+                      <span className="font-bold font-mono text-orange-300 text-sm">{twoEventsResults.pOr}</span>
+                    </div>
+                    <div className="bg-white/10 rounded-xl p-2.5">
+                      <span className="text-[10px] text-slate-300 block">P(Not A)</span>
+                      <span className="font-bold font-mono text-white text-sm">{twoEventsResults.pNotA}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="py-8 text-center space-y-2">
+                  <p className="text-purple-300 text-sm font-semibold">Please enter valid probabilities.</p>
+                  <p className="text-xs text-slate-400">Values must be between 0 and 1.</p>
+                </div>
+              )
             )}
 
-            {tab === 'combinatorics' && combinatoricsResults && (
-              <div className="space-y-4">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-purple-300">
-                    Combinations nCr (Order Does NOT Matter)
-                  </span>
-                  <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
-                    {combinatoricsResults.combinations}
+            {tab === 'combinatorics' && (
+              combinatoricsResults ? (
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-purple-300">
+                      Combinations nCr (Order Does NOT Matter)
+                    </span>
+                    <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
+                      {combinatoricsResults.combinations}
+                    </div>
+                  </div>
+
+                  <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs text-xs mt-3">
+                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Permutations nPr (Order Matters)</span>
+                    <span className="text-xl font-bold text-orange-300 font-mono">{combinatoricsResults.permutations}</span>
                   </div>
                 </div>
-
-                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs text-xs mt-3">
-                  <span className="text-[10px] text-slate-300 uppercase font-bold block">Permutations nPr (Order Matters)</span>
-                  <span className="text-xl font-bold text-orange-300 font-mono">{combinatoricsResults.permutations}</span>
+              ) : (
+                <div className="py-8 text-center space-y-2">
+                  <p className="text-purple-300 text-sm font-semibold">Please enter valid integers.</p>
+                  <p className="text-xs text-slate-400">Total items (n) must be greater than or equal to sample size (r).</p>
                 </div>
-              </div>
+              )
             )}
 
             <div className="flex items-center gap-2 pt-4 border-t border-purple-900/60">
               <button
+                disabled={!(singleResults || twoEventsResults || combinatoricsResults)}
                 onClick={handleCopy}
-                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? 'Copied' : 'Copy Probability'}</span>
               </button>
               {onSaveCalculation && (
                 <button
+                  disabled={!(singleResults || twoEventsResults || combinatoricsResults)}
                   onClick={handleSave}
-                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                 >
                   <Bookmark className="w-3.5 h-3.5" />
                   <span>{saved ? 'Saved' : 'Save'}</span>

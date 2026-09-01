@@ -214,7 +214,7 @@ Current Gestation: ${calculations.currentWeeks} weeks, ${calculations.currentDay
         </div>
 
         {/* Right Output */}
-        {calculations && (
+        {calculations ? (
           <div className="lg:col-span-6 space-y-4">
             <div className="bg-gradient-to-br from-slate-900 via-pink-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
               <div className="space-y-4">
@@ -261,6 +261,12 @@ Current Gestation: ${calculations.currentWeeks} weeks, ${calculations.currentDay
                 </div>
               </div>
             </div>
+          </div>
+        ) : (
+          <div className="lg:col-span-6 bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center justify-center text-center">
+            <p className="text-xs font-medium text-slate-400">
+              Select or enter a valid date to calculate your estimated due date.
+            </p>
           </div>
         )}
       </div>

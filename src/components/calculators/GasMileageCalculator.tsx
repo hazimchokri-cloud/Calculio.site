@@ -211,59 +211,67 @@ export const GasMileageCalculator: React.FC<GasMileageProps> = ({
         {/* Results */}
         <div className="lg:col-span-5 space-y-4">
           <div className={`bg-gradient-to-br from-slate-900 via-slate-800 to-orange-950 text-white rounded-2xl p-6 sm:p-7 shadow-lg relative overflow-hidden transition-transform ${pulse ? 'scale-[1.01]' : ''}`}>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-orange-300">
-                Total Trip Fuel Cost
-              </span>
-              <span className="px-2.5 py-1 text-xs font-bold bg-orange-500/20 text-orange-300 rounded-lg border border-orange-500/30">
-                {stats.effectiveDistance} Miles
-              </span>
-            </div>
+            {!stats ? (
+              <div className="py-8 text-center text-slate-400 text-xs">
+                Enter valid trip distance, fuel efficiency, and gas price to compute fuel requirements and costs.
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-orange-300">
+                    Total Trip Fuel Cost
+                  </span>
+                  <span className="px-2.5 py-1 text-xs font-bold bg-orange-500/20 text-orange-300 rounded-lg border border-orange-500/30">
+                    {stats.effectiveDistance} Miles
+                  </span>
+                </div>
 
-            <div className="flex items-baseline gap-2 mb-6">
-              <span className="text-5xl font-black font-mono tracking-tight text-white">
-                {formatCurrency(stats.totalCost, currencySymbol)}
-              </span>
-            </div>
+                <div className="flex items-baseline gap-2 mb-6">
+                  <span className="text-5xl font-black font-mono tracking-tight text-white">
+                    {formatCurrency(stats.totalCost, currencySymbol)}
+                  </span>
+                </div>
 
-            <div className="border-t border-slate-700/80 pt-4 space-y-2.5 text-xs">
-              <div className="flex justify-between text-slate-300 items-center bg-white/10 p-2.5 rounded-xl">
-                <span>Cost Per Person ({passengersCount} people):</span>
-                <strong className="text-orange-300 font-mono text-base">{formatCurrency(stats.costPerPerson, currencySymbol)}</strong>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Fuel Required:</span>
-                <strong className="text-white font-mono">{stats.gallonsUsed} Gallons ({stats.litersUsed} L)</strong>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Cost per Mile:</span>
-                <strong className="text-white font-mono">{formatCurrency(stats.costPerMile, currencySymbol, 3)} / mi</strong>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Metric Equivalent:</span>
-                <strong className="text-slate-300 font-mono">{stats.distanceKm} km ({stats.lPer100km} L/100km)</strong>
-              </div>
-            </div>
+                <div className="border-t border-slate-700/80 pt-4 space-y-2.5 text-xs">
+                  <div className="flex justify-between text-slate-300 items-center bg-white/10 p-2.5 rounded-xl">
+                    <span>Cost Per Person ({passengersCount} people):</span>
+                    <strong className="text-orange-300 font-mono text-base">{formatCurrency(stats.costPerPerson, currencySymbol)}</strong>
+                  </div>
+                  <div className="flex justify-between text-slate-300">
+                    <span>Fuel Required:</span>
+                    <strong className="text-white font-mono">{stats.gallonsUsed} Gallons ({stats.litersUsed} L)</strong>
+                  </div>
+                  <div className="flex justify-between text-slate-300">
+                    <span>Cost per Mile:</span>
+                    <strong className="text-white font-mono">{formatCurrency(stats.costPerMile, currencySymbol, 3)} / mi</strong>
+                  </div>
+                  <div className="flex justify-between text-slate-300">
+                    <span>Metric Equivalent:</span>
+                    <strong className="text-slate-300 font-mono">{stats.distanceKm} km ({stats.lPer100km} L/100km)</strong>
+                  </div>
+                </div>
 
-            {/* Action Bar */}
-            <div className="flex items-center gap-2 pt-4 border-t border-slate-700">
-              <button
-                onClick={handleCopy}
-                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Copied' : 'Copy Trip Summary'}</span>
-              </button>
-              {onSaveCalculation && (
-                <button
-                  onClick={handleSave}
-                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-                >
-                  <Bookmark className="w-3.5 h-3.5" />
-                  <span>{saved ? 'Saved' : 'Save'}</span>
-                </button>
-              )}
-            </div>
+                {/* Action Bar */}
+                <div className="flex items-center gap-2 pt-4 border-t border-slate-700">
+                  <button
+                    onClick={handleCopy}
+                    className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copied ? 'Copied' : 'Copy Trip Summary'}</span>
+                  </button>
+                  {onSaveCalculation && (
+                    <button
+                      onClick={handleSave}
+                      className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                    >
+                      <Bookmark className="w-3.5 h-3.5" />
+                      <span>{saved ? 'Saved' : 'Save'}</span>
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

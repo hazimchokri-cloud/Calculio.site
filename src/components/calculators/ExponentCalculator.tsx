@@ -147,7 +147,7 @@ export const ExponentCalculator: React.FC<ExponentCalculatorProps> = ({ onSaveCa
 
         {/* Right Output */}
         <div className="lg:col-span-6 space-y-4">
-          {exponentResults && (
+          {exponentResults ? (
             <div className="bg-gradient-to-br from-slate-900 via-amber-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
               <div className="space-y-4">
                 <div>
@@ -189,6 +189,10 @@ export const ExponentCalculator: React.FC<ExponentCalculatorProps> = ({ onSaveCa
                   </button>
                 )}
               </div>
+            </div>
+          ) : (
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-slate-500 text-sm">
+              Please enter a valid base number and exponent to calculate powers and scientific notation.
             </div>
           )}
         </div>

@@ -136,7 +136,7 @@ Estimated Time to Double: ~${calculations.yearsToDouble.toFixed(1)} years`;
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Principal Amount</span>
-              <span className="text-blue-600 font-mono">{formatCurrency(numPrincipal, currencySymbol)}</span>
+              <span className="text-blue-600 font-mono">{principal !== '' ? formatCurrency(numPrincipal, currencySymbol) : '—'}</span>
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
@@ -146,6 +146,7 @@ Estimated Time to Double: ~${calculations.yearsToDouble.toFixed(1)} years`;
                 max="10000000"
                 step="500"
                 value={principal}
+                placeholder="e.g. 10000"
                 onChange={(e) => setPrincipal(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
@@ -155,7 +156,7 @@ Estimated Time to Double: ~${calculations.yearsToDouble.toFixed(1)} years`;
               min="1000"
               max="250000"
               step="1000"
-              value={numPrincipal || 10000}
+              value={typeof principal === 'number' ? principal : 1000}
               onChange={(e) => setPrincipal(e.target.value === '' ? '' : Number(e.target.value))}
               className="w-full accent-blue-600 cursor-pointer"
             />
@@ -165,7 +166,7 @@ Estimated Time to Double: ~${calculations.yearsToDouble.toFixed(1)} years`;
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Annual Interest Rate</span>
-              <span className="text-blue-600 font-mono">{interestRate}%</span>
+              <span className="text-blue-600 font-mono">{interestRate !== '' ? `${interestRate}%` : '—'}</span>
             </label>
             <div className="relative">
               <input
@@ -174,6 +175,7 @@ Estimated Time to Double: ~${calculations.yearsToDouble.toFixed(1)} years`;
                 max="30"
                 step="0.1"
                 value={interestRate}
+                placeholder="e.g. 7.0"
                 onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full pl-3 pr-8 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
@@ -184,7 +186,7 @@ Estimated Time to Double: ~${calculations.yearsToDouble.toFixed(1)} years`;
               min="0.5"
               max="20"
               step="0.25"
-              value={interestRate}
+              value={typeof interestRate === 'number' ? interestRate : 1}
               onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
               className="w-full accent-blue-600 cursor-pointer"
             />
@@ -194,7 +196,7 @@ Estimated Time to Double: ~${calculations.yearsToDouble.toFixed(1)} years`;
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Time Horizon</span>
-              <span className="text-blue-600 font-mono">{timeYears} Years</span>
+              <span className="text-blue-600 font-mono">{timeYears !== '' ? `${timeYears} Years` : '—'}</span>
             </label>
             <div className="grid grid-cols-4 gap-2">
               {[3, 5, 10, 20].map(y => (
@@ -218,7 +220,7 @@ Estimated Time to Double: ~${calculations.yearsToDouble.toFixed(1)} years`;
                 min="1"
                 max="40"
                 step="1"
-                value={timeYears}
+                value={typeof timeYears === 'number' ? timeYears : 1}
                 onChange={(e) => setTimeYears(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full accent-blue-600 cursor-pointer"
               />
@@ -344,14 +346,22 @@ Estimated Time to Double: ~${calculations.yearsToDouble.toFixed(1)} years`;
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-slate-700">
-                  {calculations.yearlyBreakdown.filter((_, idx) => idx === 0 || (idx + 1) % 5 === 0 || idx === calculations.yearlyBreakdown.length - 1).map(row => (
-                    <tr key={row.year} className="hover:bg-slate-50/80">
-                      <td className="p-2 font-bold text-slate-900">Year {row.year}</td>
-                      <td className="p-2">{formatCurrency(row.simpleValue, currencySymbol)}</td>
-                      <td className="p-2 font-bold text-blue-600">{formatCurrency(row.compoundValue, currencySymbol)}</td>
-                      <td className="p-2 text-orange-600">+{formatCurrency(row.interestEarnedYear, currencySymbol)}</td>
+                  {calculations && calculations.yearlyBreakdown.length > 0 ? (
+                    calculations.yearlyBreakdown.filter((_, idx) => idx === 0 || (idx + 1) % 5 === 0 || idx === calculations.yearlyBreakdown.length - 1).map(row => (
+                      <tr key={row.year} className="hover:bg-slate-50/80">
+                        <td className="p-2 font-bold text-slate-900">Year {row.year}</td>
+                        <td className="p-2">{formatCurrency(row.simpleValue, currencySymbol)}</td>
+                        <td className="p-2 font-bold text-blue-600">{formatCurrency(row.compoundValue, currencySymbol)}</td>
+                        <td className="p-2 text-orange-600">+{formatCurrency(row.interestEarnedYear, currencySymbol)}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="p-4 text-center text-slate-400 text-xs">
+                        Enter your principal, rate, and years to view the growth timeline.
+                      </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>

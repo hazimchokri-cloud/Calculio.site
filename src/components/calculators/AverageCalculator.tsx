@@ -309,6 +309,16 @@ Count: ${standardStats.count}, Sum: ${formatNumber(standardStats.sum, 4)}`;
         {/* Right Output */}
         <div className="lg:col-span-6 space-y-4">
           <div className="bg-gradient-to-br from-slate-900 via-orange-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
+            {tab === 'standard' && !standardStats && (
+              <div className="py-8 text-center text-slate-400 text-xs">
+                Enter comma or space-separated numbers to compute average statistics.
+              </div>
+            )}
+            {tab === 'weighted' && !weightedStats && (
+              <div className="py-8 text-center text-slate-400 text-xs">
+                Enter valid values and non-zero weights to calculate weighted average.
+              </div>
+            )}
             {tab === 'standard' && standardStats && (
               <div className="space-y-4">
                 <div>

@@ -243,9 +243,9 @@ Moderate Activity TDEE: ${calculations.activityLevels[2].calories} kcal/day`;
               type="number"
               min="20"
               max="350"
-              value={unitSystem === 'metric' ? (weightKg || '') : (weightLbs || '')}
+              value={unitSystem === 'metric' ? weightKg : weightLbs}
               onChange={(e) => {
-                const val = Number(e.target.value);
+                const val = e.target.value === '' ? '' : Number(e.target.value);
                 if (unitSystem === 'metric') setWeightKg(val);
                 else setWeightLbs(val);
               }}

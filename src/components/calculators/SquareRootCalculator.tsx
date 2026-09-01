@@ -160,7 +160,7 @@ export const SquareRootCalculator: React.FC<SquareRootCalculatorProps> = ({ onSa
 
         {/* Right Output */}
         <div className="lg:col-span-6 space-y-4">
-          {rootResults && (
+          {rootResults ? (
             <div className="bg-gradient-to-br from-slate-900 via-cyan-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
               <div className="space-y-4">
                 <div>
@@ -206,6 +206,11 @@ export const SquareRootCalculator: React.FC<SquareRootCalculatorProps> = ({ onSa
                   </button>
                 )}
               </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-2xs text-center space-y-2">
+              <p className="text-slate-700 font-bold text-sm">Please enter a radicand.</p>
+              <p className="text-slate-500 text-xs">Enter a number and root degree to calculate.</p>
             </div>
           )}
         </div>

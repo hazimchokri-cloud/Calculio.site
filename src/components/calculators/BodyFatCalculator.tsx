@@ -267,41 +267,49 @@ export const BodyFatCalculator: React.FC<BodyFatCalculatorProps> = ({ onSaveCalc
 
         {/* Results */}
         <div className="lg:col-span-5 space-y-5">
-          <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-rose-950 text-white rounded-2xl p-6 sm:p-7 shadow-lg relative overflow-hidden">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-rose-300">
-                Body Fat Percentage
-              </span>
-              <span className="px-2 py-0.5 text-xs font-bold bg-rose-500/20 text-rose-300 rounded border border-rose-500/30">
-                {stats.category}
-              </span>
-            </div>
-
-            <div className="flex items-baseline gap-2 mb-6">
-              <span className="text-5xl font-black font-mono-numbers tracking-tight text-white">
-                {stats.bodyFatPercent}%
-              </span>
-            </div>
-
-            <div className="border-t border-slate-700/80 pt-4 space-y-2 text-xs">
-              <div className="flex justify-between text-slate-300">
-                <span>Fat Mass:</span>
-                <strong className="text-rose-300 font-mono-numbers text-sm">{stats.fatMass} {stats.unitLabel}</strong>
+          {stats ? (
+            <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-rose-950 text-white rounded-2xl p-6 sm:p-7 shadow-lg relative overflow-hidden">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-rose-300">
+                  Body Fat Percentage
+                </span>
+                <span className="px-2 py-0.5 text-xs font-bold bg-rose-500/20 text-rose-300 rounded border border-rose-500/30">
+                  {stats.category}
+                </span>
               </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Lean Body Mass:</span>
-                <strong className="text-orange-300 font-mono-numbers text-sm">{stats.leanMass} {stats.unitLabel}</strong>
+
+              <div className="flex items-baseline gap-2 mb-6">
+                <span className="text-5xl font-black font-mono-numbers tracking-tight text-white">
+                  {stats.bodyFatPercent}%
+                </span>
+              </div>
+
+              <div className="border-t border-slate-700/80 pt-4 space-y-2 text-xs">
+                <div className="flex justify-between text-slate-300">
+                  <span>Fat Mass:</span>
+                  <strong className="text-rose-300 font-mono-numbers text-sm">{stats.fatMass} {stats.unitLabel}</strong>
+                </div>
+                <div className="flex justify-between text-slate-300">
+                  <span>Lean Body Mass:</span>
+                  <strong className="text-orange-300 font-mono-numbers text-sm">{stats.leanMass} {stats.unitLabel}</strong>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-slate-500 text-sm">
+              Please enter valid body measurements to estimate body fat percentage.
+            </div>
+          )}
 
-          <button
-            onClick={handleCopy}
-            className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-2xs"
-          >
-            {copied ? <Check className="w-4 h-4 text-orange-600" /> : <Copy className="w-4 h-4 text-slate-700" />}
-            {copied ? 'Copied' : 'Copy Body Fat Summary'}
-          </button>
+          {stats && (
+            <button
+              onClick={handleCopy}
+              className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-2xs"
+            >
+              {copied ? <Check className="w-4 h-4 text-orange-600" /> : <Copy className="w-4 h-4 text-slate-700" />}
+              {copied ? 'Copied' : 'Copy Body Fat Summary'}
+            </button>
+          )}
         </div>
       </div>
     </div>

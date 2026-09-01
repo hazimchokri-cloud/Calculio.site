@@ -183,7 +183,8 @@ Payoff Duration: ${calculations.actualMonths} Months (${(calculations.actualMont
             </button>
             <button
               onClick={handleDownload}
-              className="px-3 py-1.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs"
+              disabled={!calculations}
+              className="px-3 py-1.5 rounded-xl bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export CSV</span>
@@ -196,7 +197,7 @@ Payoff Duration: ${calculations.actualMonths} Months (${(calculations.actualMont
             <label className="text-xs font-bold text-slate-700">Loan Amount</label>
             <input
               type="number"
-              value={loanAmount || ''}
+              value={loanAmount}
               onChange={(e) => setLoanAmount(e.target.value === '' ? '' : Number(e.target.value))}
               className="w-full p-2 text-xs font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
             />
@@ -206,7 +207,7 @@ Payoff Duration: ${calculations.actualMonths} Months (${(calculations.actualMont
             <input
               type="number"
               step="0.1"
-              value={interestRate || ''}
+              value={interestRate}
               onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
               className="w-full p-2 text-xs font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
             />
@@ -215,7 +216,7 @@ Payoff Duration: ${calculations.actualMonths} Months (${(calculations.actualMont
             <label className="text-xs font-bold text-slate-700">Term (Years)</label>
             <input
               type="number"
-              value={loanTermYears || ''}
+              value={loanTermYears}
               onChange={(e) => setLoanTermYears(e.target.value === '' ? '' : Number(e.target.value))}
               className="w-full p-2 text-xs font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
             />
@@ -224,7 +225,7 @@ Payoff Duration: ${calculations.actualMonths} Months (${(calculations.actualMont
             <label className="text-xs font-bold text-slate-700">Extra Monthly</label>
             <input
               type="number"
-              value={extraPaymentMonthly || ''}
+              value={extraPaymentMonthly}
               onChange={(e) => setExtraPaymentMonthly(e.target.value === '' ? '' : Number(e.target.value))}
               className="w-full p-2 text-xs font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
             />

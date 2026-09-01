@@ -360,7 +360,7 @@ export const DateCalculator: React.FC<DateCalculatorProps> = ({ onSaveCalculatio
 
         {/* Results Column */}
         <div className="lg:col-span-6 space-y-4">
-          {((mode === 'difference' && diffResult) || (mode === 'add-subtract' && addResult)) && (
+          {((mode === 'difference' && diffResult) || (mode === 'add-subtract' && addResult)) ? (
             <div className={`bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative transition-transform ${pulse ? 'scale-[1.01]' : ''}`}>
               {mode === 'difference' && diffResult && (
                 <div className="space-y-4">
@@ -459,6 +459,10 @@ export const DateCalculator: React.FC<DateCalculatorProps> = ({ onSaveCalculatio
                   </button>
                 )}
               </div>
+            </div>
+          ) : (
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-slate-500 text-sm">
+              Please enter valid dates to calculate intervals or calendar projections.
             </div>
           )}
         </div>

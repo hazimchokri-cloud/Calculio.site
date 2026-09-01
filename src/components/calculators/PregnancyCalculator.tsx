@@ -160,7 +160,7 @@ Fetal Size: About the size of a ${calculations.fruitInfo.fruit}`;
         </div>
 
         {/* Right Output */}
-        {calculations && (
+        {calculations ? (
           <div className="lg:col-span-6 space-y-4">
             <div className="bg-gradient-to-br from-slate-900 via-rose-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
               <div className="space-y-4">
@@ -217,6 +217,12 @@ Fetal Size: About the size of a ${calculations.fruitInfo.fruit}`;
                 </div>
               </div>
             </div>
+          </div>
+        ) : (
+          <div className="lg:col-span-6 bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center justify-center text-center">
+            <p className="text-xs font-medium text-slate-400">
+              Select your LMP date and cycle length to calculate pregnancy milestone dates.
+            </p>
           </div>
         )}
       </div>

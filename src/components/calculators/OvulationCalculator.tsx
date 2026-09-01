@@ -152,7 +152,7 @@ Based on ${numCycleLength}-day cycle with ${numLutealPhase}-day luteal phase`;
         </div>
 
         {/* Right Output */}
-        {calculations && (
+        {calculations ? (
           <div className="lg:col-span-6 space-y-4">
             <div className="bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
               <div className="space-y-4">
@@ -201,6 +201,12 @@ Based on ${numCycleLength}-day cycle with ${numLutealPhase}-day luteal phase`;
                 </div>
               </div>
             </div>
+          </div>
+        ) : (
+          <div className="lg:col-span-6 bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center justify-center text-center">
+            <p className="text-xs font-medium text-slate-400">
+              Select your period date and cycle length to calculate ovulation windows.
+            </p>
           </div>
         )}
       </div>

@@ -272,7 +272,11 @@ ${adjustInflation ? `Inflation-Adjusted Purchasing Power: ${formatCurrency(calcu
 
         {/* Right Output Results */}
         <div className="lg:col-span-6 space-y-4">
-          {calculations && (
+          {!calculations ? (
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-slate-500 text-sm">
+              Please enter valid initial investment, contribution, and time horizon to forecast portfolio growth.
+            </div>
+          ) : (
             <>
               <div className="bg-gradient-to-br from-slate-900 via-orange-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
                 <div className="space-y-4">

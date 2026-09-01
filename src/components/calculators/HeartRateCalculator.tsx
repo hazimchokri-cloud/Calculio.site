@@ -212,7 +212,7 @@ Zone 5 (VO2 Max 90-100%): ${calculations.zones[4].rangeBpm}`;
 
         {/* Right Output */}
         <div className="lg:col-span-7 space-y-4">
-          {calculations && (
+          {calculations ? (
             <div className="bg-gradient-to-br from-slate-900 via-rose-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -263,6 +263,12 @@ Zone 5 (VO2 Max 90-100%): ${calculations.zones[4].rangeBpm}`;
                   ))}
                 </div>
               </div>
+            </div>
+          ) : (
+            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center justify-center text-center">
+              <p className="text-xs font-medium text-slate-400">
+                Enter your age and resting heart rate to calculate training zones.
+              </p>
             </div>
           )}
         </div>

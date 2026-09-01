@@ -155,7 +155,7 @@ Required Exam Score: ${results.requiredScore}% (${results.difficultyStatus})`;
         </div>
 
         {/* Results Card */}
-        {results && (
+        {results ? (
           <div className="bg-gradient-to-br from-orange-50 to-teal-50/60 p-6 rounded-2xl border border-orange-200 flex flex-col justify-between space-y-4">
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-orange-200">
@@ -193,6 +193,12 @@ Required Exam Score: ${results.requiredScore}% (${results.difficultyStatus})`;
                 <span>{copied ? 'Copied Result' : 'Copy Grade Target'}</span>
               </button>
             </div>
+          </div>
+        ) : (
+          <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center justify-center text-center">
+            <p className="text-xs font-medium text-slate-400">
+              Enter your current grade, desired grade, and final exam weight to calculate required score.
+            </p>
           </div>
         )}
       </div>

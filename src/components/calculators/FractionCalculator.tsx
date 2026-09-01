@@ -42,7 +42,7 @@ export const FractionCalculator: React.FC<FractionCalculatorProps> = ({ onSaveCa
 
   const calculation = useMemo(() => {
     if (num1 === '' || den1 === '' || num2 === '' || den2 === '') {
-      return { error: 'Please enter a value for all fraction fields.', simpNum: 0, simpDen: 1, divisor: 1, decimal: 0, steps: '', mixedStr: '' };
+      return null;
     }
     const n1 = typeof num1 === 'number' ? num1 : 0;
     const d1 = typeof den1 === 'number' ? den1 : 1;
@@ -50,7 +50,7 @@ export const FractionCalculator: React.FC<FractionCalculatorProps> = ({ onSaveCa
     const d2 = typeof den2 === 'number' ? den2 : 1;
 
     if (d1 === 0 || d2 === 0) {
-      return { error: 'Denominator cannot be zero (division by zero)', simpNum: 0, simpDen: 1, decimal: 0, steps: '', mixedStr: '' };
+      return { error: 'Denominator cannot be zero (division by zero)', simpNum: 0, simpDen: 1, divisor: 1, decimal: 0, steps: '', mixedStr: '' };
     }
 
     let unsimplifiedNum = 0;
@@ -107,6 +107,7 @@ export const FractionCalculator: React.FC<FractionCalculatorProps> = ({ onSaveCa
   }, [num1, den1, op, num2, den2]);
 
   const handleCopy = async () => {
+    if (!calculation || calculation.error) return;
     const text = `${num1}/${den1} ${op} ${num2}/${den2} = ${calculation.simpNum}/${calculation.simpDen} (Decimal: ${formatNumber(calculation.decimal, 4)})`;
     const ok = await copyToClipboard(text);
     if (ok) {
@@ -116,7 +117,7 @@ export const FractionCalculator: React.FC<FractionCalculatorProps> = ({ onSaveCa
   };
 
   const handleSave = () => {
-    if (onSaveCalculation && !calculation.error) {
+    if (onSaveCalculation && calculation && !calculation.error) {
       onSaveCalculation(
         `Fraction: ${num1}/${den1} ${op} ${num2}/${den2} = ${calculation.simpNum}/${calculation.simpDen}`,
         { num1, den1, op, num2, den2 },
@@ -254,7 +255,11 @@ export const FractionCalculator: React.FC<FractionCalculatorProps> = ({ onSaveCa
         {/* Results */}
         <div className="lg:col-span-6 space-y-4">
           <div className={`bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative transition-transform ${pulse ? 'scale-[1.01]' : ''}`}>
-            {calculation.error ? (
+            {!calculation ? (
+              <div className="py-8 text-center text-slate-400 text-xs">
+                Enter valid numerator and denominator values to calculate fraction solution.
+              </div>
+            ) : calculation.error ? (
               <div className="p-4 bg-rose-500/20 border border-rose-500/40 rounded-xl text-rose-300 text-sm font-semibold">
                 {calculation.error}
               </div>

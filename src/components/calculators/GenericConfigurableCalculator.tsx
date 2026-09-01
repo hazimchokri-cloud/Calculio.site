@@ -116,7 +116,7 @@ Inputs: A=${numA}, B=${numB}, C=${numC}`;
         </div>
 
         {/* Results Block */}
-        {results && (
+        {results ? (
           <div className="bg-[#FFF7ED] p-6 rounded-2xl border border-[#FDBA74] flex flex-col justify-between space-y-4">
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-[#FDBA74]">
@@ -159,6 +159,12 @@ Inputs: A=${numA}, B=${numB}, C=${numC}`;
                 <span>{copied ? 'Copied' : 'Copy Results'}</span>
               </button>
             </div>
+          </div>
+        ) : (
+          <div className="bg-[#F8FAFC] p-6 rounded-2xl border border-[#E2E8F0] flex items-center justify-center text-center">
+            <p className="text-xs font-medium text-[#94A3B8]">
+              Enter values above to calculate results.
+            </p>
           </div>
         )}
       </div>

@@ -180,7 +180,7 @@ Annual NOI: ${currencySymbol}${results.annualNOI.toLocaleString()} | GRM: ${resu
                   min="10000"
                   step="5000"
                   value={purchasePrice}
-                  onChange={(e) => setPurchasePrice(Number(e.target.value) || 0)}
+                  onChange={(e) => setPurchasePrice(e.target.value === '' ? '' : Number(e.target.value))}
                   className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
                 />
               </div>
@@ -192,7 +192,7 @@ Annual NOI: ${currencySymbol}${results.annualNOI.toLocaleString()} | GRM: ${resu
                 min="0"
                 max="100"
                 value={downPaymentPercent}
-                onChange={(e) => setDownPaymentPercent(Number(e.target.value) || 0)}
+                onChange={(e) => setDownPaymentPercent(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
@@ -207,7 +207,7 @@ Annual NOI: ${currencySymbol}${results.annualNOI.toLocaleString()} | GRM: ${resu
                 min="1"
                 max="20"
                 value={interestRate}
-                onChange={(e) => setInterestRate(Number(e.target.value) || 0)}
+                onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
@@ -220,7 +220,7 @@ Annual NOI: ${currencySymbol}${results.annualNOI.toLocaleString()} | GRM: ${resu
                   min="100"
                   step="50"
                   value={monthlyRent}
-                  onChange={(e) => setMonthlyRent(Number(e.target.value) || 0)}
+                  onChange={(e) => setMonthlyRent(e.target.value === '' ? '' : Number(e.target.value))}
                   className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold text-orange-800"
                 />
               </div>
@@ -236,7 +236,7 @@ Annual NOI: ${currencySymbol}${results.annualNOI.toLocaleString()} | GRM: ${resu
                 <input
                   type="number"
                   value={propertyTaxYearly}
-                  onChange={(e) => setPropertyTaxYearly(Number(e.target.value) || 0)}
+                  onChange={(e) => setPropertyTaxYearly(e.target.value === '' ? '' : Number(e.target.value))}
                   className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-bold"
                 />
               </div>
@@ -245,7 +245,7 @@ Annual NOI: ${currencySymbol}${results.annualNOI.toLocaleString()} | GRM: ${resu
                 <input
                   type="number"
                   value={insuranceYearly}
-                  onChange={(e) => setInsuranceYearly(Number(e.target.value) || 0)}
+                  onChange={(e) => setInsuranceYearly(e.target.value === '' ? '' : Number(e.target.value))}
                   className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-bold"
                 />
               </div>
@@ -254,7 +254,7 @@ Annual NOI: ${currencySymbol}${results.annualNOI.toLocaleString()} | GRM: ${resu
                 <input
                   type="number"
                   value={vacancyPercent}
-                  onChange={(e) => setVacancyPercent(Number(e.target.value) || 0)}
+                  onChange={(e) => setVacancyPercent(e.target.value === '' ? '' : Number(e.target.value))}
                   className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-bold"
                 />
               </div>

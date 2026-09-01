@@ -351,60 +351,76 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
               </div>
             )}
 
-            {mode === 'simplify' && simplifyResults && (
-              <div className="space-y-4">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300">
-                    Simplified Lowest Terms
-                  </span>
-                  <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
-                    {simplifyResults.reduced}
+            {mode === 'simplify' && (
+              simplifyResults ? (
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300">
+                      Simplified Lowest Terms
+                    </span>
+                    <div className="text-4xl font-black tracking-tight text-white mt-1 font-mono">
+                      {simplifyResults.reduced}
+                    </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-3 pt-3 border-t border-indigo-900/60 text-xs">
-                  <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
-                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Decimal Value</span>
-                    <span className="text-lg font-bold text-orange-300 font-mono">{simplifyResults.decimalRatio}</span>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
-                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Greatest Common Factor</span>
-                    <span className="text-lg font-bold text-white font-mono">{simplifyResults.divisor}</span>
+                  <div className="grid grid-cols-2 gap-3 pt-3 border-t border-indigo-900/60 text-xs">
+                    <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
+                      <span className="text-[10px] text-slate-300 uppercase font-bold block">Decimal Value</span>
+                      <span className="text-lg font-bold text-orange-300 font-mono">{simplifyResults.decimalRatio}</span>
+                    </div>
+                    <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
+                      <span className="text-[10px] text-slate-300 uppercase font-bold block">Greatest Common Factor</span>
+                      <span className="text-lg font-bold text-white font-mono">{simplifyResults.divisor}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="py-8 text-center space-y-2">
+                  <p className="text-indigo-300 text-sm font-semibold">Please enter valid positive numbers.</p>
+                  <p className="text-xs text-slate-400">Fill in terms A and B to simplify the ratio.</p>
+                </div>
+              )
             )}
 
-            {mode === 'divide' && divideResults && (
-              <div className="space-y-4">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300">
-                    Proportional Shares Breakdown
-                  </span>
-                  <div className="space-y-2 mt-2">
-                    {divideResults.shares.map((share, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-white/10 text-xs">
-                        <span className="font-bold text-white">Part {idx + 1} ({share.part} units / {share.percentage}%)</span>
-                        <span className="font-bold text-orange-300 text-sm font-mono">{share.amount}</span>
-                      </div>
-                    ))}
+            {mode === 'divide' && (
+              divideResults ? (
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300">
+                      Proportional Shares Breakdown
+                    </span>
+                    <div className="space-y-2 mt-2">
+                      {divideResults.shares.map((share, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-white/10 text-xs">
+                          <span className="font-bold text-white">Part {idx + 1} ({share.part} units / {share.percentage}%)</span>
+                          <span className="font-bold text-orange-300 text-sm font-mono">{share.amount}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="py-8 text-center space-y-2">
+                  <p className="text-indigo-300 text-sm font-semibold">Please enter valid total quantity and shares.</p>
+                  <p className="text-xs text-slate-400">Example: 500 divided by 2 : 3 : 5.</p>
+                </div>
+              )
             )}
 
             <div className="flex items-center gap-2 pt-4 border-t border-indigo-900/60">
               <button
+                disabled={mode === 'simplify' ? !simplifyResults : mode === 'divide' ? !divideResults : false}
                 onClick={handleCopy}
-                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? 'Copied' : 'Copy Solution'}</span>
               </button>
               {onSaveCalculation && (
                 <button
+                  disabled={mode === 'simplify' ? !simplifyResults : mode === 'divide' ? !divideResults : false}
                   onClick={handleSave}
-                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                 >
                   <Bookmark className="w-3.5 h-3.5" />
                   <span>{saved ? 'Saved' : 'Save'}</span>

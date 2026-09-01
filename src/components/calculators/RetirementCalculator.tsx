@@ -233,7 +233,7 @@ Status: ${calculations.isOnTrack ? 'ON TRACK (Surplus: ' + formatCurrency(calcul
 
         {/* Right Output */}
         <div className="lg:col-span-6 space-y-4">
-          {calculations && (
+          {calculations ? (
             <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
               <div className="space-y-4">
                 <div>
@@ -287,6 +287,11 @@ Status: ${calculations.isOnTrack ? 'ON TRACK (Surplus: ' + formatCurrency(calcul
                   )}
                 </div>
               </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-2xs text-center space-y-2">
+              <p className="text-slate-700 font-bold text-sm">Please enter valid retirement ages and income.</p>
+              <p className="text-slate-500 text-xs">Fill in your current age, target retirement age, and desired annual income.</p>
             </div>
           )}
         </div>

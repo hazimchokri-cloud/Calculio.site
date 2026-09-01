@@ -266,7 +266,7 @@ ${geometryResults.extra}`;
                 min="0"
                 step="any"
                 value={radius}
-                onChange={(e) => setRadius(parseFloat(e.target.value) || 0)}
+                onChange={(e) => setRadius(e.target.value === '' ? '' : parseFloat(e.target.value))}
                 className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
               />
             </div>
@@ -281,7 +281,7 @@ ${geometryResults.extra}`;
                   min="0"
                   step="any"
                   value={length}
-                  onChange={(e) => setLength(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setLength(e.target.value === '' ? '' : parseFloat(e.target.value))}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -292,7 +292,7 @@ ${geometryResults.extra}`;
                   min="0"
                   step="any"
                   value={width}
-                  onChange={(e) => setWidth(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setWidth(e.target.value === '' ? '' : parseFloat(e.target.value))}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -308,7 +308,7 @@ ${geometryResults.extra}`;
                   min="0"
                   step="any"
                   value={sideA}
-                  onChange={(e) => setSideA(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setSideA(e.target.value === '' ? '' : parseFloat(e.target.value))}
                   className="w-full p-2 text-sm font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -319,7 +319,7 @@ ${geometryResults.extra}`;
                   min="0"
                   step="any"
                   value={sideB}
-                  onChange={(e) => setSideB(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setSideB(e.target.value === '' ? '' : parseFloat(e.target.value))}
                   className="w-full p-2 text-sm font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -330,7 +330,7 @@ ${geometryResults.extra}`;
                   min="0"
                   step="any"
                   value={sideC}
-                  onChange={(e) => setSideC(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setSideC(e.target.value === '' ? '' : parseFloat(e.target.value))}
                   className="w-full p-2 text-sm font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -347,7 +347,7 @@ ${geometryResults.extra}`;
                     min="0"
                     step="any"
                     value={baseA}
-                    onChange={(e) => setBaseA(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setBaseA(e.target.value === '' ? '' : parseFloat(e.target.value))}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
@@ -358,7 +358,7 @@ ${geometryResults.extra}`;
                     min="0"
                     step="any"
                     value={baseB}
-                    onChange={(e) => setBaseB(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setBaseB(e.target.value === '' ? '' : parseFloat(e.target.value))}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
@@ -370,7 +370,7 @@ ${geometryResults.extra}`;
                   min="0"
                   step="any"
                   value={height}
-                  onChange={(e) => setHeight(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setHeight(e.target.value === '' ? '' : parseFloat(e.target.value))}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -386,7 +386,7 @@ ${geometryResults.extra}`;
                   min="0"
                   step="any"
                   value={radius}
-                  onChange={(e) => setRadius(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setRadius(e.target.value === '' ? '' : parseFloat(e.target.value))}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -397,7 +397,7 @@ ${geometryResults.extra}`;
                   min="0"
                   step="any"
                   value={height}
-                  onChange={(e) => setHeight(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setHeight(e.target.value === '' ? '' : parseFloat(e.target.value))}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -412,7 +412,7 @@ ${geometryResults.extra}`;
                 min="0"
                 step="any"
                 value={length}
-                onChange={(e) => setLength(parseFloat(e.target.value) || 0)}
+                onChange={(e) => setLength(e.target.value === '' ? '' : parseFloat(e.target.value))}
                 className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
               />
             </div>
@@ -422,7 +422,7 @@ ${geometryResults.extra}`;
         {/* Right Output */}
         <div className="lg:col-span-6 space-y-4">
           <div className="bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
-            {geometryResults && (
+            {geometryResults ? (
               <div className="space-y-4">
                 <div>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-teal-300">
@@ -444,20 +444,26 @@ ${geometryResults.extra}`;
                   </div>
                 </div>
               </div>
+            ) : (
+              <div className="py-8 text-center text-slate-400 text-xs">
+                Enter geometric dimensions to compute area, perimeter, and 3D volumes.
+              </div>
             )}
 
             <div className="flex items-center gap-2 pt-4 border-t border-teal-900/60">
               <button
+                disabled={!geometryResults}
                 onClick={handleCopy}
-                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? 'Copied' : 'Copy Shape Results'}</span>
               </button>
               {onSaveCalculation && (
                 <button
+                  disabled={!geometryResults}
                   onClick={handleSave}
-                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                 >
                   <Bookmark className="w-3.5 h-3.5" />
                   <span>{saved ? 'Saved' : 'Save'}</span>
