@@ -17,6 +17,7 @@ export default defineConfig(() => {
       minify: 'esbuild',
       cssMinify: true,
       cssCodeSplit: true,
+      chunkSizeWarningLimit: 500,
       rollupOptions: {
         output: {
           manualChunks(id) {
@@ -26,19 +27,18 @@ export default defineConfig(() => {
             if (id.includes('node_modules/recharts')) {
               return 'charts';
             }
-            if (id.includes('node_modules/lucide-react')) {
-              return 'icons';
+            if (id.includes('node_modules/lucide-react') || id.includes('node_modules/motion') || id.includes('node_modules/canvas-confetti')) {
+              return 'ui';
             }
-            if (id.includes('node_modules/motion')) {
-              return 'motion';
+            if (id.includes('src/components/calculators/')) {
+              return 'calculators';
             }
-            if (id.includes('node_modules/canvas-confetti')) {
-              return 'confetti';
+            if (id.includes('src/components/views/Blog') || id.includes('src/data/blogPosts') || id.includes('blogPostsFr') || id.includes('blogPostsAr')) {
+              return 'blog';
             }
           },
         },
       },
-      chunkSizeWarningLimit: 1000,
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
