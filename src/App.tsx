@@ -1,21 +1,25 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { HeroSection } from './components/home/HeroSection';
 import { FeaturedCalculators } from './components/home/FeaturedCalculators';
 import { CategoryGrid } from './components/home/CategoryGrid';
 import { TrustAndFaqSection } from './components/home/TrustAndFaqSection';
-import { CategoryView } from './components/views/CategoryView';
-import { CalculatorDetailView } from './components/views/CalculatorDetailView';
-import { BlogListView } from './components/views/BlogListView';
-import { BlogPostView } from './components/views/BlogPostView';
-import { AboutView } from './components/views/AboutView';
-import { ContactView } from './components/views/ContactView';
-import { SitemapView } from './components/views/SitemapView';
-import { AllCalculatorsView } from './components/views/AllCalculatorsView';
-import { LegalView, LegalTab } from './components/views/LegalView';
-import { QuickSearchModal } from './components/shared/QuickSearchModal';
-import { SavedHistoryDrawer } from './components/shared/SavedHistoryDrawer';
+
+// Lazy-loaded Views for Route-Level Code Splitting
+const CategoryView = React.lazy(() => import('./components/views/CategoryView').then(m => ({ default: m.CategoryView })));
+const CalculatorDetailView = React.lazy(() => import('./components/views/CalculatorDetailView').then(m => ({ default: m.CalculatorDetailView })));
+const BlogListView = React.lazy(() => import('./components/views/BlogListView').then(m => ({ default: m.BlogListView })));
+const BlogPostView = React.lazy(() => import('./components/views/BlogPostView').then(m => ({ default: m.BlogPostView })));
+const AboutView = React.lazy(() => import('./components/views/AboutView').then(m => ({ default: m.AboutView })));
+const ContactView = React.lazy(() => import('./components/views/ContactView').then(m => ({ default: m.ContactView })));
+const SitemapView = React.lazy(() => import('./components/views/SitemapView').then(m => ({ default: m.SitemapView })));
+const AllCalculatorsView = React.lazy(() => import('./components/views/AllCalculatorsView').then(m => ({ default: m.AllCalculatorsView })));
+const LegalView = React.lazy(() => import('./components/views/LegalView').then(m => ({ default: m.LegalView })));
+const QuickSearchModal = React.lazy(() => import('./components/shared/QuickSearchModal').then(m => ({ default: m.QuickSearchModal })));
+const SavedHistoryDrawer = React.lazy(() => import('./components/shared/SavedHistoryDrawer').then(m => ({ default: m.SavedHistoryDrawer })));
+
+import type { LegalTab } from './components/views/LegalView';
 import { CALCULATORS } from './data/calculatorDirectory';
 import { CATEGORIES } from './data/categories';
 import { BLOG_POSTS } from './data/blogPosts';
@@ -40,6 +44,18 @@ import {
 import { LanguageProvider, useLanguage } from './i18n/LanguageContext';
 import { CurrencyProvider, useCurrency } from './context/CurrencyContext';
 import { ErrorBoundary } from './components/shared/ErrorBoundary';
+
+const ViewLoadingSkeleton = () => (
+  <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-6 animate-pulse" aria-busy="true" aria-label="Loading view">
+    <div className="h-8 bg-[#E2E8F0] rounded-xl w-1/3" />
+    <div className="h-4 bg-[#E2E8F0] rounded w-2/3" />
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
+      <div className="h-48 bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] p-6" />
+      <div className="h-48 bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] p-6" />
+      <div className="h-48 bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] p-6" />
+    </div>
+  </div>
+);
 
 function AppContent() {
   const { t, language, getCalculator, getCategory, getBlogPost } = useLanguage();
@@ -511,109 +527,127 @@ function AppContent() {
 
         {/* VIEW 2: All Calculators Complete Directory View */}
         {viewMode === 'all-calculators' && (
-          <AllCalculatorsView
-            onSelectCalculator={handleSelectCalculator}
-            onSelectCategory={handleSelectCategory}
-            onGoHome={handleGoHome}
-            initialCategory={selectedCategoryId !== 'all' ? selectedCategoryId : undefined}
-          />
+          <Suspense fallback={<ViewLoadingSkeleton />}>
+            <AllCalculatorsView
+              onSelectCalculator={handleSelectCalculator}
+              onSelectCategory={handleSelectCategory}
+              onGoHome={handleGoHome}
+              initialCategory={selectedCategoryId !== 'all' ? selectedCategoryId : undefined}
+            />
+          </Suspense>
         )}
 
         {/* VIEW 3: Category Directory View */}
         {viewMode === 'category' && (
-          <CategoryView
-            categoryId={selectedCategoryId}
-            onSelectCalculator={handleSelectCalculator}
-            onSelectCategory={handleSelectCategory}
-            onGoHome={handleGoHome}
-          />
+          <Suspense fallback={<ViewLoadingSkeleton />}>
+            <CategoryView
+              categoryId={selectedCategoryId}
+              onSelectCalculator={handleSelectCalculator}
+              onSelectCategory={handleSelectCategory}
+              onGoHome={handleGoHome}
+            />
+          </Suspense>
         )}
 
         {/* VIEW 4: Calculator Detail View */}
         {viewMode === 'calculator' && (
-          <CalculatorDetailView
-            calculator={currentCalculator}
-            currencySymbol={currencySymbol}
-            onSelectCalculator={handleSelectCalculator}
-            onSelectCategory={handleSelectCategory}
-            onGoHome={handleGoHome}
-            onSaveCalculation={handleSaveCalculation}
-            onGoToDisclaimer={handleGoToDisclaimer}
-          />
+          <Suspense fallback={<ViewLoadingSkeleton />}>
+            <CalculatorDetailView
+              calculator={currentCalculator}
+              currencySymbol={currencySymbol}
+              onSelectCalculator={handleSelectCalculator}
+              onSelectCategory={handleSelectCategory}
+              onGoHome={handleGoHome}
+              onSaveCalculation={handleSaveCalculation}
+              onGoToDisclaimer={handleGoToDisclaimer}
+            />
+          </Suspense>
         )}
 
         {/* VIEW 5: Blog Articles List View */}
         {viewMode === 'blog' && (
-          <BlogListView
-            onSelectPost={handleSelectPost}
-            onSelectCategory={handleSelectCategory}
-            onSelectCalculator={handleSelectCalculator}
-            onGoHome={handleGoHome}
-          />
+          <Suspense fallback={<ViewLoadingSkeleton />}>
+            <BlogListView
+              onSelectPost={handleSelectPost}
+              onSelectCategory={handleSelectCategory}
+              onSelectCalculator={handleSelectCalculator}
+              onGoHome={handleGoHome}
+            />
+          </Suspense>
         )}
 
         {/* VIEW 6: Single Blog Post Guide View */}
         {viewMode === 'blog-post' && (
-          <BlogPostView
-            post={currentBlogPost}
-            onSelectPost={handleSelectPost}
-            onSelectCalculator={handleSelectCalculator}
-            onSelectCategory={handleSelectCategory}
-            onGoToBlogList={handleGoToBlog}
-            onGoHome={handleGoHome}
-          />
+          <Suspense fallback={<ViewLoadingSkeleton />}>
+            <BlogPostView
+              post={currentBlogPost}
+              onSelectPost={handleSelectPost}
+              onSelectCalculator={handleSelectCalculator}
+              onSelectCategory={handleSelectCategory}
+              onGoToBlogList={handleGoToBlog}
+              onGoHome={handleGoHome}
+            />
+          </Suspense>
         )}
 
         {/* VIEW 7: About Us View */}
         {viewMode === 'about' && (
-          <AboutView
-            onGoHome={handleGoHome}
-            onGoToBlog={handleGoToBlog}
-            onGoToContact={handleGoToContact}
-            onSelectCategory={handleSelectCategory}
-          />
+          <Suspense fallback={<ViewLoadingSkeleton />}>
+            <AboutView
+              onGoHome={handleGoHome}
+              onGoToBlog={handleGoToBlog}
+              onGoToContact={handleGoToContact}
+              onSelectCategory={handleSelectCategory}
+            />
+          </Suspense>
         )}
 
         {/* VIEW 8: Contact & Request View */}
         {viewMode === 'contact' && (
-          <ContactView
-            onGoHome={handleGoHome}
-            onGoToAbout={handleGoToAbout}
-            onGoToBlog={handleGoToBlog}
-          />
+          <Suspense fallback={<ViewLoadingSkeleton />}>
+            <ContactView
+              onGoHome={handleGoHome}
+              onGoToAbout={handleGoToAbout}
+              onGoToBlog={handleGoToBlog}
+            />
+          </Suspense>
         )}
 
         {/* VIEW 9: XML Sitemap Inspector View */}
         {viewMode === 'sitemap' && (
-          <SitemapView
-            onSelectCalculator={handleSelectCalculator}
-            onSelectCategory={handleSelectCategory}
-            onSelectPost={handleSelectPost}
-            onGoHome={handleGoHome}
-            onGoToAbout={handleGoToAbout}
-            onGoToContact={handleGoToContact}
-            onGoToBlog={handleGoToBlog}
-            onGoToPrivacy={handleGoToPrivacy}
-            onGoToTerms={handleGoToTerms}
-            onGoToDisclaimer={handleGoToDisclaimer}
-            onGoToAllCalculators={handleGoToAllCalculators}
-          />
+          <Suspense fallback={<ViewLoadingSkeleton />}>
+            <SitemapView
+              onSelectCalculator={handleSelectCalculator}
+              onSelectCategory={handleSelectCategory}
+              onSelectPost={handleSelectPost}
+              onGoHome={handleGoHome}
+              onGoToAbout={handleGoToAbout}
+              onGoToContact={handleGoToContact}
+              onGoToBlog={handleGoToBlog}
+              onGoToPrivacy={handleGoToPrivacy}
+              onGoToTerms={handleGoToTerms}
+              onGoToDisclaimer={handleGoToDisclaimer}
+              onGoToAllCalculators={handleGoToAllCalculators}
+            />
+          </Suspense>
         )}
 
         {/* VIEW 10: Legal, Privacy Policy, Terms & Disclaimer View */}
         {(viewMode === 'privacy' || viewMode === 'terms' || viewMode === 'disclaimer') && (
-          <LegalView
-            activeTab={legalTab}
-            onChangeTab={(tab) => {
-              setLegalTab(tab);
-              setViewMode(tab);
-              navigateUrl(`/${tab}`);
-            }}
-            onGoHome={handleGoHome}
-            onGoToAbout={handleGoToAbout}
-            onGoToContact={handleGoToContact}
-            onGoToAllCalculators={handleGoToAllCalculators}
-          />
+          <Suspense fallback={<ViewLoadingSkeleton />}>
+            <LegalView
+              activeTab={legalTab}
+              onChangeTab={(tab) => {
+                setLegalTab(tab);
+                setViewMode(tab);
+                navigateUrl(`/${tab}`);
+              }}
+              onGoHome={handleGoHome}
+              onGoToAbout={handleGoToAbout}
+              onGoToContact={handleGoToContact}
+              onGoToAllCalculators={handleGoToAllCalculators}
+            />
+          </Suspense>
         )}
         </ErrorBoundary>
       </main>
@@ -635,21 +669,29 @@ function AppContent() {
       />
 
       {/* Spotlight Search Modal */}
-      <QuickSearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onSelectCalculator={handleSelectCalculator}
-        onSelectCategory={handleSelectCategory}
-      />
+      {isSearchOpen && (
+        <Suspense fallback={null}>
+          <QuickSearchModal
+            isOpen={isSearchOpen}
+            onClose={() => setIsSearchOpen(false)}
+            onSelectCalculator={handleSelectCalculator}
+            onSelectCategory={handleSelectCategory}
+          />
+        </Suspense>
+      )}
 
       {/* Calculation History Drawer */}
-      <SavedHistoryDrawer
-        isOpen={isHistoryOpen}
-        onClose={() => setIsHistoryOpen(false)}
-        savedCalculations={savedCalculations}
-        onClearAll={handleClearSavedHistory}
-        onSelectCalculation={(item) => handleSelectCalculator(item.calculatorId)}
-      />
+      {isHistoryOpen && (
+        <Suspense fallback={null}>
+          <SavedHistoryDrawer
+            isOpen={isHistoryOpen}
+            onClose={() => setIsHistoryOpen(false)}
+            savedCalculations={savedCalculations}
+            onClearAll={handleClearSavedHistory}
+            onSelectCalculation={(item) => handleSelectCalculator(item.calculatorId)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
