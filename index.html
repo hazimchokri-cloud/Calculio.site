@@ -13,7 +13,35 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Preload Critical Inter Display & Body Font with font-display=swap -->
+    <!-- Critical Above-The-Fold Inlined CSS for Instant FCP/LCP -->
+    <style>
+      :root {
+        --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #F8FAFC;
+        color: #0F172A;
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        background-color: #FFFFFF;
+      }
+    </style>
+
+    <!-- Preload Critical Inter & Display Fonts with font-display=swap -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&family=Tajawal:wght@400;700&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&family=Tajawal:wght@400;700&display=swap" media="print" onload="this.media='all'">
     <noscript>
@@ -36,6 +64,7 @@
         function loadGtag() {
           var s = document.createElement('script');
           s.async = true;
+          s.defer = true;
           s.src = 'https://www.googletagmanager.com/gtag/js?id=G-RwWTMC7JEJ';
           document.head.appendChild(s);
         }
@@ -55,9 +84,11 @@
       (function(l){if(l.search[1]==='/'){var decoded=l.search.slice(1).split('&').map(function(s){return s.replace(/~and~/g,'&')}).join('?');window.history.replaceState(null,null,l.pathname.slice(0,-1)+decoded+l.hash)}}(window.location))
     </script>
     <!-- End Single Page Apps for GitHub Pages -->
-    <script type="module" crossorigin src="/assets/index-CYhSwcT2.js"></script>
+    <script type="module" crossorigin src="/assets/index-BBZZwfUU.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/vendor-DDwC_z6H.js">
-    <link rel="modulepreload" crossorigin href="/assets/icons-DfzbgIQp.js">
+    <link rel="modulepreload" crossorigin href="/assets/ui-CGZ1DqgI.js">
+    <link rel="modulepreload" crossorigin href="/assets/blog-BgvY7HK4.js">
+    <link rel="modulepreload" crossorigin href="/assets/calculators-BsETSMuo.js">
     <link rel="stylesheet" crossorigin href="/assets/index-BAHjGC61.css">
   </head> 
   <body class="bg-[#F8FAFC] text-[#0F172A] antialiased font-sans selection:bg-[#F97316] selection:text-white">
