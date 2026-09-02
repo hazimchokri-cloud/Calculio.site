@@ -370,7 +370,7 @@ function AppContent() {
 
   // Dynamic SEO Synchronization
   useEffect(() => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://calculio.site';
+    const origin = 'https://calculio.site';
 
     if (viewMode === 'calculator') {
       const calcSchema = buildCalculatorSchema(currentCalculator, origin);

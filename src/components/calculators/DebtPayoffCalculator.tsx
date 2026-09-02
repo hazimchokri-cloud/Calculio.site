@@ -5,9 +5,9 @@ import { DollarSign, Zap, TrendingDown, Plus, Trash2, Copy, Check, Bookmark, Lay
 interface DebtItem {
   id: string;
   name: string;
-  balance: number;
-  rate: number;
-  minPayment: number;
+  balance: number | '';
+  rate: number | '';
+  minPayment: number | '';
 }
 
 interface DebtPayoffCalculatorProps {
@@ -48,11 +48,89 @@ export const DebtPayoffCalculator: React.FC<DebtPayoffCalculatorProps> = ({
   const numExtraMonthly = typeof extraMonthly === 'number' ? extraMonthly : 0;
 
   const calculations = useMemo(() => {
-    const totalBalance = debts.reduce((sum, d) => sum + (typeof d.balance === 'number' ? d.balance : 0), 0);
-    const totalMinPayments = debts.reduce((sum, d) => sum + (typeof d.minPayment === 'number' ? d.minPayment : 0), 0);
-    const totalMonthlyBudget = totalMinPayments + numExtraMonthly;
+    try {
+      const totalBalance = debts.reduce((sum, d) => sum + (typeof d.balance === 'number' ? d.balance : 0), 0);
+      const totalMinPayments = debts.reduce((sum, d) => sum + (typeof d.minPayment === 'number' ? d.minPayment : 0), 0);
+      const totalMonthlyBudget = totalMinPayments + numExtraMonthly;
 
-    if (totalBalance <= 0 || totalMinPayments <= 0) {
+      if (totalBalance <= 0 || totalMinPayments <= 0) {
+        return {
+          totalBalance: 0,
+          totalMinPayments: 0,
+          totalMonthlyBudget: numExtraMonthly,
+          monthsToPayoff: 0,
+          yearsToPayoff: '0.0',
+          totalInterestPaid: 0,
+          totalPaid: 0
+        };
+      }
+
+      // Simulate payoff order
+      // Avalanche: sort descending by interest rate
+      // Snowball: sort ascending by balance
+      const sortedDebts = [...debts].map(d => ({
+        ...d,
+        balance: typeof d.balance === 'number' ? Math.max(0, d.balance) : 0,
+        rate: typeof d.rate === 'number' ? Math.max(0, d.rate) : 0,
+        minPayment: typeof d.minPayment === 'number' ? Math.max(0, d.minPayment) : 0
+      })).sort((a, b) => {
+        if (strategy === 'avalanche') {
+          return b.rate - a.rate;
+        } else {
+          return a.balance - b.balance;
+        }
+      });
+
+      // Run monthly simulation
+      let currentDebts = sortedDebts.map(d => ({ ...d, currentBal: d.balance }));
+      let months = 0;
+      let totalInterestPaid = 0;
+      const maxMonths = 360;
+
+      while (currentDebts.some(d => d.currentBal > 0.01) && months < maxMonths) {
+        months++;
+        let extraAvailable = numExtraMonthly;
+
+        // 1. Accrue interest & pay minimums
+        currentDebts.forEach(d => {
+          if (d.currentBal > 0) {
+            const interest = d.currentBal * (d.rate / 100 / 12);
+            totalInterestPaid += interest;
+            d.currentBal += interest;
+
+            const pay = Math.min(d.currentBal, d.minPayment);
+            d.currentBal = Math.max(0, d.currentBal - pay);
+
+            if (d.currentBal <= 0) {
+              // Debt is paid off, its min payment becomes available for rollover!
+              extraAvailable += d.minPayment - pay;
+            }
+          } else {
+            // Rollover paid off debt's minimum payment
+            extraAvailable += d.minPayment;
+          }
+        });
+
+        // 2. Put all extra available cash toward the priority debt
+        for (const d of currentDebts) {
+          if (d.currentBal > 0 && extraAvailable > 0) {
+            const pay = Math.min(d.currentBal, extraAvailable);
+            d.currentBal = Math.max(0, d.currentBal - pay);
+            extraAvailable -= pay;
+          }
+        }
+      }
+
+      return {
+        totalBalance,
+        totalMinPayments,
+        totalMonthlyBudget,
+        monthsToPayoff: months,
+        yearsToPayoff: (months / 12).toFixed(1),
+        totalInterestPaid,
+        totalPaid: totalBalance + totalInterestPaid
+      };
+    } catch {
       return {
         totalBalance: 0,
         totalMinPayments: 0,
@@ -63,72 +141,6 @@ export const DebtPayoffCalculator: React.FC<DebtPayoffCalculatorProps> = ({
         totalPaid: 0
       };
     }
-
-    // Simulate payoff order
-    // Avalanche: sort descending by interest rate
-    // Snowball: sort ascending by balance
-    const sortedDebts = [...debts].map(d => ({
-      ...d,
-      balance: typeof d.balance === 'number' ? Math.max(0, d.balance) : 0,
-      rate: typeof d.rate === 'number' ? Math.max(0, d.rate) : 0,
-      minPayment: typeof d.minPayment === 'number' ? Math.max(0, d.minPayment) : 0
-    })).sort((a, b) => {
-      if (strategy === 'avalanche') {
-        return b.rate - a.rate;
-      } else {
-        return a.balance - b.balance;
-      }
-    });
-
-    // Run monthly simulation
-    let currentDebts = sortedDebts.map(d => ({ ...d, currentBal: d.balance }));
-    let months = 0;
-    let totalInterestPaid = 0;
-    const maxMonths = 360;
-
-    while (currentDebts.some(d => d.currentBal > 0.01) && months < maxMonths) {
-      months++;
-      let extraAvailable = numExtraMonthly;
-
-      // 1. Accrue interest & pay minimums
-      currentDebts.forEach(d => {
-        if (d.currentBal > 0) {
-          const interest = d.currentBal * (d.rate / 100 / 12);
-          totalInterestPaid += interest;
-          d.currentBal += interest;
-
-          const pay = Math.min(d.currentBal, d.minPayment);
-          d.currentBal = Math.max(0, d.currentBal - pay);
-
-          if (d.currentBal <= 0) {
-            // Debt is paid off, its min payment becomes available for rollover!
-            extraAvailable += d.minPayment - pay;
-          }
-        } else {
-          // Rollover paid off debt's minimum payment
-          extraAvailable += d.minPayment;
-        }
-      });
-
-      // 2. Put all extra available cash toward the priority debt
-      for (const d of currentDebts) {
-        if (d.currentBal > 0 && extraAvailable > 0) {
-          const pay = Math.min(d.currentBal, extraAvailable);
-          d.currentBal = Math.max(0, d.currentBal - pay);
-          extraAvailable -= pay;
-        }
-      }
-    }
-
-    return {
-      totalBalance,
-      totalMinPayments,
-      totalMonthlyBudget,
-      monthsToPayoff: months,
-      yearsToPayoff: (months / 12).toFixed(1),
-      totalInterestPaid,
-      totalPaid: totalBalance + totalInterestPaid
-    };
   }, [debts, numExtraMonthly, strategy]);
 
   const handleCopy = async () => {
@@ -234,8 +246,8 @@ Total Repayment: ${formatCurrency(calculations.totalPaid, currencySymbol)}`;
                     <label className="text-[10px] font-bold text-slate-500 block">Balance ({currencySymbol})</label>
                     <input
                       type="number"
-                      value={debt.balance || ''}
-                      onChange={(e) => handleUpdateDebt(debt.id, 'balance', Number(e.target.value))}
+                      value={debt.balance}
+                      onChange={(e) => handleUpdateDebt(debt.id, 'balance', e.target.value === '' ? '' : Number(e.target.value))}
                       className="w-full p-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                     />
                   </div>
@@ -244,8 +256,8 @@ Total Repayment: ${formatCurrency(calculations.totalPaid, currencySymbol)}`;
                     <input
                       type="number"
                       step="0.1"
-                      value={debt.rate || ''}
-                      onChange={(e) => handleUpdateDebt(debt.id, 'rate', Number(e.target.value))}
+                      value={debt.rate}
+                      onChange={(e) => handleUpdateDebt(debt.id, 'rate', e.target.value === '' ? '' : Number(e.target.value))}
                       className="w-full p-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                     />
                   </div>
@@ -253,8 +265,8 @@ Total Repayment: ${formatCurrency(calculations.totalPaid, currencySymbol)}`;
                     <label className="text-[10px] font-bold text-slate-500 block">Min Payment ({currencySymbol})</label>
                     <input
                       type="number"
-                      value={debt.minPayment || ''}
-                      onChange={(e) => handleUpdateDebt(debt.id, 'minPayment', Number(e.target.value))}
+                      value={debt.minPayment}
+                      onChange={(e) => handleUpdateDebt(debt.id, 'minPayment', e.target.value === '' ? '' : Number(e.target.value))}
                       className="w-full p-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                     />
                   </div>

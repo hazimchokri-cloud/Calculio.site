@@ -9,31 +9,37 @@ interface BaseCalcProps {
 
 // 1. Quadratic Equation Solver (ax² + bx + c = 0)
 export const QuadraticSolver: React.FC<BaseCalcProps> = () => {
-  const [a, setA] = useState(1);
-  const [b, setB] = useState(-5);
-  const [c, setC] = useState(6);
+  const [a, setA] = useState<number | ''>(1);
+  const [b, setB] = useState<number | ''>(-5);
+  const [c, setC] = useState<number | ''>(6);
 
   const results = useMemo(() => {
-    if (a === 0) {
-      if (b === 0) return { type: 'Invalid', text: 'Not an equation' };
-      const root = -c / b;
+    if (a === '' || b === '' || c === '') return null;
+    const numA = Number(a);
+    const numB = Number(b);
+    const numC = Number(c);
+
+    if (numA === 0) {
+      if (numB === 0) return { type: 'Invalid', text: 'Not an equation', x1: '-', x2: null, discriminant: '0', vertexX: '0', vertexY: '0', formula: '' };
+      const root = -numC / numB;
       return {
         type: 'Linear',
         x1: root.toFixed(4),
-        discriminant: 0,
-        vertexX: 0,
-        vertexY: 0,
-        explanation: `Linear equation: ${b}x + ${c} = 0 → x = ${root}`
+        x2: null,
+        discriminant: '0',
+        vertexX: '0',
+        vertexY: '0',
+        explanation: `Linear equation: ${numB}x + ${numC} = 0 → x = ${root}`
       };
     }
 
-    const disc = b * b - 4 * a * c;
-    const vertexX = -b / (2 * a);
-    const vertexY = a * vertexX * vertexX + b * vertexX + c;
+    const disc = numB * numB - 4 * numA * numC;
+    const vertexX = -numB / (2 * numA);
+    const vertexY = numA * vertexX * vertexX + numB * vertexX + numC;
 
     if (disc > 0) {
-      const x1 = (-b + Math.sqrt(disc)) / (2 * a);
-      const x2 = (-b - Math.sqrt(disc)) / (2 * a);
+      const x1 = (-numB + Math.sqrt(disc)) / (2 * numA);
+      const x2 = (-numB - Math.sqrt(disc)) / (2 * numA);
       return {
         type: 'Two Real Roots',
         x1: x1.toFixed(4),
@@ -41,22 +47,22 @@ export const QuadraticSolver: React.FC<BaseCalcProps> = () => {
         discriminant: disc.toFixed(2),
         vertexX: vertexX.toFixed(2),
         vertexY: vertexY.toFixed(2),
-        formula: `x = [ -(${b}) ± √(${disc.toFixed(2)}) ] / (2 * ${a})`
+        formula: `x = [ -(${numB}) ± √(${disc.toFixed(2)}) ] / (2 * ${numA})`
       };
     } else if (disc === 0) {
-      const x = -b / (2 * a);
+      const x = -numB / (2 * numA);
       return {
         type: 'One Double Root',
         x1: x.toFixed(4),
         x2: x.toFixed(4),
-        discriminant: 0,
+        discriminant: '0',
         vertexX: vertexX.toFixed(2),
         vertexY: vertexY.toFixed(2),
-        formula: `x = -(${b}) / (2 * ${a})`
+        formula: `x = -(${numB}) / (2 * ${numA})`
       };
     } else {
-      const real = (-b / (2 * a)).toFixed(4);
-      const imag = (Math.sqrt(-disc) / (2 * a)).toFixed(4);
+      const real = (-numB / (2 * numA)).toFixed(4);
+      const imag = (Math.sqrt(-disc) / (2 * numA)).toFixed(4);
       return {
         type: 'Complex Roots',
         x1: `${real} + ${imag}i`,
@@ -69,12 +75,16 @@ export const QuadraticSolver: React.FC<BaseCalcProps> = () => {
     }
   }, [a, b, c]);
 
+  const numA = typeof a === 'number' ? a : 0;
+  const numB = typeof b === 'number' ? b : 0;
+  const numC = typeof c === 'number' ? c : 0;
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-4">
           <div className="p-3 bg-slate-50 rounded-xl border text-center font-mono text-sm font-bold text-slate-800">
-            {a}x² {b >= 0 ? `+ ${b}` : `- ${Math.abs(b)}`}x {c >= 0 ? `+ ${c}` : `- ${Math.abs(c)}`} = 0
+            {a !== '' ? a : 'a'}x² {numB >= 0 ? `+ ${b !== '' ? b : 'b'}` : `- ${Math.abs(numB)}`}x {numC >= 0 ? `+ ${c !== '' ? c : 'c'}` : `- ${Math.abs(numC)}`} = 0
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
@@ -82,7 +92,7 @@ export const QuadraticSolver: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={a}
-                onChange={(e) => setA(Number(e.target.value))}
+                onChange={(e) => setA(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -91,7 +101,7 @@ export const QuadraticSolver: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={b}
-                onChange={(e) => setB(Number(e.target.value))}
+                onChange={(e) => setB(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -100,7 +110,7 @@ export const QuadraticSolver: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={c}
-                onChange={(e) => setC(Number(e.target.value))}
+                onChange={(e) => setC(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -108,33 +118,41 @@ export const QuadraticSolver: React.FC<BaseCalcProps> = () => {
         </div>
 
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Solution Roots</span>
-              <span className="text-[11px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">{results.type}</span>
-            </div>
-            <div className="mt-3 space-y-1">
-              <div className="text-2xl font-black text-blue-950 font-mono-numbers">
-                x₁ = {results.x1}
-              </div>
-              {results.x2 && results.x2 !== results.x1 && (
-                <div className="text-2xl font-black text-blue-950 font-mono-numbers">
-                  x₂ = {results.x2}
+          {results ? (
+            <>
+              <div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Solution Roots</span>
+                  <span className="text-[11px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">{results.type}</span>
                 </div>
-              )}
-            </div>
-          </div>
+                <div className="mt-3 space-y-1">
+                  <div className="text-2xl font-black text-blue-950 font-mono-numbers">
+                    x₁ = {results.x1}
+                  </div>
+                  {results.x2 && results.x2 !== results.x1 && (
+                    <div className="text-2xl font-black text-blue-950 font-mono-numbers">
+                      x₂ = {results.x2}
+                    </div>
+                  )}
+                </div>
+              </div>
 
-          <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>Discriminant (Δ = b² - 4ac):</span>
-              <span className="font-bold">{results.discriminant}</span>
+              <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1">
+                <div className="flex justify-between">
+                  <span>Discriminant (Δ = b² - 4ac):</span>
+                  <span className="font-bold">{results.discriminant}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Parabola Vertex (h, k):</span>
+                  <span className="font-bold">({results.vertexX}, {results.vertexY})</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="h-full flex items-center justify-center text-xs text-slate-500 py-6">
+              Enter coefficients a, b, and c to solve the equation.
             </div>
-            <div className="flex justify-between">
-              <span>Parabola Vertex (h, k):</span>
-              <span className="font-bold">({results.vertexX}, {results.vertexY})</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
@@ -269,12 +287,13 @@ export const PythagoreanCalculator: React.FC<BaseCalcProps> = () => {
 
 // 3. LCM & GCD / GCF Calculator
 export const LcmGcdCalculator: React.FC<BaseCalcProps> = () => {
-  const [num1, setNum1] = useState(24);
-  const [num2, setNum2] = useState(36);
+  const [num1, setNum1] = useState<number | ''>(24);
+  const [num2, setNum2] = useState<number | ''>(36);
 
   const results = useMemo(() => {
-    const a = Math.abs(Math.round(num1));
-    const b = Math.abs(Math.round(num2));
+    if (num1 === '' || num2 === '') return null;
+    const a = Math.abs(Math.round(Number(num1)));
+    const b = Math.abs(Math.round(Number(num2)));
     if (a === 0 || b === 0) return null;
 
     // Euclidean algorithm for GCD
@@ -316,7 +335,7 @@ export const LcmGcdCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={num1}
-                onChange={(e) => setNum1(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setNum1(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -325,7 +344,7 @@ export const LcmGcdCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={num2}
-                onChange={(e) => setNum2(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setNum2(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -333,21 +352,27 @@ export const LcmGcdCalculator: React.FC<BaseCalcProps> = () => {
         </div>
 
         <div className="bg-gradient-to-br from-purple-50 to-indigo-50 p-5 rounded-xl border border-purple-200 flex flex-col justify-between space-y-4">
-          <div className="space-y-3">
-            <div>
-              <span className="text-xs font-bold text-purple-900 uppercase tracking-wider">Greatest Common Divisor (GCD / GCF)</span>
-              <div className="text-2xl font-black text-purple-950 font-mono-numbers">{results?.gcd}</div>
-            </div>
-            <div>
-              <span className="text-xs font-bold text-purple-900 uppercase tracking-wider">Least Common Multiple (LCM)</span>
-              <div className="text-2xl font-black text-purple-950 font-mono-numbers">{results?.lcm}</div>
-            </div>
-          </div>
+          {results ? (
+            <>
+              <div className="space-y-3">
+                <div>
+                  <span className="text-xs font-bold text-purple-900 uppercase tracking-wider">Greatest Common Divisor (GCD / GCF)</span>
+                  <div className="text-2xl font-black text-purple-950 font-mono-numbers">{results.gcd}</div>
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-purple-900 uppercase tracking-wider">Least Common Multiple (LCM)</span>
+                  <div className="text-2xl font-black text-purple-950 font-mono-numbers">{results.lcm}</div>
+                </div>
+              </div>
 
-          {results && (
-            <div className="bg-white p-2.5 rounded-lg border border-purple-100 text-[11px] text-slate-700 space-y-1">
-              <div>Prime Factorization of {num1}: <span className="font-bold">{results.factorsA}</span></div>
-              <div>Prime Factorization of {num2}: <span className="font-bold">{results.factorsB}</span></div>
+              <div className="bg-white p-2.5 rounded-lg border border-purple-100 text-[11px] text-slate-700 space-y-1">
+                <div>Prime Factorization of {num1}: <span className="font-bold">{results.factorsA}</span></div>
+                <div>Prime Factorization of {num2}: <span className="font-bold">{results.factorsB}</span></div>
+              </div>
+            </>
+          ) : (
+            <div className="h-full flex items-center justify-center text-xs text-slate-500 py-6">
+              Enter two positive integers to calculate GCD and LCM.
             </div>
           )}
         </div>
@@ -358,15 +383,18 @@ export const LcmGcdCalculator: React.FC<BaseCalcProps> = () => {
 
 // 4. Logarithm Calculator (log10, ln, log2, log_b(x))
 export const LogarithmCalculator: React.FC<BaseCalcProps> = () => {
-  const [valX, setValX] = useState(100);
-  const [baseB, setBaseB] = useState(10);
+  const [valX, setValX] = useState<number | ''>(100);
+  const [baseB, setBaseB] = useState<number | ''>(10);
 
   const results = useMemo(() => {
-    if (valX <= 0 || baseB <= 0 || baseB === 1) return null;
-    const logCustom = Math.log(valX) / Math.log(baseB);
-    const lnX = Math.log(valX);
-    const log10X = Math.log10(valX);
-    const log2X = Math.log2(valX);
+    if (valX === '' || baseB === '') return null;
+    const numX = Number(valX);
+    const numB = Number(baseB);
+    if (numX <= 0 || numB <= 0 || numB === 1) return null;
+    const logCustom = Math.log(numX) / Math.log(numB);
+    const lnX = Math.log(numX);
+    const log10X = Math.log10(numX);
+    const log2X = Math.log2(numX);
 
     return {
       logCustom: logCustom.toFixed(6),
@@ -388,7 +416,7 @@ export const LogarithmCalculator: React.FC<BaseCalcProps> = () => {
                 type="number"
                 step="any"
                 value={valX}
-                onChange={(e) => setValX(Math.max(0.000001, Number(e.target.value)))}
+                onChange={(e) => setValX(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -398,7 +426,7 @@ export const LogarithmCalculator: React.FC<BaseCalcProps> = () => {
                 type="number"
                 step="any"
                 value={baseB}
-                onChange={(e) => setBaseB(Math.max(0.000001, Number(e.target.value)))}
+                onChange={(e) => setBaseB(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -406,27 +434,33 @@ export const LogarithmCalculator: React.FC<BaseCalcProps> = () => {
         </div>
 
         <div className="bg-gradient-to-br from-blue-50 to-sky-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">log_{baseB}({valX})</span>
-            <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
-              {results ? results.logCustom : 'Invalid input'}
-            </div>
-          </div>
+          {results ? (
+            <>
+              <div>
+                <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">log_{baseB}({valX})</span>
+                <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
+                  {results.logCustom}
+                </div>
+              </div>
 
-          {results && (
-            <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1">
-              <div className="flex justify-between">
-                <span>Natural Log ln({valX}):</span>
-                <span className="font-bold">{results.lnX}</span>
+              <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1">
+                <div className="flex justify-between">
+                  <span>Natural Log ln({valX}):</span>
+                  <span className="font-bold">{results.lnX}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Common Log log₁₀({valX}):</span>
+                  <span className="font-bold">{results.log10X}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Binary Log log₂({valX}):</span>
+                  <span className="font-bold">{results.log2X}</span>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span>Common Log log₁₀({valX}):</span>
-                <span className="font-bold">{results.log10X}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Binary Log log₂({valX}):</span>
-                <span className="font-bold">{results.log2X}</span>
-              </div>
+            </>
+          ) : (
+            <div className="h-full flex items-center justify-center text-xs text-slate-500 py-6">
+              Enter argument x (x &gt; 0) and base b (b &gt; 0, b ≠ 1) to calculate logarithm.
             </div>
           )}
         </div>
@@ -437,16 +471,19 @@ export const LogarithmCalculator: React.FC<BaseCalcProps> = () => {
 
 // 5. Factorial, Permutations (nPr) & Combinations (nCr)
 export const FactorialCalculator: React.FC<BaseCalcProps> = () => {
-  const [n, setN] = useState(7);
-  const [r, setR] = useState(3);
+  const [n, setN] = useState<number | ''>(7);
+  const [r, setR] = useState<number | ''>(3);
 
   const results = useMemo(() => {
+    if (n === '' || r === '') return null;
+    const numN = Number(n);
+    const numR = Number(r);
     const fact = (num: number): number => (num <= 1 ? 1 : num * fact(num - 1));
-    if (n < 0 || r < 0 || r > n || n > 20) return null;
+    if (numN < 0 || numR < 0 || numR > numN || numN > 20) return null;
 
-    const nFact = fact(n);
-    const rFact = fact(r);
-    const nMinusRFact = fact(n - r);
+    const nFact = fact(numN);
+    const rFact = fact(numR);
+    const nMinusRFact = fact(numN - numR);
 
     const nPr = nFact / nMinusRFact;
     const nCr = nFact / (rFact * nMinusRFact);
@@ -465,7 +502,7 @@ export const FactorialCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={n}
-                onChange={(e) => setN(Math.max(0, Math.min(20, Number(e.target.value))))}
+                onChange={(e) => setN(e.target.value === '' ? '' : Math.max(0, Math.min(20, Number(e.target.value))))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -474,7 +511,7 @@ export const FactorialCalculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={r}
-                onChange={(e) => setR(Math.max(0, Math.min(n, Number(e.target.value))))}
+                onChange={(e) => setR(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -482,20 +519,26 @@ export const FactorialCalculator: React.FC<BaseCalcProps> = () => {
         </div>
 
         <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
-          <div className="space-y-2">
-            <div className="flex justify-between items-center bg-white p-2 rounded-lg border">
-              <span className="text-xs text-slate-600">Factorial ({n}!):</span>
-              <span className="font-black text-slate-900 font-mono-numbers">{results?.nFact.toLocaleString()}</span>
+          {results ? (
+            <div className="space-y-2">
+              <div className="flex justify-between items-center bg-white p-2 rounded-lg border">
+                <span className="text-xs text-slate-600">Factorial ({n}!):</span>
+                <span className="font-black text-slate-900 font-mono-numbers">{results.nFact.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center bg-white p-2 rounded-lg border">
+                <span className="text-xs text-slate-600">Permutations <sub>{n}</sub>P<sub>{r}</sub> (Order matters):</span>
+                <span className="font-black text-blue-700 font-mono-numbers">{results.nPr.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center bg-white p-2 rounded-lg border">
+                <span className="text-xs text-slate-600">Combinations <sub>{n}</sub>C<sub>{r}</sub> (Order does not matter):</span>
+                <span className="font-black text-orange-700 font-mono-numbers">{results.nCr.toLocaleString()}</span>
+              </div>
             </div>
-            <div className="flex justify-between items-center bg-white p-2 rounded-lg border">
-              <span className="text-xs text-slate-600">Permutations <sub>{n}</sub>P<sub>{r}</sub> (Order matters):</span>
-              <span className="font-black text-blue-700 font-mono-numbers">{results?.nPr.toLocaleString()}</span>
+          ) : (
+            <div className="h-full flex items-center justify-center text-xs text-slate-500 py-6">
+              Enter n (0 ≤ n ≤ 20) and r (0 ≤ r ≤ n) to calculate.
             </div>
-            <div className="flex justify-between items-center bg-white p-2 rounded-lg border">
-              <span className="text-xs text-slate-600">Combinations <sub>{n}</sub>C<sub>{r}</sub> (Order does not matter):</span>
-              <span className="font-black text-orange-700 font-mono-numbers">{results?.nCr.toLocaleString()}</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
@@ -504,20 +547,25 @@ export const FactorialCalculator: React.FC<BaseCalcProps> = () => {
 
 // 6. 2x2 Matrix Determinant & Inverse Calculator
 export const Matrix2x2Calculator: React.FC<BaseCalcProps> = () => {
-  const [a, setA] = useState(4);
-  const [b, setB] = useState(7);
-  const [c, setC] = useState(2);
-  const [d, setD] = useState(6);
+  const [a, setA] = useState<number | ''>(4);
+  const [b, setB] = useState<number | ''>(7);
+  const [c, setC] = useState<number | ''>(2);
+  const [d, setD] = useState<number | ''>(6);
 
   const results = useMemo(() => {
-    const det = a * d - b * c;
+    if (a === '' || b === '' || c === '' || d === '') return null;
+    const numA = Number(a);
+    const numB = Number(b);
+    const numC = Number(c);
+    const numD = Number(d);
+    const det = numA * numD - numB * numC;
     if (det === 0) {
-      return { det: 0, invertible: false };
+      return { det: 0, invertible: false, invA: '0', invB: '0', invC: '0', invD: '0' };
     }
-    const invA = (d / det).toFixed(3);
-    const invB = (-b / det).toFixed(3);
-    const invC = (-c / det).toFixed(3);
-    const invD = (a / det).toFixed(3);
+    const invA = (numD / det).toFixed(3);
+    const invB = (-numB / det).toFixed(3);
+    const invC = (-numC / det).toFixed(3);
+    const invD = (numA / det).toFixed(3);
 
     return {
       det,
@@ -537,7 +585,7 @@ export const Matrix2x2Calculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={a}
-                onChange={(e) => setA(Number(e.target.value))}
+                onChange={(e) => setA(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full p-2 border rounded-lg text-center font-bold bg-white"
               />
             </div>
@@ -546,7 +594,7 @@ export const Matrix2x2Calculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={b}
-                onChange={(e) => setB(Number(e.target.value))}
+                onChange={(e) => setB(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full p-2 border rounded-lg text-center font-bold bg-white"
               />
             </div>
@@ -555,7 +603,7 @@ export const Matrix2x2Calculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={c}
-                onChange={(e) => setC(Number(e.target.value))}
+                onChange={(e) => setC(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full p-2 border rounded-lg text-center font-bold bg-white"
               />
             </div>
@@ -564,7 +612,7 @@ export const Matrix2x2Calculator: React.FC<BaseCalcProps> = () => {
               <input
                 type="number"
                 value={d}
-                onChange={(e) => setD(Number(e.target.value))}
+                onChange={(e) => setD(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full p-2 border rounded-lg text-center font-bold bg-white"
               />
             </div>
@@ -572,26 +620,34 @@ export const Matrix2x2Calculator: React.FC<BaseCalcProps> = () => {
         </div>
 
         <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">Determinant det(A) = ad - bc</span>
-            <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-1">
-              {results.det}
-            </div>
-          </div>
-
-          <div className="bg-white p-3 rounded-lg border border-indigo-100 text-xs space-y-2">
-            <span className="font-bold text-slate-700 block">Inverse Matrix A⁻¹:</span>
-            {results.invertible ? (
-              <div className="grid grid-cols-2 gap-2 text-center font-mono font-bold text-slate-900 bg-slate-50 p-2 rounded border">
-                <div>{results.invA}</div>
-                <div>{results.invB}</div>
-                <div>{results.invC}</div>
-                <div>{results.invD}</div>
+          {results ? (
+            <>
+              <div>
+                <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">Determinant det(A) = ad - bc</span>
+                <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-1">
+                  {results.det}
+                </div>
               </div>
-            ) : (
-              <span className="text-red-600 font-semibold">Matrix is singular (det = 0, no inverse exists).</span>
-            )}
-          </div>
+
+              <div className="bg-white p-3 rounded-lg border border-indigo-100 text-xs space-y-2">
+                <span className="font-bold text-slate-700 block">Inverse Matrix A⁻¹:</span>
+                {results.invertible ? (
+                  <div className="grid grid-cols-2 gap-2 text-center font-mono font-bold text-slate-900 bg-slate-50 p-2 rounded border">
+                    <div>{results.invA}</div>
+                    <div>{results.invB}</div>
+                    <div>{results.invC}</div>
+                    <div>{results.invD}</div>
+                  </div>
+                ) : (
+                  <span className="text-red-600 font-semibold">Matrix is singular (det = 0, no inverse exists).</span>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="h-full flex items-center justify-center text-xs text-slate-500 py-6">
+              Enter all 4 matrix elements to calculate determinant and inverse.
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -44,55 +44,59 @@ export const ConcreteCalculator: React.FC<ConcreteCalculatorProps> = ({
     : length === '' || width === '' || depth === '';
 
   const results = useMemo(() => {
-    if (isInputEmpty) return null;
+    try {
+      if (isInputEmpty) return null;
 
-    let volumeCubicYards = 0;
-    let volumeCubicMeters = 0;
+      let volumeCubicYards = 0;
+      let volumeCubicMeters = 0;
 
-    if (unit === 'imperial') {
-      if (shape === 'slab' || shape === 'footing') {
-        const depthFeet = numDepth / 12;
-        const cubicFeet = numLength * numWidth * depthFeet * numQuantity;
-        volumeCubicYards = cubicFeet / 27;
-        volumeCubicMeters = volumeCubicYards * 0.764555;
+      if (unit === 'imperial') {
+        if (shape === 'slab' || shape === 'footing') {
+          const depthFeet = numDepth / 12;
+          const cubicFeet = numLength * numWidth * depthFeet * numQuantity;
+          volumeCubicYards = cubicFeet / 27;
+          volumeCubicMeters = volumeCubicYards * 0.764555;
+        } else {
+          // Cylindrical Column
+          const radiusFeet = (numDiameter / 2) / 12;
+          const cubicFeet = Math.PI * Math.pow(radiusFeet, 2) * numHeight * numQuantity;
+          volumeCubicYards = cubicFeet / 27;
+          volumeCubicMeters = volumeCubicYards * 0.764555;
+        }
       } else {
-        // Cylindrical Column
-        const radiusFeet = (numDiameter / 2) / 12;
-        const cubicFeet = Math.PI * Math.pow(radiusFeet, 2) * numHeight * numQuantity;
-        volumeCubicYards = cubicFeet / 27;
-        volumeCubicMeters = volumeCubicYards * 0.764555;
+        // Metric
+        if (shape === 'slab' || shape === 'footing') {
+          const depthMeters = numDepth / 100;
+          volumeCubicMeters = numLength * numWidth * depthMeters * numQuantity;
+          volumeCubicYards = volumeCubicMeters * 1.30795;
+        } else {
+          const radiusMeters = (numDiameter / 2) / 100;
+          volumeCubicMeters = Math.PI * Math.pow(radiusMeters, 2) * numHeight * numQuantity;
+          volumeCubicYards = volumeCubicMeters * 1.30795;
+        }
       }
-    } else {
-      // Metric
-      if (shape === 'slab' || shape === 'footing') {
-        const depthMeters = numDepth / 100;
-        volumeCubicMeters = numLength * numWidth * depthMeters * numQuantity;
-        volumeCubicYards = volumeCubicMeters * 1.30795;
-      } else {
-        const radiusMeters = (numDiameter / 2) / 100;
-        volumeCubicMeters = Math.PI * Math.pow(radiusMeters, 2) * numHeight * numQuantity;
-        volumeCubicYards = volumeCubicMeters * 1.30795;
-      }
+
+      const wasteMultiplier = 1 + (numWasteMargin / 100);
+      const totalVolumeYards = volumeCubicYards * wasteMultiplier;
+      const totalVolumeMeters = volumeCubicMeters * wasteMultiplier;
+
+      // Premix bags: 1 cu yard ≈ 60 of 60lb bags or 45 of 80lb bags
+      const bags60lb = Math.ceil(totalVolumeYards * 60);
+      const bags80lb = Math.ceil(totalVolumeYards * 45);
+
+      const estimatedTotalCost = (unit === 'imperial' ? totalVolumeYards : totalVolumeMeters) * numPricePerUnit;
+
+      return {
+        volumeCubicYards: Math.round(totalVolumeYards * 100) / 100,
+        volumeCubicMeters: Math.round(totalVolumeMeters * 100) / 100,
+        rawYards: Math.round(volumeCubicYards * 100) / 100,
+        bags60lb,
+        bags80lb,
+        estimatedTotalCost: Math.round(estimatedTotalCost * 100) / 100
+      };
+    } catch {
+      return null;
     }
-
-    const wasteMultiplier = 1 + (numWasteMargin / 100);
-    const totalVolumeYards = volumeCubicYards * wasteMultiplier;
-    const totalVolumeMeters = volumeCubicMeters * wasteMultiplier;
-
-    // Premix bags: 1 cu yard ≈ 60 of 60lb bags or 45 of 80lb bags
-    const bags60lb = Math.ceil(totalVolumeYards * 60);
-    const bags80lb = Math.ceil(totalVolumeYards * 45);
-
-    const estimatedTotalCost = (unit === 'imperial' ? totalVolumeYards : totalVolumeMeters) * numPricePerUnit;
-
-    return {
-      volumeCubicYards: Math.round(totalVolumeYards * 100) / 100,
-      volumeCubicMeters: Math.round(totalVolumeMeters * 100) / 100,
-      rawYards: Math.round(volumeCubicYards * 100) / 100,
-      bags60lb,
-      bags80lb,
-      estimatedTotalCost: Math.round(estimatedTotalCost * 100) / 100
-    };
   }, [isInputEmpty, shape, unit, numLength, numWidth, numDepth, numDiameter, numHeight, numQuantity, numWasteMargin, numPricePerUnit]);
 
   const handleCopy = () => {

@@ -61,69 +61,73 @@ export const BodyFatCalculator: React.FC<BodyFatCalculatorProps> = ({ onSaveCalc
   };
 
   const stats = useMemo(() => {
-    if (isInputEmpty) return null;
+    try {
+      if (isInputEmpty) return null;
 
-    let hIn = numHeightIn;
-    let wLbs = numWeightLbs;
-    let nIn = numNeckIn;
-    let wsIn = numWaistIn;
-    let hpIn = numHipIn;
+      let hIn = numHeightIn;
+      let wLbs = numWeightLbs;
+      let nIn = numNeckIn;
+      let wsIn = numWaistIn;
+      let hpIn = numHipIn;
 
-    if (unitSystem === 'metric') {
-      // In metric mode, input numbers are cm and kg
-      hIn = numHeightIn / 2.54;
-      wLbs = numWeightLbs * 2.20462;
-      nIn = numNeckIn / 2.54;
-      wsIn = numWaistIn / 2.54;
-      hpIn = numHipIn / 2.54;
-    }
-
-    if (hIn <= 0 || wLbs <= 0 || nIn <= 0 || wsIn <= 0) return null;
-
-    let bodyFatPercent = 0;
-
-    if (gender === 'male') {
-      // US Navy Male: 86.010 * log10(waist - neck) - 70.041 * log10(height) + 36.76
-      const diff = wsIn - nIn;
-      if (diff > 0 && hIn > 0) {
-        bodyFatPercent = 86.010 * Math.log10(diff) - 70.041 * Math.log10(hIn) + 36.76;
+      if (unitSystem === 'metric') {
+        // In metric mode, input numbers are cm and kg
+        hIn = numHeightIn / 2.54;
+        wLbs = numWeightLbs * 2.20462;
+        nIn = numNeckIn / 2.54;
+        wsIn = numWaistIn / 2.54;
+        hpIn = numHipIn / 2.54;
       }
-    } else {
-      // US Navy Female: 163.205 * log10(waist + hip - neck) - 97.684 * log10(height) - 78.387
-      const sum = wsIn + hpIn - nIn;
-      if (sum > 0 && hIn > 0) {
+
+      if (hIn <= 0 || wLbs <= 0 || nIn <= 0 || wsIn <= 0) return null;
+
+      let bodyFatPercent = 0;
+
+      if (gender === 'male') {
+        // US Navy Male: 86.010 * log10(waist - neck) - 70.041 * log10(height) + 36.76
+        const diff = wsIn - nIn;
+        if (diff <= 0 || hIn <= 0) return null;
+        bodyFatPercent = 86.010 * Math.log10(diff) - 70.041 * Math.log10(hIn) + 36.76;
+      } else {
+        // US Navy Female: 163.205 * log10(waist + hip - neck) - 97.684 * log10(height) - 78.387
+        const sum = wsIn + hpIn - nIn;
+        if (sum <= 0 || hIn <= 0) return null;
         bodyFatPercent = 163.205 * Math.log10(sum) - 97.684 * Math.log10(hIn) - 78.387;
       }
+
+      if (isNaN(bodyFatPercent) || !isFinite(bodyFatPercent)) return null;
+
+      bodyFatPercent = Math.max(2, Math.min(60, bodyFatPercent));
+
+      const totalWeightUser = numWeightLbs;
+      const fatMass = (totalWeightUser * bodyFatPercent) / 100;
+      const leanMass = totalWeightUser - fatMass;
+
+      let category = 'Fitness';
+      if (gender === 'male') {
+        if (bodyFatPercent < 6) category = 'Essential Fat';
+        else if (bodyFatPercent < 14) category = 'Athletes';
+        else if (bodyFatPercent < 18) category = 'Fitness';
+        else if (bodyFatPercent < 25) category = 'Average';
+        else category = 'Obese';
+      } else {
+        if (bodyFatPercent < 14) category = 'Essential Fat';
+        else if (bodyFatPercent < 21) category = 'Athletes';
+        else if (bodyFatPercent < 25) category = 'Fitness';
+        else if (bodyFatPercent < 32) category = 'Average';
+        else category = 'Obese';
+      }
+
+      return {
+        bodyFatPercent: Number(bodyFatPercent.toFixed(1)),
+        fatMass: Number(fatMass.toFixed(1)),
+        leanMass: Number(leanMass.toFixed(1)),
+        unitLabel: unitSystem === 'imperial' ? 'lbs' : 'kg',
+        category
+      };
+    } catch {
+      return null;
     }
-
-    bodyFatPercent = Math.max(2, Math.min(60, bodyFatPercent));
-
-    const totalWeightUser = numWeightLbs;
-    const fatMass = (totalWeightUser * bodyFatPercent) / 100;
-    const leanMass = totalWeightUser - fatMass;
-
-    let category = 'Fitness';
-    if (gender === 'male') {
-      if (bodyFatPercent < 6) category = 'Essential Fat';
-      else if (bodyFatPercent < 14) category = 'Athletes';
-      else if (bodyFatPercent < 18) category = 'Fitness';
-      else if (bodyFatPercent < 25) category = 'Average';
-      else category = 'Obese';
-    } else {
-      if (bodyFatPercent < 14) category = 'Essential Fat';
-      else if (bodyFatPercent < 21) category = 'Athletes';
-      else if (bodyFatPercent < 25) category = 'Fitness';
-      else if (bodyFatPercent < 32) category = 'Average';
-      else category = 'Obese';
-    }
-
-    return {
-      bodyFatPercent: Number(bodyFatPercent.toFixed(1)),
-      fatMass: Number(fatMass.toFixed(1)),
-      leanMass: Number(leanMass.toFixed(1)),
-      unitLabel: unitSystem === 'imperial' ? 'lbs' : 'kg',
-      category
-    };
   }, [isInputEmpty, gender, unitSystem, numHeightIn, numWeightLbs, numNeckIn, numWaistIn, numHipIn]);
 
   const handleCopy = async () => {

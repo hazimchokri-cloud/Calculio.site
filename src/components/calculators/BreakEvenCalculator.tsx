@@ -26,32 +26,36 @@ export const BreakEvenCalculator: React.FC<BreakEvenCalculatorProps> = ({
   const isInputEmpty = fixedCosts === '' || unitPrice === '' || variableCostPerUnit === '';
 
   const results = useMemo(() => {
-    if (isInputEmpty || numUnitPrice <= 0) return null;
-    // Contribution margin per unit = Price - Variable Cost
-    const contributionMargin = numUnitPrice - numVariableCostPerUnit;
-    const contributionMarginRatio = numUnitPrice > 0 ? (contributionMargin / numUnitPrice) * 100 : 0;
+    try {
+      if (isInputEmpty || numUnitPrice <= 0) return null;
+      // Contribution margin per unit = Price - Variable Cost
+      const contributionMargin = numUnitPrice - numVariableCostPerUnit;
+      const contributionMarginRatio = numUnitPrice > 0 ? (contributionMargin / numUnitPrice) * 100 : 0;
 
-    // Break-even units = Fixed Costs / Contribution Margin
-    const breakEvenUnits = contributionMargin > 0 ? Math.ceil(numFixedCosts / contributionMargin) : 0;
-    const breakEvenRevenue = breakEvenUnits * numUnitPrice;
+      // Break-even units = Fixed Costs / Contribution Margin
+      const breakEvenUnits = contributionMargin > 0 ? Math.ceil(numFixedCosts / contributionMargin) : 0;
+      const breakEvenRevenue = breakEvenUnits * numUnitPrice;
 
-    // Expected profit/loss based on expected units
-    const totalRevenue = numExpectedUnitsSold * numUnitPrice;
-    const totalVariableCosts = numExpectedUnitsSold * numVariableCostPerUnit;
-    const totalCosts = numFixedCosts + totalVariableCosts;
-    const netProfit = totalRevenue - totalCosts;
-    const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+      // Expected profit/loss based on expected units
+      const totalRevenue = numExpectedUnitsSold * numUnitPrice;
+      const totalVariableCosts = numExpectedUnitsSold * numVariableCostPerUnit;
+      const totalCosts = numFixedCosts + totalVariableCosts;
+      const netProfit = totalRevenue - totalCosts;
+      const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
-    return {
-      contributionMargin: Math.round(contributionMargin * 100) / 100,
-      contributionMarginRatio: Math.round(contributionMarginRatio * 10) / 10,
-      breakEvenUnits,
-      breakEvenRevenue: Math.round(breakEvenRevenue),
-      totalRevenue: Math.round(totalRevenue),
-      totalCosts: Math.round(totalCosts),
-      netProfit: Math.round(netProfit),
-      profitMargin: Math.round(profitMargin * 10) / 10
-    };
+      return {
+        contributionMargin: Math.round(contributionMargin * 100) / 100,
+        contributionMarginRatio: Math.round(contributionMarginRatio * 10) / 10,
+        breakEvenUnits,
+        breakEvenRevenue: Math.round(breakEvenRevenue),
+        totalRevenue: Math.round(totalRevenue),
+        totalCosts: Math.round(totalCosts),
+        netProfit: Math.round(netProfit),
+        profitMargin: Math.round(profitMargin * 10) / 10
+      };
+    } catch {
+      return null;
+    }
   }, [isInputEmpty, numFixedCosts, numUnitPrice, numVariableCostPerUnit, numExpectedUnitsSold]);
 
   const handleCopy = () => {

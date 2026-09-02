@@ -28,75 +28,79 @@ export const CompoundInterestCalculator: React.FC<CompoundInterestProps> = ({
   const isInputEmpty = initialPrincipal === '' || interestRate === '' || years === '';
 
   const results = useMemo(() => {
-    if (isInputEmpty || (numInitialPrincipal <= 0 && numMonthlyContribution <= 0) || numYears <= 0) {
-      return null;
-    }
-
-    const P = Math.max(0, numInitialPrincipal);
-    const PMT = Math.max(0, numMonthlyContribution);
-    const r = Math.max(0, numInterestRate) / 100;
-    const n = Math.max(1, compoundFrequency);
-    const t = Math.max(1, numYears);
-
-    // Effective monthly compounding rate matching compoundFrequency n
-    const monthlyRate = r === 0 ? 0 : Math.pow(1 + r / n, n / 12) - 1;
-
-    let balance = P;
-    let totalContributed = P;
-
-    const yearlyData: {
-      year: number;
-      startingBalance: number;
-      depositsThisYear: number;
-      interestThisYear: number;
-      endingBalance: number;
-      totalDeposits: number;
-      totalInterest: number;
-    }[] = [];
-
-    let runningTotalInterest = 0;
-
-    for (let yr = 1; yr <= t; yr++) {
-      const starting = balance;
-      let yearlyDeposits = 0;
-      let yrInterest = 0;
-
-      // Calculate compounding month by month
-      for (let m = 1; m <= 12; m++) {
-        balance += PMT;
-        yearlyDeposits += PMT;
-        totalContributed += PMT;
-
-        // Interest compounding step
-        const interestEarned = balance * monthlyRate;
-        balance += interestEarned;
-        yrInterest += interestEarned;
+    try {
+      if (isInputEmpty || (numInitialPrincipal <= 0 && numMonthlyContribution <= 0) || numYears <= 0) {
+        return null;
       }
 
-      runningTotalInterest += yrInterest;
+      const P = Math.max(0, numInitialPrincipal);
+      const PMT = Math.max(0, numMonthlyContribution);
+      const r = Math.max(0, numInterestRate) / 100;
+      const n = Math.max(1, compoundFrequency);
+      const t = Math.max(1, numYears);
 
-      yearlyData.push({
-        year: yr,
-        startingBalance: starting,
-        depositsThisYear: yearlyDeposits,
-        interestThisYear: yrInterest,
-        endingBalance: balance,
-        totalDeposits: totalContributed,
-        totalInterest: runningTotalInterest
-      });
+      // Effective monthly compounding rate matching compoundFrequency n
+      const monthlyRate = r === 0 ? 0 : Math.pow(1 + r / n, n / 12) - 1;
+
+      let balance = P;
+      let totalContributed = P;
+
+      const yearlyData: {
+        year: number;
+        startingBalance: number;
+        depositsThisYear: number;
+        interestThisYear: number;
+        endingBalance: number;
+        totalDeposits: number;
+        totalInterest: number;
+      }[] = [];
+
+      let runningTotalInterest = 0;
+
+      for (let yr = 1; yr <= t; yr++) {
+        const starting = balance;
+        let yearlyDeposits = 0;
+        let yrInterest = 0;
+
+        // Calculate compounding month by month
+        for (let m = 1; m <= 12; m++) {
+          balance += PMT;
+          yearlyDeposits += PMT;
+          totalContributed += PMT;
+
+          // Interest compounding step
+          const interestEarned = balance * monthlyRate;
+          balance += interestEarned;
+          yrInterest += interestEarned;
+        }
+
+        runningTotalInterest += yrInterest;
+
+        yearlyData.push({
+          year: yr,
+          startingBalance: starting,
+          depositsThisYear: yearlyDeposits,
+          interestThisYear: yrInterest,
+          endingBalance: balance,
+          totalDeposits: totalContributed,
+          totalInterest: runningTotalInterest
+        });
+      }
+
+      const finalFutureValue = balance;
+      const totalInterestEarned = Math.max(0, finalFutureValue - totalContributed);
+      const multiplier = totalContributed > 0 ? (finalFutureValue / totalContributed).toFixed(2) : '1.00';
+
+      return {
+        finalFutureValue,
+        totalContributed,
+        totalInterestEarned,
+        multiplier,
+        yearlyData
+      };
+    } catch {
+      return null;
     }
-
-    const finalFutureValue = balance;
-    const totalInterestEarned = Math.max(0, finalFutureValue - totalContributed);
-    const multiplier = totalContributed > 0 ? (finalFutureValue / totalContributed).toFixed(2) : '1.00';
-
-    return {
-      finalFutureValue,
-      totalContributed,
-      totalInterestEarned,
-      multiplier,
-      yearlyData
-    };
   }, [isInputEmpty, numInitialPrincipal, numMonthlyContribution, numInterestRate, numYears, compoundFrequency]);
 
   const handleCopy = async () => {

@@ -34,36 +34,40 @@ export const AutoLoanCalculator: React.FC<AutoLoanProps> = ({
   const isInputEmpty = vehiclePrice === '' || interestRate === '';
 
   const calc = useMemo(() => {
-    if (isInputEmpty || numVehiclePrice <= 0) return null;
+    try {
+      if (isInputEmpty || numVehiclePrice <= 0) return null;
 
-    const netTradeIn = Math.max(0, numTradeInValue - numTradeInOwed);
-    const taxablePrice = Math.max(0, numVehiclePrice - netTradeIn);
-    const salesTaxAmount = (taxablePrice * numSalesTaxPercent) / 100;
-    const totalOutTheDoor = numVehiclePrice + salesTaxAmount + numTitleAndFees;
+      const netTradeIn = Math.max(0, numTradeInValue - numTradeInOwed);
+      const taxablePrice = Math.max(0, numVehiclePrice - netTradeIn);
+      const salesTaxAmount = (taxablePrice * numSalesTaxPercent) / 100;
+      const totalOutTheDoor = numVehiclePrice + salesTaxAmount + numTitleAndFees;
 
-    const totalFinanced = Math.max(0, totalOutTheDoor - numDownPayment - netTradeIn);
+      const totalFinanced = Math.max(0, totalOutTheDoor - numDownPayment - netTradeIn);
 
-    const monthlyRate = numInterestRate / 100 / 12;
-    let monthlyPayment = 0;
-    if (monthlyRate > 0) {
-      monthlyPayment = (totalFinanced * (monthlyRate * Math.pow(1 + monthlyRate, loanTermMonths))) /
-        (Math.pow(1 + monthlyRate, loanTermMonths) - 1);
-    } else {
-      monthlyPayment = totalFinanced / loanTermMonths;
+      const monthlyRate = numInterestRate / 100 / 12;
+      let monthlyPayment = 0;
+      if (monthlyRate > 0) {
+        monthlyPayment = (totalFinanced * (monthlyRate * Math.pow(1 + monthlyRate, loanTermMonths))) /
+          (Math.pow(1 + monthlyRate, loanTermMonths) - 1);
+      } else {
+        monthlyPayment = totalFinanced / Math.max(1, loanTermMonths);
+      }
+
+      const totalInterest = (monthlyPayment * loanTermMonths) - totalFinanced;
+      const totalVehicleCost = totalOutTheDoor + Math.max(0, totalInterest);
+
+      return {
+        netTradeIn,
+        salesTaxAmount,
+        totalOutTheDoor,
+        totalFinanced,
+        monthlyPayment,
+        totalInterest: Math.max(0, totalInterest),
+        totalVehicleCost
+      };
+    } catch {
+      return null;
     }
-
-    const totalInterest = (monthlyPayment * loanTermMonths) - totalFinanced;
-    const totalVehicleCost = totalOutTheDoor + Math.max(0, totalInterest);
-
-    return {
-      netTradeIn,
-      salesTaxAmount,
-      totalOutTheDoor,
-      totalFinanced,
-      monthlyPayment,
-      totalInterest: Math.max(0, totalInterest),
-      totalVehicleCost
-    };
   }, [isInputEmpty, numVehiclePrice, numInterestRate, loanTermMonths, numDownPayment, numTradeInValue, numTradeInOwed, numSalesTaxPercent, numTitleAndFees]);
 
   const handleCopy = async () => {

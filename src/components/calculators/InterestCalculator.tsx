@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { formatCurrency, formatNumber, copyToClipboard } from '../../utils/formatters';
-import { DollarSign, Percent, Calendar, Copy, Check, Bookmark, TrendingUp, Info } from 'lucide-react';
+import { formatCurrency, copyToClipboard } from '../../utils/formatters';
+import { Percent, Copy, Check, Bookmark, TrendingUp, AlertTriangle } from 'lucide-react';
 
 interface InterestCalculatorProps {
   currencySymbol?: string;
@@ -18,63 +18,80 @@ export const InterestCalculator: React.FC<InterestCalculatorProps> = ({
   const [copied, setCopied] = useState<boolean>(false);
   const [saved, setSaved] = useState<boolean>(false);
 
-  const numPrincipal = typeof principal === 'number' ? principal : 0;
-  const numInterestRate = typeof interestRate === 'number' ? interestRate : 0;
-  const numTimeYears = typeof timeYears === 'number' ? timeYears : 0;
-  const numCompoundFreq = typeof compoundFreq === 'number' ? compoundFreq : 12;
-
   const isInputEmpty = principal === '' || interestRate === '' || timeYears === '';
 
   const calculations = useMemo(() => {
-    if (isInputEmpty || numPrincipal <= 0 || numTimeYears <= 0) return null;
-    const P = Math.max(0, numPrincipal);
-    const r = Math.max(0, numInterestRate) / 100;
-    const t = Math.max(1, numTimeYears);
-    const n = Math.max(1, numCompoundFreq);
-
-    // Simple interest
-    const simpleInterest = P * r * t;
-    const simpleTotal = P + simpleInterest;
-
-    // Compound interest: A = P * (1 + r/n)^(n*t)
-    const compoundTotal = P * Math.pow(1 + r / n, n * t);
-    const compoundInterest = Math.max(0, compoundTotal - P);
-    const compoundDifference = Math.max(0, compoundInterest - simpleInterest);
-
-    // Rule of 72
-    const yearsToDouble = r > 0 ? 72 / (r * 100) : 0;
-
-    // Year-by-year comparison
-    const yearlyBreakdown: Array<{
-      year: number;
-      simpleValue: number;
-      compoundValue: number;
-      interestEarnedYear: number;
-    }> = [];
-
-    let prevCompoundVal = P;
-    for (let y = 1; y <= t; y++) {
-      const sVal = P + P * r * y;
-      const cVal = P * Math.pow(1 + r / n, n * y);
-      yearlyBreakdown.push({
-        year: y,
-        simpleValue: sVal,
-        compoundValue: cVal,
-        interestEarnedYear: cVal - prevCompoundVal
-      });
-      prevCompoundVal = cVal;
+    // If any input is cleared, silently hide results with no error
+    if (isInputEmpty) {
+      return null;
     }
 
-    return {
-      simpleInterest,
-      simpleTotal,
-      compoundInterest,
-      compoundTotal,
-      compoundDifference,
-      yearsToDouble,
-      yearlyBreakdown
-    };
-  }, [isInputEmpty, numPrincipal, numInterestRate, numTimeYears, numCompoundFreq]);
+    try {
+      const P = Number(principal);
+      const r = Number(interestRate) / 100;
+      const t = Number(timeYears);
+      const n = Number(compoundFreq) > 0 ? Number(compoundFreq) : 12;
+
+      // Validate inputs are valid finite positive numbers
+      if (isNaN(P) || isNaN(r) || isNaN(t) || isNaN(n) || P < 0 || t <= 0) {
+        return null;
+      }
+
+      // Simple interest: I = P * r * t
+      const simpleInterest = P * r * t;
+      const simpleTotal = P + simpleInterest;
+
+      // Compound interest: A = P * (1 + r/n)^(n*t)
+      const compoundTotal = P * Math.pow(1 + r / n, n * t);
+      const compoundInterest = Math.max(0, compoundTotal - P);
+      const compoundDifference = Math.max(0, compoundInterest - simpleInterest);
+
+      if (!isFinite(simpleTotal) || !isFinite(compoundTotal) || isNaN(compoundTotal)) {
+        return null;
+      }
+
+      // Rule of 72
+      const yearsToDouble = r > 0 ? 72 / (r * 100) : 0;
+
+      // Year-by-year comparison
+      const clampedYears = Math.min(100, Math.round(t));
+      const yearlyBreakdown: Array<{
+        year: number;
+        simpleValue: number;
+        compoundValue: number;
+        interestEarnedYear: number;
+      }> = [];
+
+      let prevCompoundVal = P;
+      for (let y = 1; y <= clampedYears; y++) {
+        const sVal = P + P * r * y;
+        const cVal = P * Math.pow(1 + r / n, n * y);
+        yearlyBreakdown.push({
+          year: y,
+          simpleValue: sVal,
+          compoundValue: cVal,
+          interestEarnedYear: cVal - prevCompoundVal
+        });
+        prevCompoundVal = cVal;
+      }
+
+      return {
+        simpleInterest,
+        simpleTotal,
+        compoundInterest,
+        compoundTotal,
+        compoundDifference,
+        yearsToDouble,
+        yearlyBreakdown
+      };
+    } catch {
+      return null;
+    }
+  }, [isInputEmpty, principal, interestRate, timeYears, compoundFreq]);
+
+  const numPrincipal = typeof principal === 'number' ? principal : 0;
+  const numInterestRate = typeof interestRate === 'number' ? interestRate : 0;
+  const numTimeYears = typeof timeYears === 'number' ? timeYears : 0;
 
   const handleCopy = async () => {
     if (!calculations) return;
@@ -83,7 +100,7 @@ Principal: ${formatCurrency(numPrincipal, currencySymbol)}
 Compound Interest Earned: ${formatCurrency(calculations.compoundInterest, currencySymbol)} (Total: ${formatCurrency(calculations.compoundTotal, currencySymbol)})
 Simple Interest Earned: ${formatCurrency(calculations.simpleInterest, currencySymbol)} (Total: ${formatCurrency(calculations.simpleTotal, currencySymbol)})
 Compounding Advantage: +${formatCurrency(calculations.compoundDifference, currencySymbol)}
-Estimated Time to Double: ~${calculations.yearsToDouble.toFixed(1)} years`;
+Estimated Time to Double: ~${calculations.yearsToDouble > 0 ? `${calculations.yearsToDouble.toFixed(1)} years` : 'N/A'}`;
 
     const ok = await copyToClipboard(text);
     if (ok) {
@@ -300,7 +317,7 @@ Estimated Time to Double: ~${calculations.yearsToDouble.toFixed(1)} years`;
                   <div className="flex items-center gap-2">
                     <TrendingUp className="w-4 h-4 text-blue-300 shrink-0" />
                     <span>
-                      Rule of 72: Doubling your capital takes ~<strong>{calculations.yearsToDouble.toFixed(1)} years</strong> at {interestRate}% rate.
+                      Rule of 72: Doubling your capital takes ~<strong>{calculations.yearsToDouble > 0 ? `${calculations.yearsToDouble.toFixed(1)} years` : 'N/A'}</strong> at {interestRate}% rate.
                     </span>
                   </div>
                 </div>

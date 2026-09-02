@@ -32,47 +32,51 @@ export const BmrCalculator: React.FC<BmrCalculatorProps> = ({ onSaveCalculation 
     : age === '' || heightFt === '' || heightIn === '' || weightLbs === '';
 
   const calculations = useMemo(() => {
-    if (isInputEmpty) return null;
+    try {
+      if (isInputEmpty) return null;
 
-    let weightInKg = unitSystem === 'metric' ? numWeightKg : numWeightLbs * 0.45359237;
-    let heightInCmVal = unitSystem === 'metric' ? numHeightCm : (numHeightFt * 12 + numHeightIn) * 2.54;
+      let weightInKg = unitSystem === 'metric' ? numWeightKg : numWeightLbs * 0.45359237;
+      let heightInCmVal = unitSystem === 'metric' ? numHeightCm : (numHeightFt * 12 + numHeightIn) * 2.54;
 
-    if (weightInKg <= 0 || heightInCmVal <= 0 || numAge <= 0) return null;
+      if (weightInKg <= 0 || heightInCmVal <= 0 || numAge <= 0) return null;
 
-    weightInKg = Math.max(20, weightInKg);
-    heightInCmVal = Math.max(50, heightInCmVal);
-    const validAge = Math.max(10, numAge);
+      weightInKg = Math.max(20, weightInKg);
+      heightInCmVal = Math.max(50, heightInCmVal);
+      const validAge = Math.max(10, numAge);
 
-    // 1. Mifflin-St Jeor Equation (Most accurate standard)
-    let bmrMifflin = 10 * weightInKg + 6.25 * heightInCmVal - 5 * validAge + (gender === 'male' ? 5 : -161);
+      // 1. Mifflin-St Jeor Equation (Most accurate standard)
+      let bmrMifflin = 10 * weightInKg + 6.25 * heightInCmVal - 5 * validAge + (gender === 'male' ? 5 : -161);
 
-    // 2. Revised Harris-Benedict Equation
-    let bmrHarris = gender === 'male'
-      ? 13.397 * weightInKg + 4.799 * heightInCmVal - 5.677 * validAge + 88.362
-      : 9.247 * weightInKg + 3.098 * heightInCmVal - 4.330 * validAge + 447.593;
+      // 2. Revised Harris-Benedict Equation
+      let bmrHarris = gender === 'male'
+        ? 13.397 * weightInKg + 4.799 * heightInCmVal - 5.677 * validAge + 88.362
+        : 9.247 * weightInKg + 3.098 * heightInCmVal - 4.330 * validAge + 447.593;
 
-    // 3. Katch-McArdle Equation (Based on Lean Body Mass)
-    const leanMassKg = weightInKg * (1 - numBodyFatPct / 100);
-    const bmrKatch = 370 + 21.6 * leanMassKg;
+      // 3. Katch-McArdle Equation (Based on Lean Body Mass)
+      const leanMassKg = weightInKg * (1 - numBodyFatPct / 100);
+      const bmrKatch = 370 + 21.6 * leanMassKg;
 
-    // Activity Multipliers based on Mifflin
-    const activityLevels = [
-      { label: 'Sedentary (Little or no exercise)', mult: 1.2 },
-      { label: 'Light (Exercise 1-3 times/week)', mult: 1.375 },
-      { label: 'Moderate (Exercise 4-5 times/week)', mult: 1.55 },
-      { label: 'Very Active (Intense exercise 6-7 times/week)', mult: 1.725 },
-      { label: 'Extra Active (Hard manual job or 2x training)', mult: 1.9 }
-    ].map(lvl => ({
-      ...lvl,
-      calories: Math.round(bmrMifflin * lvl.mult)
-    }));
+      // Activity Multipliers based on Mifflin
+      const activityLevels = [
+        { label: 'Sedentary (Little or no exercise)', mult: 1.2 },
+        { label: 'Light (Exercise 1-3 times/week)', mult: 1.375 },
+        { label: 'Moderate (Exercise 4-5 times/week)', mult: 1.55 },
+        { label: 'Very Active (Intense exercise 6-7 times/week)', mult: 1.725 },
+        { label: 'Extra Active (Hard manual job or 2x training)', mult: 1.9 }
+      ].map(lvl => ({
+        ...lvl,
+        calories: Math.round(bmrMifflin * lvl.mult)
+      }));
 
-    return {
-      bmrMifflin: Math.round(bmrMifflin),
-      bmrHarris: Math.round(bmrHarris),
-      bmrKatch: Math.round(bmrKatch),
-      activityLevels
-    };
+      return {
+        bmrMifflin: Math.round(bmrMifflin),
+        bmrHarris: Math.round(bmrHarris),
+        bmrKatch: Math.round(bmrKatch),
+        activityLevels
+      };
+    } catch {
+      return null;
+    }
   }, [isInputEmpty, unitSystem, gender, numAge, numHeightCm, numHeightFt, numHeightIn, numWeightKg, numWeightLbs, numBodyFatPct]);
 
   const handleCopy = async () => {

@@ -30,51 +30,55 @@ export const AprCalculator: React.FC<AprCalculatorProps> = ({
   const isInputEmpty = loanAmount === '' || interestRate === '' || loanTermYears === '';
 
   const calculations = useMemo(() => {
-    if (isInputEmpty || numLoanAmount <= 0 || numLoanTermYears <= 0) return null;
+    try {
+      if (isInputEmpty || numLoanAmount <= 0 || numLoanTermYears <= 0) return null;
 
-    const P = Math.max(0, numLoanAmount);
-    const nominalAnnual = Math.max(0, numInterestRate) / 100;
-    const r = nominalAnnual / 12;
-    const n = Math.max(1, numLoanTermYears * 12);
+      const P = Math.max(0, numLoanAmount);
+      const nominalAnnual = Math.max(0, numInterestRate) / 100;
+      const r = nominalAnnual / 12;
+      const n = Math.max(1, numLoanTermYears * 12);
 
-    // Monthly payment on the full note amount P
-    let monthlyPayment = 0;
-    if (r === 0) {
-      monthlyPayment = P / n;
-    } else {
-      monthlyPayment = (P * (r * Math.pow(1 + r, n))) / (Math.pow(1 + r, n) - 1);
-    }
-
-    const pointsDollar = P * (Math.max(0, numDiscountPoints) / 100);
-    const totalFinanceFees = numOriginationFee + pointsDollar + numOtherClosingCosts;
-    const netProceeds = Math.max(0, P - totalFinanceFees);
-
-    // Solve for APR via Newton-Raphson
-    let apr = numInterestRate;
-    if (totalFinanceFees > 0 && netProceeds > 0 && r > 0) {
-      let rGuess = r;
-      for (let i = 0; i < 30; i++) {
-        const f = (monthlyPayment * (1 - Math.pow(1 + rGuess, -n))) / rGuess - netProceeds;
-        const fPrime = (monthlyPayment * (n * Math.pow(1 + rGuess, -n - 1) * rGuess - (1 - Math.pow(1 + rGuess, -n)))) / (rGuess * rGuess);
-        if (Math.abs(fPrime) < 1e-12) break;
-        const rNext = rGuess - f / fPrime;
-        if (Math.abs(rNext - rGuess) < 1e-8) {
-          rGuess = rNext;
-          break;
-        }
-        rGuess = rNext;
+      // Monthly payment on the full note amount P
+      let monthlyPayment = 0;
+      if (r === 0) {
+        monthlyPayment = P / n;
+      } else {
+        monthlyPayment = (P * (r * Math.pow(1 + r, n))) / (Math.pow(1 + r, n) - 1);
       }
-      apr = Math.max(numInterestRate, rGuess * 12 * 100);
-    }
 
-    return {
-      monthlyPayment,
-      pointsDollar,
-      totalFinanceFees,
-      netProceeds,
-      effectiveApr: apr,
-      aprSpread: apr - numInterestRate
-    };
+      const pointsDollar = P * (Math.max(0, numDiscountPoints) / 100);
+      const totalFinanceFees = numOriginationFee + pointsDollar + numOtherClosingCosts;
+      const netProceeds = Math.max(0, P - totalFinanceFees);
+
+      // Solve for APR via Newton-Raphson
+      let apr = numInterestRate;
+      if (totalFinanceFees > 0 && netProceeds > 0 && r > 0) {
+        let rGuess = r;
+        for (let i = 0; i < 30; i++) {
+          const f = (monthlyPayment * (1 - Math.pow(1 + rGuess, -n))) / rGuess - netProceeds;
+          const fPrime = (monthlyPayment * (n * Math.pow(1 + rGuess, -n - 1) * rGuess - (1 - Math.pow(1 + rGuess, -n)))) / (rGuess * rGuess);
+          if (Math.abs(fPrime) < 1e-12) break;
+          const rNext = rGuess - f / fPrime;
+          if (Math.abs(rNext - rGuess) < 1e-8) {
+            rGuess = rNext;
+            break;
+          }
+          rGuess = rNext;
+        }
+        apr = Math.max(numInterestRate, rGuess * 12 * 100);
+      }
+
+      return {
+        monthlyPayment,
+        pointsDollar,
+        totalFinanceFees,
+        netProceeds,
+        effectiveApr: apr,
+        aprSpread: apr - numInterestRate
+      };
+    } catch {
+      return null;
+    }
   }, [isInputEmpty, numLoanAmount, numInterestRate, numLoanTermYears, numOriginationFee, numDiscountPoints, numOtherClosingCosts]);
 
   const handleCopy = async () => {

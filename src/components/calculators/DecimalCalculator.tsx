@@ -58,59 +58,71 @@ export const DecimalCalculator: React.FC<DecimalCalculatorProps> = ({ onSaveCalc
   };
 
   const conversionResults = useMemo(() => {
-    const val = parseFloat(decimalInput);
-    if (isNaN(val)) return null;
+    try {
+      const val = parseFloat(decimalInput);
+      if (isNaN(val)) return null;
 
-    const fraction = decimalToFraction(val);
-    const percentage = `${(val * 100).toFixed(4).replace(/\.?0+$/, '')}%`;
-    const scientific = val.toExponential();
+      const fraction = decimalToFraction(val);
+      const percentage = `${(val * 100).toFixed(4).replace(/\.?0+$/, '')}%`;
+      const scientific = val.toExponential();
 
-    return {
-      value: val,
-      fraction: fraction.text,
-      numerator: fraction.num,
-      denominator: fraction.den,
-      percentage,
-      scientific
-    };
+      return {
+        value: val,
+        fraction: fraction.text,
+        numerator: fraction.num,
+        denominator: fraction.den,
+        percentage,
+        scientific
+      };
+    } catch {
+      return null;
+    }
   }, [decimalInput]);
 
   const operationResults = useMemo(() => {
-    const a = parseFloat(num1);
-    const b = parseFloat(num2);
-    if (isNaN(a) || isNaN(b)) return null;
+    try {
+      const a = parseFloat(num1);
+      const b = parseFloat(num2);
+      if (isNaN(a) || isNaN(b)) return null;
 
-    let res = 0;
-    if (op === '+') res = a + b;
-    else if (op === '-') res = a - b;
-    else if (op === '*') res = a * b;
-    else if (op === '/') res = b !== 0 ? a / b : NaN;
+      let res = 0;
+      if (op === '+') res = a + b;
+      else if (op === '-') res = a - b;
+      else if (op === '*') res = a * b;
+      else if (op === '/') res = b !== 0 ? a / b : NaN;
 
-    return {
-      a,
-      b,
-      op,
-      result: isNaN(res) ? 'Undefined (Division by zero)' : res.toString(),
-      fraction: !isNaN(res) ? decimalToFraction(res).text : 'N/A'
-    };
+      return {
+        a,
+        b,
+        op,
+        result: isNaN(res) ? 'Undefined (Division by zero)' : res.toString(),
+        fraction: !isNaN(res) ? decimalToFraction(res).text : 'N/A'
+      };
+    } catch {
+      return null;
+    }
   }, [num1, num2, op]);
 
   const roundingResults = useMemo(() => {
-    const val = parseFloat(roundInput);
-    if (isNaN(val)) return null;
+    try {
+      const val = parseFloat(roundInput);
+      if (isNaN(val)) return null;
 
-    const fixed = val.toFixed(decimalPlaces);
-    const ceil = Math.ceil(val * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
-    const floor = Math.floor(val * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
-    const whole = Math.round(val);
+      const fixed = val.toFixed(decimalPlaces);
+      const ceil = Math.ceil(val * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
+      const floor = Math.floor(val * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
+      const whole = Math.round(val);
 
-    return {
-      val,
-      fixed,
-      ceil: ceil.toFixed(decimalPlaces),
-      floor: floor.toFixed(decimalPlaces),
-      whole
-    };
+      return {
+        val,
+        fixed,
+        ceil: ceil.toFixed(decimalPlaces),
+        floor: floor.toFixed(decimalPlaces),
+        whole
+      };
+    } catch {
+      return null;
+    }
   }, [roundInput, decimalPlaces]);
 
   const handleCopy = async () => {

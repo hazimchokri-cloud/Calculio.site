@@ -120,16 +120,11 @@ export function updateDocumentSeo(config: SeoConfig) {
     }
 
     // Canonical link
-    let currentOrigin = 'https://calculio.site';
-    try {
-      if (typeof window !== 'undefined' && window.location?.origin) {
-        currentOrigin = window.location.origin;
-      }
-    } catch (_) {}
+    const CANONICAL_ORIGIN = 'https://calculio.site';
 
     const fullCanonical = config.canonicalUrl 
-      ? (config.canonicalUrl.startsWith('http') ? config.canonicalUrl : `${currentOrigin}${config.canonicalUrl}`)
-      : currentOrigin;
+      ? (config.canonicalUrl.startsWith('http') ? config.canonicalUrl : `${CANONICAL_ORIGIN}${config.canonicalUrl.startsWith('/') ? config.canonicalUrl : `/${config.canonicalUrl}`}`)
+      : CANONICAL_ORIGIN;
 
     let canonEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonEl) {
@@ -196,10 +191,10 @@ export function updateDocumentSeo(config: SeoConfig) {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
       name: 'Calculio',
-      url: currentOrigin,
+      url: CANONICAL_ORIGIN,
       potentialAction: {
         '@type': 'SearchAction',
-        target: `${currentOrigin}/search?q={search_term_string}`,
+        target: `${CANONICAL_ORIGIN}/calculators?q={search_term_string}`,
         'query-input': 'required name=search_term_string'
       }
     };

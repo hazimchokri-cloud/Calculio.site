@@ -19,45 +19,49 @@ export const DueDateCalculator: React.FC<DueDateCalculatorProps> = ({ onSaveCalc
   const [saved, setSaved] = useState<boolean>(false);
 
   const calculations = useMemo(() => {
-    const baseDate = new Date(inputDate);
-    if (isNaN(baseDate.getTime())) return null;
+    try {
+      const baseDate = new Date(inputDate);
+      if (isNaN(baseDate.getTime())) return null;
 
-    const numCycleLength = typeof cycleLength === 'number' ? cycleLength : 28;
-    const numUltrasoundWeeks = typeof ultrasoundWeeks === 'number' ? ultrasoundWeeks : 0;
-    const numUltrasoundDays = typeof ultrasoundDays === 'number' ? ultrasoundDays : 0;
+      const numCycleLength = typeof cycleLength === 'number' ? cycleLength : 28;
+      const numUltrasoundWeeks = typeof ultrasoundWeeks === 'number' ? ultrasoundWeeks : 0;
+      const numUltrasoundDays = typeof ultrasoundDays === 'number' ? ultrasoundDays : 0;
 
-    let dueDate = new Date(baseDate);
+      let dueDate = new Date(baseDate);
 
-    if (calcMethod === 'lmp') {
-      // Due = LMP + 280 days + (cycle - 28)
-      dueDate.setDate(dueDate.getDate() + 280 + (numCycleLength - 28));
-    } else if (calcMethod === 'conception') {
-      // Due = Conception + 266 days
-      dueDate.setDate(dueDate.getDate() + 266);
-    } else if (calcMethod === 'ultrasound') {
-      // Due = Scan Date + (280 - (scanWeeks*7 + scanDays))
-      const daysAtScan = numUltrasoundWeeks * 7 + numUltrasoundDays;
-      const daysRemainingFromScan = 280 - daysAtScan;
-      dueDate.setDate(dueDate.getDate() + daysRemainingFromScan);
-    } else if (calcMethod === 'ivf') {
-      // IVF 3-day transfer: + 263 days; 5-day transfer: + 261 days
-      const daysToAdd = ivfType === 'day5' ? 261 : 263;
-      dueDate.setDate(dueDate.getDate() + daysToAdd);
+      if (calcMethod === 'lmp') {
+        // Due = LMP + 280 days + (cycle - 28)
+        dueDate.setDate(dueDate.getDate() + 280 + (numCycleLength - 28));
+      } else if (calcMethod === 'conception') {
+        // Due = Conception + 266 days
+        dueDate.setDate(dueDate.getDate() + 266);
+      } else if (calcMethod === 'ultrasound') {
+        // Due = Scan Date + (280 - (scanWeeks*7 + scanDays))
+        const daysAtScan = numUltrasoundWeeks * 7 + numUltrasoundDays;
+        const daysRemainingFromScan = 280 - daysAtScan;
+        dueDate.setDate(dueDate.getDate() + daysRemainingFromScan);
+      } else if (calcMethod === 'ivf') {
+        // IVF 3-day transfer: + 263 days; 5-day transfer: + 261 days
+        const daysToAdd = ivfType === 'day5' ? 261 : 263;
+        dueDate.setDate(dueDate.getDate() + daysToAdd);
+      }
+
+      const today = new Date();
+      const daysUntilDue = Math.floor((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      const currentGestationalDays = 280 - daysUntilDue;
+      const currentWeeks = Math.max(0, Math.floor(currentGestationalDays / 7));
+      const currentDays = Math.max(0, currentGestationalDays % 7);
+
+      return {
+        dueDate: dueDate.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+        daysUntilDue: Math.max(0, daysUntilDue),
+        currentWeeks,
+        currentDays,
+        trimester: currentWeeks >= 28 ? 'Third Trimester' : currentWeeks >= 14 ? 'Second Trimester' : 'First Trimester'
+      };
+    } catch {
+      return null;
     }
-
-    const today = new Date();
-    const daysUntilDue = Math.floor((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    const currentGestationalDays = 280 - daysUntilDue;
-    const currentWeeks = Math.max(0, Math.floor(currentGestationalDays / 7));
-    const currentDays = Math.max(0, currentGestationalDays % 7);
-
-    return {
-      dueDate: dueDate.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-      daysUntilDue: Math.max(0, daysUntilDue),
-      currentWeeks,
-      currentDays,
-      trimester: currentWeeks >= 28 ? 'Third Trimester' : currentWeeks >= 14 ? 'Second Trimester' : 'First Trimester'
-    };
   }, [calcMethod, inputDate, cycleLength, ultrasoundWeeks, ultrasoundDays, ivfType]);
 
   const handleCopy = async () => {

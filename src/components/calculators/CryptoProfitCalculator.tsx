@@ -28,27 +28,31 @@ export const CryptoProfitCalculator: React.FC<CryptoProfitCalculatorProps> = ({
   const isInputEmpty = investmentAmount === '' || buyPrice === '' || sellPrice === '';
 
   const results = useMemo(() => {
-    if (isInputEmpty || numBuyPrice <= 0 || numInvestmentAmount <= 0) return null;
+    try {
+      if (isInputEmpty || numBuyPrice <= 0 || numInvestmentAmount <= 0) return null;
 
-    const buyFee = numInvestmentAmount * (numBuyFeePercent / 100);
-    const netInvestment = Math.max(0, numInvestmentAmount - buyFee);
-    const coinsAcquired = numBuyPrice > 0 ? netInvestment / numBuyPrice : 0;
+      const buyFee = numInvestmentAmount * (numBuyFeePercent / 100);
+      const netInvestment = Math.max(0, numInvestmentAmount - buyFee);
+      const coinsAcquired = numBuyPrice > 0 ? netInvestment / numBuyPrice : 0;
 
-    const grossExitValue = coinsAcquired * numSellPrice;
-    const sellFee = grossExitValue * (numSellFeePercent / 100);
-    const totalPayout = Math.max(0, grossExitValue - sellFee);
+      const grossExitValue = coinsAcquired * numSellPrice;
+      const sellFee = grossExitValue * (numSellFeePercent / 100);
+      const totalPayout = Math.max(0, grossExitValue - sellFee);
 
-    const netProfit = totalPayout - numInvestmentAmount;
-    const returnOnInvestment = numInvestmentAmount > 0 ? (netProfit / numInvestmentAmount) * 100 : 0;
-    const totalFees = buyFee + sellFee;
+      const netProfit = totalPayout - numInvestmentAmount;
+      const returnOnInvestment = numInvestmentAmount > 0 ? (netProfit / numInvestmentAmount) * 100 : 0;
+      const totalFees = buyFee + sellFee;
 
-    return {
-      coinsAcquired: Math.round(coinsAcquired * 1000000) / 1000000,
-      totalPayout: Math.round(totalPayout * 100) / 100,
-      netProfit: Math.round(netProfit * 100) / 100,
-      returnOnInvestment: Math.round(returnOnInvestment * 10) / 10,
-      totalFees: Math.round(totalFees * 100) / 100
-    };
+      return {
+        coinsAcquired: Math.round(coinsAcquired * 1000000) / 1000000,
+        totalPayout: Math.round(totalPayout * 100) / 100,
+        netProfit: Math.round(netProfit * 100) / 100,
+        returnOnInvestment: Math.round(returnOnInvestment * 10) / 10,
+        totalFees: Math.round(totalFees * 100) / 100
+      };
+    } catch {
+      return null;
+    }
   }, [isInputEmpty, numInvestmentAmount, numBuyPrice, numSellPrice, numBuyFeePercent, numSellFeePercent]);
 
   const handleCopy = () => {

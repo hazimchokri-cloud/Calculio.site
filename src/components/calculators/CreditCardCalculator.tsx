@@ -28,75 +28,79 @@ export const CreditCardCalculator: React.FC<CreditCardCalculatorProps> = ({
   const isInputEmpty = balance === '' || interestRate === '';
 
   const calculations = useMemo(() => {
-    if (isInputEmpty || numBalance <= 0) return null;
-    const P = Math.max(0, numBalance);
-    const annualR = Math.max(0, numInterestRate) / 100;
-    const monthlyR = annualR / 12;
+    try {
+      if (isInputEmpty || numBalance <= 0) return null;
+      const P = Math.max(0, numBalance);
+      const annualR = Math.max(0, numInterestRate) / 100;
+      const monthlyR = annualR / 12;
 
-    // Minimum Payment Scenario (Typical card minimum: max(P * min%, $25))
-    let minBal = P;
-    let minMonths = 0;
-    let minTotalInterest = 0;
-    let minTotalPaid = 0;
-    const minMaxCapMonths = 600; // 50 years cap
-    const minPct = typeof minPaymentPercent === 'number' ? minPaymentPercent : 2.5;
+      // Minimum Payment Scenario (Typical card minimum: max(P * min%, $25))
+      let minBal = P;
+      let minMonths = 0;
+      let minTotalInterest = 0;
+      let minTotalPaid = 0;
+      const minMaxCapMonths = 600; // 50 years cap
+      const minPct = typeof minPaymentPercent === 'number' ? minPaymentPercent : 2.5;
 
-    while (minBal > 0.5 && minMonths < minMaxCapMonths) {
-      minMonths++;
-      const interest = minBal * monthlyR;
-      const computedMin = Math.max(25, minBal * (minPct / 100) + interest);
-      const payment = Math.min(minBal + interest, computedMin);
-      const principal = payment - interest;
-      minBal = Math.max(0, minBal - principal);
-      minTotalInterest += interest;
-      minTotalPaid += payment;
-    }
-
-    // Custom Payoff Scenario
-    let customMonthly = numFixedMonthly;
-    if (payoffType === 'targetMonths') {
-      const n = Math.max(1, numTargetMonths);
-      if (monthlyR === 0) {
-        customMonthly = P / n;
-      } else {
-        customMonthly = (P * (monthlyR * Math.pow(1 + monthlyR, n))) / (Math.pow(1 + monthlyR, n) - 1);
+      while (minBal > 0.5 && minMonths < minMaxCapMonths) {
+        minMonths++;
+        const interest = minBal * monthlyR;
+        const computedMin = Math.max(25, minBal * (minPct / 100) + interest);
+        const payment = Math.min(minBal + interest, computedMin);
+        const principal = payment - interest;
+        minBal = Math.max(0, minBal - principal);
+        minTotalInterest += interest;
+        minTotalPaid += payment;
       }
-    }
 
-    let customBal = P;
-    let customMonths = 0;
-    let customTotalInterest = 0;
-    let customTotalPaid = 0;
-
-    while (customBal > 0.01 && customMonths < 600) {
-      customMonths++;
-      const interest = customBal * monthlyR;
-      const payment = Math.min(customBal + interest, Math.max(customMonthly, 1));
-      const principal = payment - interest;
-      if (principal <= 0) {
-        // Payment doesn't even cover interest!
-        customMonths = 999;
-        break;
+      // Custom Payoff Scenario
+      let customMonthly = numFixedMonthly;
+      if (payoffType === 'targetMonths') {
+        const n = Math.max(1, numTargetMonths);
+        if (monthlyR === 0) {
+          customMonthly = P / n;
+        } else {
+          customMonthly = (P * (monthlyR * Math.pow(1 + monthlyR, n))) / (Math.pow(1 + monthlyR, n) - 1);
+        }
       }
-      customBal = Math.max(0, customBal - principal);
-      customTotalInterest += interest;
-      customTotalPaid += payment;
+
+      let customBal = P;
+      let customMonths = 0;
+      let customTotalInterest = 0;
+      let customTotalPaid = 0;
+
+      while (customBal > 0.01 && customMonths < 600) {
+        customMonths++;
+        const interest = customBal * monthlyR;
+        const payment = Math.min(customBal + interest, Math.max(customMonthly, 1));
+        const principal = payment - interest;
+        if (principal <= 0) {
+          // Payment doesn't even cover interest!
+          customMonths = 999;
+          break;
+        }
+        customBal = Math.max(0, customBal - principal);
+        customTotalInterest += interest;
+        customTotalPaid += payment;
+      }
+
+      const interestSaved = Math.max(0, minTotalInterest - customTotalInterest);
+      const monthsSaved = Math.max(0, minMonths - customMonths);
+
+      return {
+        minMonths,
+        minTotalInterest,
+        minTotalPaid,
+        customMonthly,
+        customMonths,
+        customTotalInterest,
+        customTotalPaid,
+        interestSaved,
+        monthsSaved
+      };
+    } catch {
+      return null;
     }
-
-    const interestSaved = Math.max(0, minTotalInterest - customTotalInterest);
-    const monthsSaved = Math.max(0, minMonths - customMonths);
-
-    return {
-      minMonths,
-      minTotalInterest,
-      minTotalPaid,
-      customMonthly,
-      customMonths,
-      customTotalInterest,
-      customTotalPaid,
-      interestSaved,
-      monthsSaved
-    };
   }, [isInputEmpty, numBalance, numInterestRate, payoffType, numFixedMonthly, numTargetMonths, minPaymentPercent]);
 
   const handleCopy = async () => {

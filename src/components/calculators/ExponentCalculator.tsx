@@ -14,42 +14,46 @@ export const ExponentCalculator: React.FC<ExponentCalculatorProps> = ({ onSaveCa
   const [saved, setSaved] = useState<boolean>(false);
 
   const exponentResults = useMemo(() => {
-    if (base === '' || exponent === '' || typeof base !== 'number' || typeof exponent !== 'number') return null;
+    try {
+      if (base === '' || exponent === '' || typeof base !== 'number' || typeof exponent !== 'number') return null;
 
-    // Evaluate base ^ exponent
-    let result = Math.pow(base, exponent);
-    let isInfinite = !isFinite(result);
-    let isNanResult = isNaN(result);
+      // Evaluate base ^ exponent
+      let result = Math.pow(base, exponent);
+      let isInfinite = !isFinite(result);
+      let isNanResult = isNaN(result);
 
-    let scientific = !isInfinite && !isNanResult ? result.toExponential() : 'N/A';
-    let formattedResult = !isInfinite && !isNanResult 
-      ? (Math.abs(result) > 1e12 || (Math.abs(result) < 1e-6 && result !== 0) ? scientific : formatNumber(result, 6)) 
-      : 'Overflow / Undefined';
+      let scientific = !isInfinite && !isNanResult ? result.toExponential() : 'N/A';
+      let formattedResult = !isInfinite && !isNanResult 
+        ? (Math.abs(result) > 1e12 || (Math.abs(result) < 1e-6 && result !== 0) ? scientific : formatNumber(result, 6)) 
+        : 'Overflow / Undefined';
 
-    // Step explanation
-    let stepExplanation = '';
-    if (exponent === 0) {
-      stepExplanation = `Any non-zero number raised to the power of 0 equals 1. (a⁰ = 1)`;
-    } else if (exponent === 1) {
-      stepExplanation = `Any number raised to the power of 1 equals itself. (a¹ = a)`;
-    } else if (exponent < 0) {
-      stepExplanation = `${base}^(${exponent}) = 1 / (${base}^${Math.abs(exponent)}) = 1 / ${Math.pow(base, Math.abs(exponent))}`;
-    } else if (Number.isInteger(exponent) && exponent > 0 && exponent <= 10) {
-      stepExplanation = `${Array(exponent).fill(base).join(' × ')} = ${result}`;
-    } else if (!Number.isInteger(exponent)) {
-      stepExplanation = `Fractional exponent: ${base}^(${exponent}) corresponds to radical calculation.`;
+      // Step explanation
+      let stepExplanation = '';
+      if (exponent === 0) {
+        stepExplanation = `Any non-zero number raised to the power of 0 equals 1. (a⁰ = 1)`;
+      } else if (exponent === 1) {
+        stepExplanation = `Any number raised to the power of 1 equals itself. (a¹ = a)`;
+      } else if (exponent < 0) {
+        stepExplanation = `${base}^(${exponent}) = 1 / (${base}^${Math.abs(exponent)}) = 1 / ${Math.pow(base, Math.abs(exponent))}`;
+      } else if (Number.isInteger(exponent) && exponent > 0 && exponent <= 10) {
+        stepExplanation = `${Array(exponent).fill(base).join(' × ')} = ${result}`;
+      } else if (!Number.isInteger(exponent)) {
+        stepExplanation = `Fractional exponent: ${base}^(${exponent}) corresponds to radical calculation.`;
+      }
+
+      return {
+        base,
+        exponent,
+        result,
+        formattedResult,
+        scientific,
+        isInfinite,
+        isNanResult,
+        stepExplanation
+      };
+    } catch {
+      return null;
     }
-
-    return {
-      base,
-      exponent,
-      result,
-      formattedResult,
-      scientific,
-      isInfinite,
-      isNanResult,
-      stepExplanation
-    };
   }, [base, exponent]);
 
   const handleCopy = async () => {

@@ -23,35 +23,39 @@ export const FinalGradeCalculator: React.FC<FinalGradeCalculatorProps> = ({
   const isInputEmpty = currentGrade === '' || targetGrade === '' || finalWeight === '';
 
   const results = useMemo(() => {
-    if (isInputEmpty || numFinalWeight <= 0) return null;
+    try {
+      if (isInputEmpty || numFinalWeight <= 0) return null;
 
-    // Formula: Required Final = (Target - Current * (1 - Weight)) / Weight
-    const currentWeight = (100 - numFinalWeight) / 100;
-    const finalWeightDecimal = numFinalWeight / 100;
+      // Formula: Required Final = (Target - Current * (1 - Weight)) / Weight
+      const currentWeight = (100 - numFinalWeight) / 100;
+      const finalWeightDecimal = numFinalWeight / 100;
 
-    const requiredScore = finalWeightDecimal > 0
-      ? (numTargetGrade - (numCurrentGrade * currentWeight)) / finalWeightDecimal
-      : 0;
+      const requiredScore = finalWeightDecimal > 0
+        ? (numTargetGrade - (numCurrentGrade * currentWeight)) / finalWeightDecimal
+        : 0;
 
-    let difficultyStatus = 'Achievable';
-    let difficultyColor = 'text-orange-700 bg-orange-50 border-orange-200';
+      let difficultyStatus = 'Achievable';
+      let difficultyColor = 'text-orange-700 bg-orange-50 border-orange-200';
 
-    if (requiredScore > 100) {
-      difficultyStatus = 'Extra Credit Needed (>100%)';
-      difficultyColor = 'text-rose-700 bg-rose-50 border-rose-200';
-    } else if (requiredScore > 90) {
-      difficultyStatus = 'Challenging (90-100%)';
-      difficultyColor = 'text-amber-700 bg-amber-50 border-amber-200';
-    } else if (requiredScore <= 0) {
-      difficultyStatus = 'Already Guaranteed (≤0%)';
-      difficultyColor = 'text-blue-700 bg-blue-50 border-blue-200';
+      if (requiredScore > 100) {
+        difficultyStatus = 'Extra Credit Needed (>100%)';
+        difficultyColor = 'text-rose-700 bg-rose-50 border-rose-200';
+      } else if (requiredScore > 90) {
+        difficultyStatus = 'Challenging (90-100%)';
+        difficultyColor = 'text-amber-700 bg-amber-50 border-amber-200';
+      } else if (requiredScore <= 0) {
+        difficultyStatus = 'Already Guaranteed (≤0%)';
+        difficultyColor = 'text-blue-700 bg-blue-50 border-blue-200';
+      }
+
+      return {
+        requiredScore: Math.round(requiredScore * 10) / 10,
+        difficultyStatus,
+        difficultyColor
+      };
+    } catch {
+      return null;
     }
-
-    return {
-      requiredScore: Math.round(requiredScore * 10) / 10,
-      difficultyStatus,
-      difficultyColor
-    };
   }, [isInputEmpty, numCurrentGrade, numTargetGrade, numFinalWeight]);
 
   const handleCopy = () => {

@@ -27,101 +27,105 @@ export const AmortizationCalculator: React.FC<AmortizationCalculatorProps> = ({
   const isInputEmpty = loanAmount === '' || interestRate === '' || loanTermYears === '';
 
   const calculations = useMemo(() => {
-    if (isInputEmpty || numLoanAmount <= 0 || numLoanTermYears <= 0) return null;
-    const P = Math.max(0, numLoanAmount);
-    const annualR = Math.max(0, numInterestRate) / 100;
-    const r = annualR / 12;
-    const n = Math.max(1, numLoanTermYears * 12);
+    try {
+      if (isInputEmpty || numLoanAmount <= 0 || numLoanTermYears <= 0) return null;
+      const P = Math.max(0, numLoanAmount);
+      const annualR = Math.max(0, numInterestRate) / 100;
+      const r = annualR / 12;
+      const n = Math.max(1, numLoanTermYears * 12);
 
-    let monthlyPayment = 0;
-    if (r === 0) {
-      monthlyPayment = P / n;
-    } else {
-      monthlyPayment = (P * (r * Math.pow(1 + r, n))) / (Math.pow(1 + r, n) - 1);
-    }
-
-    const monthlySchedule: Array<{
-      month: number;
-      year: number;
-      payment: number;
-      principal: number;
-      interest: number;
-      extra: number;
-      balance: number;
-      totalInterestToDate: number;
-    }> = [];
-
-    const yearlySchedule: Array<{
-      year: number;
-      totalPayment: number;
-      principalPaid: number;
-      interestPaid: number;
-      endingBalance: number;
-    }> = [];
-
-    let currentBalance = P;
-    let totalInterestAccum = 0;
-    let actualMonths = 0;
-
-    let currYearInterest = 0;
-    let currYearPrincipal = 0;
-    let currYearPayment = 0;
-
-    for (let m = 1; m <= n && currentBalance > 0.01; m++) {
-      actualMonths = m;
-      const interestThisMonth = currentBalance * r;
-      let principalThisMonth = monthlyPayment - interestThisMonth;
-      if (principalThisMonth > currentBalance) principalThisMonth = currentBalance;
-
-      let extra = numExtraPaymentMonthly;
-      if (principalThisMonth + extra > currentBalance) {
-        extra = Math.max(0, currentBalance - principalThisMonth);
+      let monthlyPayment = 0;
+      if (r === 0) {
+        monthlyPayment = P / n;
+      } else {
+        monthlyPayment = (P * (r * Math.pow(1 + r, n))) / (Math.pow(1 + r, n) - 1);
       }
 
-      const totalPrincipal = principalThisMonth + extra;
-      const totalPaymentMonth = totalPrincipal + interestThisMonth;
-      currentBalance = Math.max(0, currentBalance - totalPrincipal);
-      totalInterestAccum += interestThisMonth;
+      const monthlySchedule: Array<{
+        month: number;
+        year: number;
+        payment: number;
+        principal: number;
+        interest: number;
+        extra: number;
+        balance: number;
+        totalInterestToDate: number;
+      }> = [];
 
-      currYearInterest += interestThisMonth;
-      currYearPrincipal += totalPrincipal;
-      currYearPayment += totalPaymentMonth;
+      const yearlySchedule: Array<{
+        year: number;
+        totalPayment: number;
+        principalPaid: number;
+        interestPaid: number;
+        endingBalance: number;
+      }> = [];
 
-      const yr = Math.ceil(m / 12);
+      let currentBalance = P;
+      let totalInterestAccum = 0;
+      let actualMonths = 0;
 
-      monthlySchedule.push({
-        month: m,
-        year: yr,
-        payment: totalPaymentMonth,
-        principal: principalThisMonth,
-        interest: interestThisMonth,
-        extra,
-        balance: currentBalance,
-        totalInterestToDate: totalInterestAccum
-      });
+      let currYearInterest = 0;
+      let currYearPrincipal = 0;
+      let currYearPayment = 0;
 
-      if (m % 12 === 0 || currentBalance <= 0.01 || m === n) {
-        yearlySchedule.push({
+      for (let m = 1; m <= n && currentBalance > 0.01; m++) {
+        actualMonths = m;
+        const interestThisMonth = currentBalance * r;
+        let principalThisMonth = monthlyPayment - interestThisMonth;
+        if (principalThisMonth > currentBalance) principalThisMonth = currentBalance;
+
+        let extra = numExtraPaymentMonthly;
+        if (principalThisMonth + extra > currentBalance) {
+          extra = Math.max(0, currentBalance - principalThisMonth);
+        }
+
+        const totalPrincipal = principalThisMonth + extra;
+        const totalPaymentMonth = totalPrincipal + interestThisMonth;
+        currentBalance = Math.max(0, currentBalance - totalPrincipal);
+        totalInterestAccum += interestThisMonth;
+
+        currYearInterest += interestThisMonth;
+        currYearPrincipal += totalPrincipal;
+        currYearPayment += totalPaymentMonth;
+
+        const yr = Math.ceil(m / 12);
+
+        monthlySchedule.push({
+          month: m,
           year: yr,
-          totalPayment: currYearPayment,
-          principalPaid: currYearPrincipal,
-          interestPaid: currYearInterest,
-          endingBalance: currentBalance
+          payment: totalPaymentMonth,
+          principal: principalThisMonth,
+          interest: interestThisMonth,
+          extra,
+          balance: currentBalance,
+          totalInterestToDate: totalInterestAccum
         });
-        currYearInterest = 0;
-        currYearPrincipal = 0;
-        currYearPayment = 0;
-      }
-    }
 
-    return {
-      monthlyPayment,
-      totalInterestAccum,
-      totalPaid: P + totalInterestAccum,
-      actualMonths,
-      monthlySchedule,
-      yearlySchedule
-    };
+        if (m % 12 === 0 || currentBalance <= 0.01 || m === n) {
+          yearlySchedule.push({
+            year: yr,
+            totalPayment: currYearPayment,
+            principalPaid: currYearPrincipal,
+            interestPaid: currYearInterest,
+            endingBalance: currentBalance
+          });
+          currYearInterest = 0;
+          currYearPrincipal = 0;
+          currYearPayment = 0;
+        }
+      }
+
+      return {
+        monthlyPayment,
+        totalInterestAccum,
+        totalPaid: P + totalInterestAccum,
+        actualMonths,
+        monthlySchedule,
+        yearlySchedule
+      };
+    } catch {
+      return null;
+    }
   }, [isInputEmpty, numLoanAmount, numInterestRate, numLoanTermYears, numExtraPaymentMonthly]);
 
   const handleDownload = () => {

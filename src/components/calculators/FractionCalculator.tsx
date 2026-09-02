@@ -41,69 +41,73 @@ export const FractionCalculator: React.FC<FractionCalculatorProps> = ({ onSaveCa
   };
 
   const calculation = useMemo(() => {
-    if (num1 === '' || den1 === '' || num2 === '' || den2 === '') {
+    try {
+      if (num1 === '' || den1 === '' || num2 === '' || den2 === '') {
+        return null;
+      }
+      const n1 = typeof num1 === 'number' ? num1 : 0;
+      const d1 = typeof den1 === 'number' ? den1 : 1;
+      const n2 = typeof num2 === 'number' ? num2 : 0;
+      const d2 = typeof den2 === 'number' ? den2 : 1;
+
+      if (d1 === 0 || d2 === 0) {
+        return { error: 'Denominator cannot be zero (division by zero)', simpNum: 0, simpDen: 1, divisor: 1, decimal: 0, steps: '', mixedStr: '' };
+      }
+
+      let unsimplifiedNum = 0;
+      let unsimplifiedDen = 1;
+      let steps = '';
+
+      if (op === '+') {
+        unsimplifiedNum = (n1 * d2) + (n2 * d1);
+        unsimplifiedDen = d1 * d2;
+        steps = `Step 1: Find common denominator (${d1} × ${d2} = ${unsimplifiedDen}).\nStep 2: (${n1} × ${d2}) + (${n2} × ${d1}) = ${n1 * d2} + ${n2 * d1} = ${unsimplifiedNum}.\nStep 3: Unreduced = ${unsimplifiedNum}/${unsimplifiedDen}`;
+      } else if (op === '-') {
+        unsimplifiedNum = (n1 * d2) - (n2 * d1);
+        unsimplifiedDen = d1 * d2;
+        steps = `Step 1: Common denominator (${d1} × ${d2} = ${unsimplifiedDen}).\nStep 2: (${n1} × ${d2}) - (${n2} × ${d1}) = ${n1 * d2} - ${n2 * d1} = ${unsimplifiedNum}.\nStep 3: Unreduced = ${unsimplifiedNum}/${unsimplifiedDen}`;
+      } else if (op === '×') {
+        unsimplifiedNum = n1 * n2;
+        unsimplifiedDen = d1 * d2;
+        steps = `Step 1: Multiply numerators (${n1} × ${n2} = ${unsimplifiedNum}).\nStep 2: Multiply denominators (${d1} × ${d2} = ${unsimplifiedDen}).\nStep 3: Unreduced = ${unsimplifiedNum}/${unsimplifiedDen}`;
+      } else if (op === '÷') {
+        if (n2 === 0) return { error: 'Cannot divide by a zero fraction', simpNum: 0, simpDen: 1, divisor: 1, decimal: 0, steps: '', mixedStr: '' };
+        unsimplifiedNum = n1 * d2;
+        unsimplifiedDen = d1 * n2;
+        steps = `Step 1: Invert second fraction (${n2}/${d2} → ${d2}/${n2}).\nStep 2: Multiply (${n1} × ${d2}) / (${d1} × ${n2}) = ${unsimplifiedNum}/${unsimplifiedDen}`;
+      }
+
+      const divisor = gcd(unsimplifiedNum, unsimplifiedDen);
+      let simpNum = unsimplifiedNum / divisor;
+      let simpDen = unsimplifiedDen / divisor;
+
+      if (simpDen < 0) {
+        simpNum = -simpNum;
+        simpDen = -simpDen;
+      }
+
+      const decimal = simpNum / simpDen;
+
+      // Mixed number format
+      let mixedStr = '';
+      if (Math.abs(simpNum) >= simpDen && simpDen !== 1) {
+        const whole = Math.floor(Math.abs(simpNum) / simpDen) * (simpNum < 0 ? -1 : 1);
+        const rem = Math.abs(simpNum) % simpDen;
+        mixedStr = rem === 0 ? `${whole}` : `${whole} ${rem}/${simpDen}`;
+      }
+
+      return {
+        error: null,
+        simpNum,
+        simpDen,
+        divisor,
+        decimal,
+        steps,
+        mixedStr
+      };
+    } catch {
       return null;
     }
-    const n1 = typeof num1 === 'number' ? num1 : 0;
-    const d1 = typeof den1 === 'number' ? den1 : 1;
-    const n2 = typeof num2 === 'number' ? num2 : 0;
-    const d2 = typeof den2 === 'number' ? den2 : 1;
-
-    if (d1 === 0 || d2 === 0) {
-      return { error: 'Denominator cannot be zero (division by zero)', simpNum: 0, simpDen: 1, divisor: 1, decimal: 0, steps: '', mixedStr: '' };
-    }
-
-    let unsimplifiedNum = 0;
-    let unsimplifiedDen = 1;
-    let steps = '';
-
-    if (op === '+') {
-      unsimplifiedNum = (n1 * d2) + (n2 * d1);
-      unsimplifiedDen = d1 * d2;
-      steps = `Step 1: Find common denominator (${d1} × ${d2} = ${unsimplifiedDen}).\nStep 2: (${n1} × ${d2}) + (${n2} × ${d1}) = ${n1 * d2} + ${n2 * d1} = ${unsimplifiedNum}.\nStep 3: Unreduced = ${unsimplifiedNum}/${unsimplifiedDen}`;
-    } else if (op === '-') {
-      unsimplifiedNum = (n1 * d2) - (n2 * d1);
-      unsimplifiedDen = d1 * d2;
-      steps = `Step 1: Common denominator (${d1} × ${d2} = ${unsimplifiedDen}).\nStep 2: (${n1} × ${d2}) - (${n2} × ${d1}) = ${n1 * d2} - ${n2 * d1} = ${unsimplifiedNum}.\nStep 3: Unreduced = ${unsimplifiedNum}/${unsimplifiedDen}`;
-    } else if (op === '×') {
-      unsimplifiedNum = n1 * n2;
-      unsimplifiedDen = d1 * d2;
-      steps = `Step 1: Multiply numerators (${n1} × ${n2} = ${unsimplifiedNum}).\nStep 2: Multiply denominators (${d1} × ${d2} = ${unsimplifiedDen}).\nStep 3: Unreduced = ${unsimplifiedNum}/${unsimplifiedDen}`;
-    } else if (op === '÷') {
-      if (n2 === 0) return { error: 'Cannot divide by a zero fraction', simpNum: 0, simpDen: 1, divisor: 1, decimal: 0, steps: '', mixedStr: '' };
-      unsimplifiedNum = n1 * d2;
-      unsimplifiedDen = d1 * n2;
-      steps = `Step 1: Invert second fraction (${n2}/${d2} → ${d2}/${n2}).\nStep 2: Multiply (${n1} × ${d2}) / (${d1} × ${n2}) = ${unsimplifiedNum}/${unsimplifiedDen}`;
-    }
-
-    const divisor = gcd(unsimplifiedNum, unsimplifiedDen);
-    let simpNum = unsimplifiedNum / divisor;
-    let simpDen = unsimplifiedDen / divisor;
-
-    if (simpDen < 0) {
-      simpNum = -simpNum;
-      simpDen = -simpDen;
-    }
-
-    const decimal = simpNum / simpDen;
-
-    // Mixed number format
-    let mixedStr = '';
-    if (Math.abs(simpNum) >= simpDen && simpDen !== 1) {
-      const whole = Math.floor(Math.abs(simpNum) / simpDen) * (simpNum < 0 ? -1 : 1);
-      const rem = Math.abs(simpNum) % simpDen;
-      mixedStr = rem === 0 ? `${whole}` : `${whole} ${rem}/${simpDen}`;
-    }
-
-    return {
-      error: null,
-      simpNum,
-      simpDen,
-      divisor,
-      decimal,
-      steps,
-      mixedStr
-    };
   }, [num1, den1, op, num2, den2]);
 
   const handleCopy = async () => {

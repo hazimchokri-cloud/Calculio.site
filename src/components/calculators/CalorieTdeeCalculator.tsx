@@ -55,80 +55,84 @@ export const CalorieTdeeCalculator: React.FC<CalorieTdeeProps> = ({ onSaveCalcul
   };
 
   const stats = useMemo(() => {
-    if (isInputEmpty) return null;
+    try {
+      if (isInputEmpty) return null;
 
-    let hCm = 0;
-    let wKg = 0;
+      let hCm = 0;
+      let wKg = 0;
 
-    if (unitSystem === 'imperial') {
-      const totalIn = (numFeet * 12) + numInches;
-      hCm = totalIn * 2.54;
-      wKg = numWeightLbs * 0.45359237;
-    } else {
-      hCm = numHeightCm;
-      wKg = numWeightKg;
+      if (unitSystem === 'imperial') {
+        const totalIn = (numFeet * 12) + numInches;
+        hCm = totalIn * 2.54;
+        wKg = numWeightLbs * 0.45359237;
+      } else {
+        hCm = numHeightCm;
+        wKg = numWeightKg;
+      }
+
+      if (hCm <= 0 || wKg <= 0 || numAge <= 0) return null;
+
+      // Mifflin-St Jeor formula
+      let bmr = 10 * wKg + 6.25 * hCm - 5 * numAge;
+      if (gender === 'male') {
+        bmr += 5;
+      } else {
+        bmr -= 161;
+      }
+
+      const tdee = bmr * numActivityLevel;
+
+      // Adjust for goal
+      let targetCalories = tdee;
+      if (goal === 'mild_cut') targetCalories = tdee - 250; // -0.5 lb / week
+      if (goal === 'cut') targetCalories = tdee - 500; // -1 lb / week
+      if (goal === 'mild_bulk') targetCalories = tdee + 250; // +0.5 lb / week
+      if (goal === 'bulk') targetCalories = tdee + 500; // +1 lb / week
+
+      targetCalories = Math.max(1200, Math.round(targetCalories));
+
+      // Macro distributions
+      let carbPct = 0.45;
+      let proteinPct = 0.30;
+      let fatPct = 0.25;
+
+      if (dietPlan === 'high_protein') {
+        carbPct = 0.35;
+        proteinPct = 0.40;
+        fatPct = 0.25;
+      } else if (dietPlan === 'low_carb') {
+        carbPct = 0.20;
+        proteinPct = 0.40;
+        fatPct = 0.40;
+      } else if (dietPlan === 'keto') {
+        carbPct = 0.05;
+        proteinPct = 0.25;
+        fatPct = 0.70;
+      }
+
+      // Carbs: 4 cal/g, Protein: 4 cal/g, Fat: 9 cal/g
+      const proteinGrams = Math.round((targetCalories * proteinPct) / 4);
+      const carbGrams = Math.round((targetCalories * carbPct) / 4);
+      const fatGrams = Math.round((targetCalories * fatPct) / 9);
+
+      return {
+        bmr: Math.round(bmr),
+        tdee: Math.round(tdee),
+        targetCalories,
+        proteinGrams,
+        carbGrams,
+        fatGrams,
+        carbPct: Math.round(carbPct * 100),
+        proteinPct: Math.round(proteinPct * 100),
+        fatPct: Math.round(fatPct * 100),
+        mildLossCal: Math.round(tdee - 250),
+        lossCal: Math.round(tdee - 500),
+        mildGainCal: Math.round(tdee + 250),
+        gainCal: Math.round(tdee + 500)
+      };
+    } catch {
+      return null;
     }
-
-    if (hCm <= 0 || wKg <= 0 || numAge <= 0) return null;
-
-    // Mifflin-St Jeor formula
-    let bmr = 10 * wKg + 6.25 * hCm - 5 * numAge;
-    if (gender === 'male') {
-      bmr += 5;
-    } else {
-      bmr -= 161;
-    }
-
-    const tdee = bmr * numActivityLevel;
-
-    // Adjust for goal
-    let targetCalories = tdee;
-    if (goal === 'mild_cut') targetCalories = tdee - 250; // -0.5 lb / week
-    if (goal === 'cut') targetCalories = tdee - 500; // -1 lb / week
-    if (goal === 'mild_bulk') targetCalories = tdee + 250; // +0.5 lb / week
-    if (goal === 'bulk') targetCalories = tdee + 500; // +1 lb / week
-
-    targetCalories = Math.max(1200, Math.round(targetCalories));
-
-    // Macro distributions
-    let carbPct = 0.45;
-    let proteinPct = 0.30;
-    let fatPct = 0.25;
-
-    if (dietPlan === 'high_protein') {
-      carbPct = 0.35;
-      proteinPct = 0.40;
-      fatPct = 0.25;
-    } else if (dietPlan === 'low_carb') {
-      carbPct = 0.20;
-      proteinPct = 0.40;
-      fatPct = 0.40;
-    } else if (dietPlan === 'keto') {
-      carbPct = 0.05;
-      proteinPct = 0.25;
-      fatPct = 0.70;
-    }
-
-    // Carbs: 4 cal/g, Protein: 4 cal/g, Fat: 9 cal/g
-    const proteinGrams = Math.round((targetCalories * proteinPct) / 4);
-    const carbGrams = Math.round((targetCalories * carbPct) / 4);
-    const fatGrams = Math.round((targetCalories * fatPct) / 9);
-
-    return {
-      bmr: Math.round(bmr),
-      tdee: Math.round(tdee),
-      targetCalories,
-      proteinGrams,
-      carbGrams,
-      fatGrams,
-      carbPct: Math.round(carbPct * 100),
-      proteinPct: Math.round(proteinPct * 100),
-      fatPct: Math.round(fatPct * 100),
-      mildLossCal: Math.round(tdee - 250),
-      lossCal: Math.round(tdee - 500),
-      mildGainCal: Math.round(tdee + 250),
-      gainCal: Math.round(tdee + 500)
-    };
   }, [isInputEmpty, unitSystem, gender, numAge, numFeet, numInches, numWeightLbs, numHeightCm, numWeightKg, numActivityLevel, goal, dietPlan]);
 
   const handleCopy = async () => {
@@ -283,7 +287,7 @@ export const CalorieTdeeCalculator: React.FC<CalorieTdeeProps> = ({ onSaveCalcul
                 type="number"
                 value={unitSystem === 'imperial' ? weightLbs : weightKg}
                 onChange={(e) => {
-                  const val = Number(e.target.value);
+                  const val = e.target.value === '' ? '' : Number(e.target.value);
                   if (unitSystem === 'imperial') setWeightLbs(val);
                   else setWeightKg(val);
                 }}

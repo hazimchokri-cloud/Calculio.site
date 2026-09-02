@@ -8,8 +8,8 @@ interface AverageCalculatorProps {
 
 interface WeightedItem {
   id: string;
-  value: number;
-  weight: number;
+  value: number | '';
+  weight: number | '';
 }
 
 export const AverageCalculator: React.FC<AverageCalculatorProps> = ({ onSaveCalculation }) => {
@@ -30,91 +30,106 @@ export const AverageCalculator: React.FC<AverageCalculatorProps> = ({ onSaveCalc
 
   // Standard calculations
   const standardStats = useMemo(() => {
-    const rawNumbers = dataInput
-      .split(/[\s,;\n]+/)
-      .map(v => parseFloat(v))
-      .filter(v => !isNaN(v));
+    try {
+      const rawNumbers = dataInput
+        .split(/[\s,;\n]+/)
+        .map(v => parseFloat(v))
+        .filter(v => !isNaN(v));
 
-    if (rawNumbers.length === 0) return null;
+      if (rawNumbers.length === 0) return null;
 
-    const count = rawNumbers.length;
-    const sum = rawNumbers.reduce((acc, v) => acc + v, 0);
-    const mean = sum / count;
+      const count = rawNumbers.length;
+      const sum = rawNumbers.reduce((acc, v) => acc + v, 0);
+      const mean = sum / count;
 
-    // Median
-    const sorted = [...rawNumbers].sort((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    const median = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+      // Median
+      const sorted = [...rawNumbers].sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      const median = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
 
-    // Mode
-    const freq: Record<number, number> = {};
-    let maxFreq = 0;
-    rawNumbers.forEach(n => {
-      freq[n] = (freq[n] || 0) + 1;
-      if (freq[n] > maxFreq) maxFreq = freq[n];
-    });
-    const modes: number[] = [];
-    if (maxFreq > 1) {
-      Object.keys(freq).forEach(k => {
-        if (freq[Number(k)] === maxFreq) modes.push(Number(k));
+      // Mode
+      const freq: Record<number, number> = {};
+      let maxFreq = 0;
+      rawNumbers.forEach(n => {
+        freq[n] = (freq[n] || 0) + 1;
+        if (freq[n] > maxFreq) maxFreq = freq[n];
       });
+      const modes: number[] = [];
+      if (maxFreq > 1) {
+        Object.keys(freq).forEach(k => {
+          if (freq[Number(k)] === maxFreq) modes.push(Number(k));
+        });
+      }
+
+      // Min, Max, Range
+      const min = sorted[0];
+      const max = sorted[sorted.length - 1];
+      const range = max - min;
+
+      // Geometric Mean (for positive values)
+      const allPositive = rawNumbers.every(n => n > 0);
+      let geometricMean: number | null = null;
+      if (allPositive) {
+        const logSum = rawNumbers.reduce((acc, v) => acc + Math.log(v), 0);
+        geometricMean = Math.exp(logSum / count);
+      }
+
+      // Harmonic Mean (for non-zero positive values)
+      let harmonicMean: number | null = null;
+      if (allPositive) {
+        const recipSum = rawNumbers.reduce((acc, v) => acc + 1 / v, 0);
+        harmonicMean = count / recipSum;
+      }
+
+      return {
+        count,
+        sum,
+        mean,
+        median,
+        mode: modes.length > 0 ? modes.join(', ') : 'No unique mode',
+        min,
+        max,
+        range,
+        geometricMean,
+        harmonicMean
+      };
+    } catch {
+      return null;
     }
-
-    // Min, Max, Range
-    const min = sorted[0];
-    const max = sorted[sorted.length - 1];
-    const range = max - min;
-
-    // Geometric Mean (for positive values)
-    const allPositive = rawNumbers.every(n => n > 0);
-    let geometricMean: number | null = null;
-    if (allPositive) {
-      const logSum = rawNumbers.reduce((acc, v) => acc + Math.log(v), 0);
-      geometricMean = Math.exp(logSum / count);
-    }
-
-    // Harmonic Mean (for non-zero positive values)
-    let harmonicMean: number | null = null;
-    if (allPositive) {
-      const recipSum = rawNumbers.reduce((acc, v) => acc + 1 / v, 0);
-      harmonicMean = count / recipSum;
-    }
-
-    return {
-      count,
-      sum,
-      mean,
-      median,
-      mode: modes.length > 0 ? modes.join(', ') : 'No unique mode',
-      min,
-      max,
-      range,
-      geometricMean,
-      harmonicMean
-    };
   }, [dataInput]);
 
   // Weighted calculations
   const weightedStats = useMemo(() => {
-    let totalWeight = 0;
-    let weightedSum = 0;
+    try {
+      let totalWeight = 0;
+      let weightedSum = 0;
+      let hasIncomplete = false;
 
-    weightedItems.forEach(item => {
-      if (!isNaN(item.value) && !isNaN(item.weight)) {
-        weightedSum += item.value * item.weight;
-        totalWeight += item.weight;
+      for (const item of weightedItems) {
+        if (item.value === '' || item.weight === '') {
+          hasIncomplete = true;
+          break;
+        }
+        const val = Number(item.value);
+        const wt = Number(item.weight);
+        if (!isNaN(val) && !isNaN(wt)) {
+          weightedSum += val * wt;
+          totalWeight += wt;
+        }
       }
-    });
 
-    if (totalWeight === 0) return null;
+      if (hasIncomplete || totalWeight === 0) return null;
 
-    const weightedAverage = weightedSum / totalWeight;
+      const weightedAverage = weightedSum / totalWeight;
 
-    return {
-      weightedAverage,
-      totalWeight,
-      weightedSum
-    };
+      return {
+        weightedAverage,
+        totalWeight,
+        weightedSum
+      };
+    } catch {
+      return null;
+    }
   }, [weightedItems]);
 
   const addWeightedItem = () => {
@@ -129,7 +144,7 @@ export const AverageCalculator: React.FC<AverageCalculatorProps> = ({ onSaveCalc
     setWeightedItems(prev => prev.filter(item => item.id !== id));
   };
 
-  const updateWeightedItem = (id: string, field: 'value' | 'weight', val: number) => {
+  const updateWeightedItem = (id: string, field: 'value' | 'weight', val: number | '') => {
     setWeightedItems(prev =>
       prev.map(item => (item.id === id ? { ...item, [field]: val } : item))
     );
@@ -276,16 +291,16 @@ Count: ${standardStats.count}, Sum: ${formatNumber(standardStats.sum, 4)}`;
                     <div className="col-span-6">
                       <input
                         type="number"
-                        value={item.value || ''}
-                        onChange={(e) => updateWeightedItem(item.id, 'value', parseFloat(e.target.value) || 0)}
+                        value={item.value}
+                        onChange={(e) => updateWeightedItem(item.id, 'value', e.target.value === '' ? '' : (parseFloat(e.target.value) || 0))}
                         className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:outline-none"
                       />
                     </div>
                     <div className="col-span-5">
                       <input
                         type="number"
-                        value={item.weight || ''}
-                        onChange={(e) => updateWeightedItem(item.id, 'weight', parseFloat(e.target.value) || 0)}
+                        value={item.weight}
+                        onChange={(e) => updateWeightedItem(item.id, 'weight', e.target.value === '' ? '' : (parseFloat(e.target.value) || 0))}
                         className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:outline-none"
                       />
                     </div>

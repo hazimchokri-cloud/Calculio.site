@@ -35,96 +35,100 @@ export const BmiCalculator: React.FC<BmiCalculatorProps> = ({ onSaveCalculation 
     : heightCm === '' || weightKg === '';
 
   const result = useMemo(() => {
-    if (isInputEmpty) return null;
+    try {
+      if (isInputEmpty) return null;
 
-    let heightInMeters = 0;
-    let weightInKg = 0;
+      let heightInMeters = 0;
+      let weightInKg = 0;
 
-    if (unitSystem === 'imperial') {
-      const totalInches = (numFeet * 12) + numInches;
-      heightInMeters = totalInches * 0.0254;
-      weightInKg = numWeightLbs * 0.45359237;
-    } else {
-      heightInMeters = numHeightCm / 100;
-      weightInKg = numWeightKg;
-    }
+      if (unitSystem === 'imperial') {
+        const totalInches = (numFeet * 12) + numInches;
+        heightInMeters = totalInches * 0.0254;
+        weightInKg = numWeightLbs * 0.45359237;
+      } else {
+        heightInMeters = numHeightCm / 100;
+        weightInKg = numWeightKg;
+      }
 
-    if (heightInMeters <= 0 || weightInKg <= 0) {
+      if (heightInMeters <= 0 || weightInKg <= 0) {
+        return null;
+      }
+
+      const bmi = weightInKg / (heightInMeters * heightInMeters);
+      const bmiPrime = bmi / 25.0;
+
+      // Normal range is 18.5 to 24.9
+      const minHealthyKg = 18.5 * (heightInMeters * heightInMeters);
+      const maxHealthyKg = 24.9 * (heightInMeters * heightInMeters);
+      const minHealthyLbs = minHealthyKg * 2.20462;
+      const maxHealthyLbs = maxHealthyKg * 2.20462;
+
+      let category = 'Normal weight';
+      let color = 'text-orange-600';
+      let bgColor = 'bg-orange-500';
+      let badgeBg = 'bg-orange-50 border-orange-200 text-orange-800';
+
+      if (bmi < 16) {
+        category = 'Severe Thinness';
+        color = 'text-blue-700';
+        bgColor = 'bg-blue-600';
+        badgeBg = 'bg-blue-50 border-blue-200 text-blue-800';
+      } else if (bmi < 17) {
+        category = 'Moderate Thinness';
+        color = 'text-blue-600';
+        bgColor = 'bg-blue-500';
+        badgeBg = 'bg-blue-50 border-blue-200 text-blue-800';
+      } else if (bmi < 18.5) {
+        category = 'Mild Thinness / Underweight';
+        color = 'text-cyan-600';
+        bgColor = 'bg-cyan-500';
+        badgeBg = 'bg-cyan-50 border-cyan-200 text-cyan-800';
+      } else if (bmi < 25) {
+        category = 'Normal & Healthy Weight';
+        color = 'text-orange-600';
+        bgColor = 'bg-orange-500';
+        badgeBg = 'bg-orange-50 border-orange-200 text-orange-800';
+      } else if (bmi < 30) {
+        category = 'Overweight';
+        color = 'text-orange-600';
+        bgColor = 'bg-orange-500';
+        badgeBg = 'bg-orange-50 border-orange-200 text-orange-800';
+      } else if (bmi < 35) {
+        category = 'Obese Class I';
+        color = 'text-orange-600';
+        bgColor = 'bg-orange-500';
+        badgeBg = 'bg-orange-50 border-orange-200 text-orange-800';
+      } else if (bmi < 40) {
+        category = 'Obese Class II';
+        color = 'text-rose-600';
+        bgColor = 'bg-rose-500';
+        badgeBg = 'bg-rose-50 border-rose-200 text-rose-800';
+      } else {
+        category = 'Obese Class III (Severe)';
+        color = 'text-purple-700';
+        bgColor = 'bg-purple-600';
+        badgeBg = 'bg-purple-50 border-purple-200 text-purple-800';
+      }
+
+      // Gauge calculation: range from 15 to 40 BMI
+      const gaugePercentage = Math.min(100, Math.max(0, ((bmi - 15) / (40 - 15)) * 100));
+
+      return {
+        bmi: Number(bmi.toFixed(1)),
+        category,
+        color,
+        bgColor,
+        badgeBg,
+        minHealthyWeightKg: Number(minHealthyKg.toFixed(1)),
+        maxHealthyWeightKg: Number(maxHealthyKg.toFixed(1)),
+        minHealthyWeightLbs: Number(minHealthyLbs.toFixed(1)),
+        maxHealthyWeightLbs: Number(maxHealthyLbs.toFixed(1)),
+        bmiPrime: Number(bmiPrime.toFixed(2)),
+        gaugePercentage
+      };
+    } catch {
       return null;
     }
-
-    const bmi = weightInKg / (heightInMeters * heightInMeters);
-    const bmiPrime = bmi / 25.0;
-
-    // Normal range is 18.5 to 24.9
-    const minHealthyKg = 18.5 * (heightInMeters * heightInMeters);
-    const maxHealthyKg = 24.9 * (heightInMeters * heightInMeters);
-    const minHealthyLbs = minHealthyKg * 2.20462;
-    const maxHealthyLbs = maxHealthyKg * 2.20462;
-
-    let category = 'Normal weight';
-    let color = 'text-orange-600';
-    let bgColor = 'bg-orange-500';
-    let badgeBg = 'bg-orange-50 border-orange-200 text-orange-800';
-
-    if (bmi < 16) {
-      category = 'Severe Thinness';
-      color = 'text-blue-700';
-      bgColor = 'bg-blue-600';
-      badgeBg = 'bg-blue-50 border-blue-200 text-blue-800';
-    } else if (bmi < 17) {
-      category = 'Moderate Thinness';
-      color = 'text-blue-600';
-      bgColor = 'bg-blue-500';
-      badgeBg = 'bg-blue-50 border-blue-200 text-blue-800';
-    } else if (bmi < 18.5) {
-      category = 'Mild Thinness / Underweight';
-      color = 'text-cyan-600';
-      bgColor = 'bg-cyan-500';
-      badgeBg = 'bg-cyan-50 border-cyan-200 text-cyan-800';
-    } else if (bmi < 25) {
-      category = 'Normal & Healthy Weight';
-      color = 'text-orange-600';
-      bgColor = 'bg-orange-500';
-      badgeBg = 'bg-orange-50 border-orange-200 text-orange-800';
-    } else if (bmi < 30) {
-      category = 'Overweight';
-      color = 'text-orange-600';
-      bgColor = 'bg-orange-500';
-      badgeBg = 'bg-orange-50 border-orange-200 text-orange-800';
-    } else if (bmi < 35) {
-      category = 'Obese Class I';
-      color = 'text-orange-600';
-      bgColor = 'bg-orange-500';
-      badgeBg = 'bg-orange-50 border-orange-200 text-orange-800';
-    } else if (bmi < 40) {
-      category = 'Obese Class II';
-      color = 'text-rose-600';
-      bgColor = 'bg-rose-500';
-      badgeBg = 'bg-rose-50 border-rose-200 text-rose-800';
-    } else {
-      category = 'Obese Class III (Severe)';
-      color = 'text-purple-700';
-      bgColor = 'bg-purple-600';
-      badgeBg = 'bg-purple-50 border-purple-200 text-purple-800';
-    }
-
-    // Gauge calculation: range from 15 to 40 BMI
-    const gaugePercentage = Math.min(100, Math.max(0, ((bmi - 15) / (40 - 15)) * 100));
-
-    return {
-      bmi: Number(bmi.toFixed(1)),
-      category,
-      color,
-      bgColor,
-      badgeBg,
-      minHealthyWeightKg: Number(minHealthyKg.toFixed(1)),
-      maxHealthyWeightKg: Number(maxHealthyKg.toFixed(1)),
-      minHealthyWeightLbs: Number(minHealthyLbs.toFixed(1)),
-      maxHealthyWeightLbs: Number(maxHealthyLbs.toFixed(1)),
-      bmiPrime: Number(bmiPrime.toFixed(2)),
-      gaugePercentage
-    };
   }, [isInputEmpty, unitSystem, numFeet, numInches, numWeightLbs, numHeightCm, numWeightKg]);
 
   const handleCopy = async () => {

@@ -45,91 +45,99 @@ export const DateCalculator: React.FC<DateCalculatorProps> = ({ onSaveCalculatio
   };
 
   const diffResult = useMemo(() => {
-    if (mode !== 'difference') return null;
+    try {
+      if (mode !== 'difference') return null;
 
-    const d1 = new Date(startDate);
-    const d2 = new Date(endDate);
+      const d1 = new Date(startDate);
+      const d2 = new Date(endDate);
 
-    if (isNaN(d1.getTime()) || isNaN(d2.getTime())) {
+      if (isNaN(d1.getTime()) || isNaN(d2.getTime())) {
+        return null;
+      }
+
+      const start = d1 < d2 ? d1 : d2;
+      const end = d1 < d2 ? d2 : d1;
+      const isReversed = d1 > d2;
+
+      const diffTime = Math.abs(end.getTime() - start.getTime());
+      let totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      if (includeEndDay) totalDays += 1;
+
+      // Calculate business days (Monday-Friday)
+      let businessDays = 0;
+      let weekendDays = 0;
+      const cur = new Date(start);
+      const stopTime = end.getTime() + (includeEndDay ? 24 * 60 * 60 * 1000 : 0);
+
+      while (cur.getTime() < stopTime) {
+        const dayOfWeek = cur.getDay(); // 0 is Sunday, 6 is Saturday
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+          weekendDays++;
+        } else {
+          businessDays++;
+        }
+        cur.setDate(cur.getDate() + 1);
+      }
+
+      const weeks = Math.floor(totalDays / 7);
+      const remainingDays = totalDays % 7;
+      const totalHours = totalDays * 24;
+      const totalMinutes = totalHours * 60;
+
+      return {
+        totalDays,
+        businessDays,
+        weekendDays,
+        weeks,
+        remainingDays,
+        totalHours,
+        totalMinutes,
+        isReversed,
+        businessRatio: totalDays > 0 ? (businessDays / totalDays) * 100 : 0
+      };
+    } catch {
       return null;
     }
-
-    const start = d1 < d2 ? d1 : d2;
-    const end = d1 < d2 ? d2 : d1;
-    const isReversed = d1 > d2;
-
-    const diffTime = Math.abs(end.getTime() - start.getTime());
-    let totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    if (includeEndDay) totalDays += 1;
-
-    // Calculate business days (Monday-Friday)
-    let businessDays = 0;
-    let weekendDays = 0;
-    const cur = new Date(start);
-    const stopTime = end.getTime() + (includeEndDay ? 24 * 60 * 60 * 1000 : 0);
-
-    while (cur.getTime() < stopTime) {
-      const dayOfWeek = cur.getDay(); // 0 is Sunday, 6 is Saturday
-      if (dayOfWeek === 0 || dayOfWeek === 6) {
-        weekendDays++;
-      } else {
-        businessDays++;
-      }
-      cur.setDate(cur.getDate() + 1);
-    }
-
-    const weeks = Math.floor(totalDays / 7);
-    const remainingDays = totalDays % 7;
-    const totalHours = totalDays * 24;
-    const totalMinutes = totalHours * 60;
-
-    return {
-      totalDays,
-      businessDays,
-      weekendDays,
-      weeks,
-      remainingDays,
-      totalHours,
-      totalMinutes,
-      isReversed,
-      businessRatio: totalDays > 0 ? (businessDays / totalDays) * 100 : 0
-    };
   }, [mode, startDate, endDate, includeEndDay]);
 
   const addResult = useMemo(() => {
-    if (mode !== 'add-subtract') return null;
+    try {
+      if (mode !== 'add-subtract') return null;
 
-    const b = new Date(baseDate);
-    if (isNaN(b.getTime())) return null;
+      const b = new Date(baseDate);
+      if (isNaN(b.getTime())) return null;
 
-    const numDaysSafe = typeof numDays === 'number' ? numDays : 0;
-    const numWeeksSafe = typeof numWeeks === 'number' ? numWeeks : 0;
-    const numMonthsSafe = typeof numMonths === 'number' ? numMonths : 0;
+      const numDaysSafe = typeof numDays === 'number' ? numDays : 0;
+      const numWeeksSafe = typeof numWeeks === 'number' ? numWeeks : 0;
+      const numMonthsSafe = typeof numMonths === 'number' ? numMonths : 0;
 
-    const totalDaysToAdd = numDaysSafe + (numWeeksSafe * 7);
-    const targetDate = new Date(b);
+      const totalDaysToAdd = numDaysSafe + (numWeeksSafe * 7);
+      const targetDate = new Date(b);
 
-    if (addOp === 'add') {
-      targetDate.setMonth(targetDate.getMonth() + numMonthsSafe);
-      targetDate.setDate(targetDate.getDate() + totalDaysToAdd);
-    } else {
-      targetDate.setMonth(targetDate.getMonth() - numMonthsSafe);
-      targetDate.setDate(targetDate.getDate() - totalDaysToAdd);
+      if (addOp === 'add') {
+        targetDate.setMonth(targetDate.getMonth() + numMonthsSafe);
+        targetDate.setDate(targetDate.getDate() + totalDaysToAdd);
+      } else {
+        targetDate.setMonth(targetDate.getMonth() - numMonthsSafe);
+        targetDate.setDate(targetDate.getDate() - totalDaysToAdd);
+      }
+
+      const options: Intl.DateTimeFormatOptions = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      };
+
+      return {
+        formatted: targetDate.toLocaleDateString('en-US', options),
+        iso: targetDate.toISOString().split('T')[0],
+        dayOfWeek: targetDate.toLocaleDateString('en-US', { weekday: 'long' }),
+        totalDaysOffset: totalDaysToAdd + (numMonthsSafe * 30.4)
+      };
+    } catch {
+      return null;
     }
-
-    const options: Intl.DateTimeFormatOptions = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    };
-
-    return {
-      formatted: targetDate.toLocaleDateString('en-US', options),
-      iso: targetDate.toISOString().split('T')[0],
-      dayOfWeek: targetDate.toLocaleDateString('en-US', { weekday: 'long' }),
-      totalDaysOffset: totalDaysToAdd + (numMonthsSafe * 30.4)
-    };
   }, [mode, baseDate, addOp, numDays, numWeeks, numMonths]);
 
   const handleCopy = async () => {
