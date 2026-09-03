@@ -491,7 +491,7 @@ export const LegalView: React.FC<LegalViewProps> = ({
                   Calculio aims to deliver reliable, high-precision tools and up-to-date educational articles. However, we cannot guarantee that:
                 </p>
                 <ul className="list-disc pl-6 space-y-1.5 text-[#475569]">
-                  <li>Every calculator result will always be 100% accurate, complete, or error-free.</li>
+                  <li>Every calculator result will always be completely error-free, exhaustive, or suited to every condition.</li>
                   <li>The website, tools, or servers will be continuously available without interruption, latency, or technical downtime.</li>
                   <li>Defects or formula oversights will be corrected immediately, although we make good-faith efforts to resolve reported issues promptly.</li>
                   <li>Third-party data feeds, exchange rates, or external APIs will always be accurate, available, or up-to-date.</li>
@@ -740,7 +740,7 @@ export const LegalView: React.FC<LegalViewProps> = ({
                   2. Calculator Results and Independent Verification
                 </h2>
                 <p>
-                  Calculio strives to implement established mathematical algorithms, standard algebraic formulas, and recognized formulas. However, we do not make absolute claims that results are &quot;100% accurate,&quot; &quot;error-free,&quot; or completely suited to every individual circumstance.
+                  Calculio strives to implement established mathematical algorithms, standard algebraic formulas, and recognized formulas. However, we do not make absolute claims that results are &quot;error-free&quot; or completely suited to every individual circumstance.
                 </p>
                 <div className="p-4 rounded-2xl bg-[#FFF7ED] border border-[#FDBA74] text-xs sm:text-sm text-[#0F172A] space-y-2">
                   <div className="font-bold flex items-center gap-2 text-[#F97316]">

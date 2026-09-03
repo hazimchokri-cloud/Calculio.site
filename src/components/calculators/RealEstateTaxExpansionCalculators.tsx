@@ -18,11 +18,20 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
   const [rentIncrease, setRentIncrease] = useState<number | ''>(3.0);
 
   const results = useMemo(() => {
-    const hp = typeof homePrice === 'number' ? homePrice : 0;
-    const mr = typeof monthlyRent === 'number' ? monthlyRent : 0;
+    if (
+      homePrice === '' ||
+      monthlyRent === '' ||
+      interestRate === '' ||
+      downPaymentPct === ''
+    ) {
+      return null;
+    }
+
+    const hp = homePrice;
+    const mr = monthlyRent;
     const sy = typeof stayYears === 'number' ? stayYears : 7;
-    const dpPct = typeof downPaymentPct === 'number' ? downPaymentPct : 0;
-    const ir = typeof interestRate === 'number' ? interestRate : 0;
+    const dpPct = downPaymentPct;
+    const ir = interestRate;
     const ha = typeof homeAppreciation === 'number' ? homeAppreciation : 0;
     const ri = typeof rentIncrease === 'number' ? rentIncrease : 0;
 
@@ -128,30 +137,36 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">{stayYears}-Year Financial Verdict</span>
-            <div className="text-2xl font-black text-blue-950 mt-1">
-              {results.cheaperOption} is cheaper by {currencySymbol}{results.difference.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+        {results ? (
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">{stayYears}-Year Financial Verdict</span>
+              <div className="text-2xl font-black text-blue-950 mt-1">
+                {results.cheaperOption} is cheaper by {currencySymbol}{results.difference.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              </div>
+              <p className="text-xs text-slate-600 mt-1">Total estimated net cost over {stayYears} years factoring equity.</p>
             </div>
-            <p className="text-xs text-slate-600 mt-1">Total estimated net cost over {stayYears} years factoring equity.</p>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1.5">
-            <div className="flex justify-between">
-              <span>Total Rent Outflow ({stayYears} yrs):</span>
-              <span className="font-bold">{currencySymbol}{results.cumulativeRent.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Net Cost of Buying ({stayYears} yrs):</span>
-              <span className="font-bold">{currencySymbol}{results.netCostBuying.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-            </div>
-            <div className="flex justify-between border-t pt-1">
-              <span>Projected Home Value in {stayYears} yrs:</span>
-              <span className="font-bold text-orange-700">{currencySymbol}{results.futureHomeVal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+            <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1.5">
+              <div className="flex justify-between">
+                <span>Total Rent Outflow ({stayYears} yrs):</span>
+                <span className="font-bold">{currencySymbol}{results.cumulativeRent.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Net Cost of Buying ({stayYears} yrs):</span>
+                <span className="font-bold">{currencySymbol}{results.netCostBuying.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+              </div>
+              <div className="flex justify-between border-t pt-1">
+                <span>Projected Home Value in {stayYears} yrs:</span>
+                <span className="font-bold text-orange-700">{currencySymbol}{results.futureHomeVal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter home price, rent, and mortgage details to compare renting vs buying.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -167,12 +182,23 @@ export const RefinanceCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
   const [closingCosts, setClosingCosts] = useState<number | ''>(6000);
 
   const results = useMemo(() => {
-    const cb = typeof currentBalance === 'number' ? currentBalance : 0;
-    const cr = typeof currentRate === 'number' ? currentRate : 0;
-    const ctr = typeof currentTermRemaining === 'number' ? currentTermRemaining : 0;
-    const nr = typeof newRate === 'number' ? newRate : 0;
-    const nt = typeof newTerm === 'number' ? newTerm : 0;
-    const cc = typeof closingCosts === 'number' ? closingCosts : 0;
+    if (
+      currentBalance === '' ||
+      currentRate === '' ||
+      currentTermRemaining === '' ||
+      newRate === '' ||
+      newTerm === '' ||
+      closingCosts === ''
+    ) {
+      return null;
+    }
+
+    const cb = currentBalance;
+    const cr = currentRate;
+    const ctr = currentTermRemaining;
+    const nr = newRate;
+    const nt = newTerm;
+    const cc = closingCosts;
 
     const rCurrent = (cr / 100) / 12;
     const nCurrent = ctr * 12;
@@ -249,32 +275,38 @@ export const RefinanceCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Monthly Payment Savings</span>
-            <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
-              {currencySymbol}{results.monthlySavings.toFixed(2)}
-              <span className="text-xs font-normal text-orange-700"> / month</span>
+        {results ? (
+          <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Monthly Payment Savings</span>
+              <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
+                {currencySymbol}{results.monthlySavings.toFixed(2)}
+                <span className="text-xs font-normal text-orange-700"> / month</span>
+              </div>
             </div>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1.5">
-            <div className="flex justify-between">
-              <span>Closing Cost Breakeven Time:</span>
-              <span className="font-bold text-orange-800">
-                {results.breakevenMonths === Infinity ? 'No savings' : `${results.breakevenMonths} months (${(results.breakevenMonths / 12).toFixed(1)} yrs)`}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Old Monthly P&I:</span>
-              <span>{currencySymbol}{results.currentMonthly.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>New Monthly P&I:</span>
-              <span>{currencySymbol}{results.newMonthly.toFixed(2)}</span>
+            <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1.5">
+              <div className="flex justify-between">
+                <span>Closing Cost Breakeven Time:</span>
+                <span className="font-bold text-orange-800">
+                  {results.breakevenMonths === Infinity ? 'No savings' : `${results.breakevenMonths} months (${(results.breakevenMonths / 12).toFixed(1)} yrs)`}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Old Monthly P&I:</span>
+                <span>{currencySymbol}{results.currentMonthly.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>New Monthly P&I:</span>
+                <span>{currencySymbol}{results.newMonthly.toFixed(2)}</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter loan balance, rates, and closing costs to calculate refinance savings.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -287,13 +319,18 @@ export const CashOnCashCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
   const [closingCosts, setClosingCosts] = useState<number | ''>(5000);
   const [rehabRepairs, setRehabRepairs] = useState<number | ''>(15000);
 
-  const acf = typeof annualCashFlow === 'number' ? annualCashFlow : 0;
-  const dp = typeof downPayment === 'number' ? downPayment : 0;
-  const cc = typeof closingCosts === 'number' ? closingCosts : 0;
-  const rr = typeof rehabRepairs === 'number' ? rehabRepairs : 0;
+  const results = useMemo(() => {
+    if (annualCashFlow === '' || downPayment === '') return null;
+    const acf = annualCashFlow;
+    const dp = downPayment;
+    const cc = typeof closingCosts === 'number' ? closingCosts : 0;
+    const rr = typeof rehabRepairs === 'number' ? rehabRepairs : 0;
 
-  const totalCashInvested = dp + cc + rr;
-  const cocReturn = totalCashInvested > 0 ? (acf / totalCashInvested) * 100 : 0;
+    const totalCashInvested = dp + cc + rr;
+    const cocReturn = totalCashInvested > 0 ? (acf / totalCashInvested) * 100 : 0;
+
+    return { acf, totalCashInvested, cocReturn };
+  }, [annualCashFlow, downPayment, closingCosts, rehabRepairs]);
 
   return (
     <div className="space-y-6">
@@ -340,25 +377,31 @@ export const CashOnCashCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Cash-on-Cash (CoC) Return</span>
-            <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
-              {cocReturn.toFixed(2)}%
+        {results ? (
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Cash-on-Cash (CoC) Return</span>
+              <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
+                {results.cocReturn.toFixed(2)}%
+              </div>
             </div>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>Total Out-of-Pocket Cash Invested:</span>
-              <span className="font-bold">{currencySymbol}{totalCashInvested.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Monthly Cash Flow:</span>
-              <span className="font-bold text-orange-700">{currencySymbol}{(acf / 12).toFixed(2)} / mo</span>
+            <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <span>Total Out-of-Pocket Cash Invested:</span>
+                <span className="font-bold">{currencySymbol}{results.totalCashInvested.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Monthly Cash Flow:</span>
+                <span className="font-bold text-orange-700">{currencySymbol}{(results.acf / 12).toFixed(2)} / mo</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter annual cash flow and down payment to calculate cash-on-cash return.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -369,10 +412,13 @@ export const GrmCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
   const [propertyPrice, setPropertyPrice] = useState<number | ''>(350000);
   const [annualGrossRent, setAnnualGrossRent] = useState<number | ''>(36000);
 
-  const pp = typeof propertyPrice === 'number' ? propertyPrice : 0;
-  const agr = typeof annualGrossRent === 'number' ? annualGrossRent : 0;
-
-  const grm = agr > 0 ? pp / agr : 0;
+  const results = useMemo(() => {
+    if (propertyPrice === '' || annualGrossRent === '' || annualGrossRent <= 0) return null;
+    const pp = propertyPrice;
+    const agr = annualGrossRent;
+    const grm = pp / agr;
+    return { grm };
+  }, [propertyPrice, annualGrossRent]);
 
   return (
     <div className="space-y-6">
@@ -399,15 +445,21 @@ export const GrmCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Gross Rent Multiplier (GRM)</span>
-            <div className="text-3xl font-black text-slate-900 font-mono-numbers mt-1">
-              {grm.toFixed(2)}
+        {results ? (
+          <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Gross Rent Multiplier (GRM)</span>
+              <div className="text-3xl font-black text-slate-900 font-mono-numbers mt-1">
+                {results.grm.toFixed(2)}
+              </div>
+              <p className="text-xs text-slate-500 mt-1">A GRM between 6 and 9 is generally considered attractive in most rental markets.</p>
             </div>
-            <p className="text-xs text-slate-500 mt-1">A GRM between 6 and 9 is generally considered attractive in most rental markets.</p>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter purchase price and gross annual rent to calculate GRM.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -420,30 +472,35 @@ export const CapitalGainsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
   const [holdingPeriodMonths, setHoldingPeriodMonths] = useState<number | ''>(18);
   const [taxableIncome, setTaxableIncome] = useState<number | ''>(90000);
 
-  const pp = typeof purchasePrice === 'number' ? purchasePrice : 0;
-  const sp = typeof sellingPrice === 'number' ? sellingPrice : 0;
-  const hpm = typeof holdingPeriodMonths === 'number' ? holdingPeriodMonths : 0;
-  const ti = typeof taxableIncome === 'number' ? taxableIncome : 0;
+  const results = useMemo(() => {
+    if (purchasePrice === '' || sellingPrice === '' || taxableIncome === '') return null;
+    const pp = purchasePrice;
+    const sp = sellingPrice;
+    const hpm = typeof holdingPeriodMonths === 'number' ? holdingPeriodMonths : 0;
+    const ti = taxableIncome;
 
-  const gain = sp - pp;
-  const isLongTerm = hpm >= 12;
+    const gain = sp - pp;
+    const isLongTerm = hpm >= 12;
 
-  // Approx US federal capital gains brackets
-  let taxRate = 0;
-  if (isLongTerm) {
-    if (ti > 518900) taxRate = 20;
-    else if (ti > 47025) taxRate = 15;
-    else taxRate = 0;
-  } else {
-    // Short term -> standard income tax bracket approximation
-    if (ti > 231250) taxRate = 35;
-    else if (ti > 100525) taxRate = 24;
-    else if (ti > 47150) taxRate = 22;
-    else taxRate = 12;
-  }
+    // Approx US federal capital gains brackets
+    let taxRate = 0;
+    if (isLongTerm) {
+      if (ti > 518900) taxRate = 20;
+      else if (ti > 47025) taxRate = 15;
+      else taxRate = 0;
+    } else {
+      // Short term -> standard income tax bracket approximation
+      if (ti > 231250) taxRate = 35;
+      else if (ti > 100525) taxRate = 24;
+      else if (ti > 47150) taxRate = 22;
+      else taxRate = 12;
+    }
 
-  const estimatedTax = gain > 0 ? (gain * taxRate) / 100 : 0;
-  const netProceeds = sp - estimatedTax;
+    const estimatedTax = gain > 0 ? (gain * taxRate) / 100 : 0;
+    const netProceeds = sp - estimatedTax;
+
+    return { gain, isLongTerm, taxRate, estimatedTax, netProceeds };
+  }, [purchasePrice, sellingPrice, holdingPeriodMonths, taxableIncome]);
 
   return (
     <div className="space-y-6">
@@ -493,31 +550,37 @@ export const CapitalGainsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-5 rounded-xl border border-amber-200 flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">Estimated Tax Owed</span>
-              <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${isLongTerm ? 'bg-orange-100 text-orange-800' : 'bg-amber-100 text-amber-900'}`}>
-                {isLongTerm ? 'Long-Term Gain (≥ 1 Year)' : 'Short-Term Ordinary Rate'}
-              </span>
+        {results ? (
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-5 rounded-xl border border-amber-200 flex flex-col justify-between space-y-4">
+            <div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">Estimated Tax Owed</span>
+                <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${results.isLongTerm ? 'bg-orange-100 text-orange-800' : 'bg-amber-100 text-amber-900'}`}>
+                  {results.isLongTerm ? 'Long-Term Gain (≥ 1 Year)' : 'Short-Term Ordinary Rate'}
+                </span>
+              </div>
+              <div className="text-3xl font-black text-amber-950 font-mono-numbers mt-2">
+                {currencySymbol}{results.estimatedTax.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              </div>
+              <span className="text-xs text-amber-800 font-semibold">Effective Rate: {results.taxRate}%</span>
             </div>
-            <div className="text-3xl font-black text-amber-950 font-mono-numbers mt-2">
-              {currencySymbol}{estimatedTax.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-            </div>
-            <span className="text-xs text-amber-800 font-semibold">Effective Rate: {taxRate}%</span>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-amber-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>Gross Capital Gain:</span>
-              <span className="font-bold text-orange-700">{currencySymbol}{gain.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between border-t pt-1">
-              <span>Net After-Tax Proceeds:</span>
-              <span className="font-bold text-slate-900">{currencySymbol}{netProceeds.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+            <div className="bg-white p-3 rounded-lg border border-amber-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <span>Gross Capital Gain:</span>
+                <span className="font-bold text-orange-700">{currencySymbol}{results.gain.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between border-t pt-1">
+                <span>Net After-Tax Proceeds:</span>
+                <span className="font-bold text-slate-900">{currencySymbol}{results.netProceeds.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter purchase price, selling price, and taxable income to calculate capital gains tax.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -529,11 +592,16 @@ export const TipCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
   const [tipPercent, setTipPercent] = useState<number>(18);
   const [splitCount, setSplitCount] = useState<number>(2);
 
-  const ba = typeof billAmount === 'number' ? billAmount : 0;
-  const tipAmount = (ba * tipPercent) / 100;
-  const totalWithTip = ba + tipAmount;
-  const perPersonTotal = splitCount > 0 ? totalWithTip / splitCount : totalWithTip;
-  const perPersonTip = splitCount > 0 ? tipAmount / splitCount : tipAmount;
+  const results = useMemo(() => {
+    if (billAmount === '') return null;
+    const ba = billAmount;
+    const tipAmount = (ba * tipPercent) / 100;
+    const totalWithTip = ba + tipAmount;
+    const perPersonTotal = splitCount > 0 ? totalWithTip / splitCount : totalWithTip;
+    const perPersonTip = splitCount > 0 ? tipAmount / splitCount : tipAmount;
+
+    return { tipAmount, totalWithTip, perPersonTotal, perPersonTip };
+  }, [billAmount, tipPercent, splitCount]);
 
   return (
     <div className="space-y-6">
@@ -582,26 +650,32 @@ export const TipCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Total Per Person</span>
-            <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
-              {currencySymbol}{perPersonTotal.toFixed(2)}
+        {results ? (
+          <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Total Per Person</span>
+              <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
+                {currencySymbol}{results.perPersonTotal.toFixed(2)}
+              </div>
+              <span className="text-xs text-orange-700 font-semibold">Includes {currencySymbol}{results.perPersonTip.toFixed(2)} tip each</span>
             </div>
-            <span className="text-xs text-orange-700 font-semibold">Includes {currencySymbol}{perPersonTip.toFixed(2)} tip each</span>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>Total Tip Amount:</span>
-              <span className="font-bold text-orange-800">{currencySymbol}{tipAmount.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between border-t pt-1">
-              <span>Grand Total with Tip:</span>
-              <span className="font-bold text-slate-900">{currencySymbol}{totalWithTip.toFixed(2)}</span>
+            <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <span>Total Tip Amount:</span>
+                <span className="font-bold text-orange-800">{currencySymbol}{results.tipAmount.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between border-t pt-1">
+                <span>Grand Total with Tip:</span>
+                <span className="font-bold text-slate-900">{currencySymbol}{results.totalWithTip.toFixed(2)}</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter bill total to calculate tip and split.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -614,8 +688,9 @@ export const VatCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
   const [mode, setMode] = useState<'add' | 'remove'>('add');
 
   const results = useMemo(() => {
-    const a = typeof amount === 'number' ? amount : 0;
-    const vr = typeof vatRate === 'number' ? vatRate : 0;
+    if (amount === '' || vatRate === '') return null;
+    const a = amount;
+    const vr = vatRate;
 
     if (a <= 0 || vr < 0) return { net: 0, vat: 0, gross: 0 };
     if (mode === 'add') {
@@ -677,31 +752,37 @@ export const VatCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">
-              {mode === 'add' ? 'Gross Price (With VAT)' : 'Net Price (Without VAT)'}
-            </span>
-            <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-1">
-              {currencySymbol}{mode === 'add' ? results.gross.toFixed(2) : results.net.toFixed(2)}
+        {results ? (
+          <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">
+                {mode === 'add' ? 'Gross Price (With VAT)' : 'Net Price (Without VAT)'}
+              </span>
+              <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-1">
+                {currencySymbol}{mode === 'add' ? results.gross.toFixed(2) : results.net.toFixed(2)}
+              </div>
             </div>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-indigo-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>Net Price (Excl. VAT):</span>
-              <span className="font-bold">{currencySymbol}{results.net.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>VAT ({typeof vatRate === 'number' ? vatRate : 0}%):</span>
-              <span className="font-bold text-orange-700">{currencySymbol}{results.vat.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between border-t pt-1 font-bold text-slate-900">
-              <span>Gross Total:</span>
-              <span>{currencySymbol}{results.gross.toFixed(2)}</span>
+            <div className="bg-white p-3 rounded-lg border border-indigo-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <span>Net Price (Excl. VAT):</span>
+                <span className="font-bold">{currencySymbol}{results.net.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>VAT ({typeof vatRate === 'number' ? vatRate : 0}%):</span>
+                <span className="font-bold text-orange-700">{currencySymbol}{results.vat.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between border-t pt-1 font-bold text-slate-900">
+                <span>Gross Total:</span>
+                <span>{currencySymbol}{results.gross.toFixed(2)}</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter price amount and VAT rate to calculate tax.
+          </div>
+        )}
       </div>
     </div>
   );

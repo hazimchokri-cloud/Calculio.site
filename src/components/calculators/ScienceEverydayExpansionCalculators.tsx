@@ -15,18 +15,17 @@ export const DensityCalculator: React.FC<BaseCalcProps> = () => {
   const [density, setDensity] = useState<number | ''>(2.0); // g/cm³
 
   const results = useMemo(() => {
-    const m = typeof mass === 'number' ? mass : 0;
-    const v = typeof volume === 'number' ? volume : 0;
-    const d = typeof density === 'number' ? density : 0;
-
     if (solveFor === 'density') {
-      const calcD = v > 0 ? m / v : 0;
+      if (mass === '' || volume === '' || volume <= 0) return null;
+      const calcD = mass / volume;
       return { output: calcD.toFixed(3), unit: 'g/cm³ (or kg/L)', label: 'Calculated Density' };
     } else if (solveFor === 'mass') {
-      const calcM = d * v;
+      if (density === '' || volume === '') return null;
+      const calcM = density * volume;
       return { output: calcM.toFixed(2), unit: 'grams', label: 'Calculated Mass' };
     } else {
-      const calcV = d > 0 ? m / d : 0;
+      if (mass === '' || density === '' || density <= 0) return null;
+      const calcV = mass / density;
       return { output: calcV.toFixed(2), unit: 'cm³ (mL)', label: 'Calculated Volume' };
     }
   }, [solveFor, mass, volume, density]);
@@ -86,14 +85,20 @@ export const DensityCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">{results.label}</span>
-            <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-1">
-              {results.output} <span className="text-sm font-normal text-indigo-700">{results.unit}</span>
+        {results ? (
+          <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">{results.label}</span>
+              <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-1">
+                {results.output} <span className="text-sm font-normal text-indigo-700">{results.unit}</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter valid numbers for the required fields to calculate.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -105,13 +110,18 @@ export const EnergyCalculator: React.FC<BaseCalcProps> = () => {
   const [velocityMs, setVelocityMs] = useState<number | ''>(15);
   const [heightM, setHeightM] = useState<number | ''>(20);
 
-  const m = typeof massKg === 'number' ? massKg : 0;
-  const v = typeof velocityMs === 'number' ? velocityMs : 0;
-  const h = typeof heightM === 'number' ? heightM : 0;
+  const results = useMemo(() => {
+    if (massKg === '' || velocityMs === '' || heightM === '') return null;
+    const m = massKg;
+    const v = velocityMs;
+    const h = heightM;
 
-  const kineticEnergyJoules = 0.5 * m * Math.pow(v, 2);
-  const potentialEnergyJoules = m * 9.80665 * h;
-  const totalMechanicalJoules = kineticEnergyJoules + potentialEnergyJoules;
+    const kineticEnergyJoules = 0.5 * m * Math.pow(v, 2);
+    const potentialEnergyJoules = m * 9.80665 * h;
+    const totalMechanicalJoules = kineticEnergyJoules + potentialEnergyJoules;
+
+    return { kineticEnergyJoules, potentialEnergyJoules, totalMechanicalJoules };
+  }, [massKg, velocityMs, heightM]);
 
   return (
     <div className="space-y-6">
@@ -149,25 +159,31 @@ export const EnergyCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-orange-100/60 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
-          <div className="space-y-3">
-            <div>
-              <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Kinetic Energy (0.5 mv²)</span>
-              <div className="text-2xl font-black text-orange-950 font-mono-numbers">{kineticEnergyJoules.toLocaleString(undefined, { maximumFractionDigits: 2 })} J</div>
+        {results ? (
+          <div className="bg-gradient-to-br from-orange-50 to-orange-100/60 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
+            <div className="space-y-3">
+              <div>
+                <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Kinetic Energy (0.5 mv²)</span>
+                <div className="text-2xl font-black text-orange-950 font-mono-numbers">{results.kineticEnergyJoules.toLocaleString(undefined, { maximumFractionDigits: 2 })} J</div>
+              </div>
+              <div>
+                <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Gravitational Potential Energy (mgh)</span>
+                <div className="text-2xl font-black text-orange-950 font-mono-numbers">{results.potentialEnergyJoules.toLocaleString(undefined, { maximumFractionDigits: 2 })} J</div>
+              </div>
             </div>
-            <div>
-              <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Gravitational Potential Energy (mgh)</span>
-              <div className="text-2xl font-black text-orange-950 font-mono-numbers">{potentialEnergyJoules.toLocaleString(undefined, { maximumFractionDigits: 2 })} J</div>
-            </div>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700">
-            <div className="flex justify-between font-bold text-slate-900">
-              <span>Total Mechanical Energy:</span>
-              <span>{totalMechanicalJoules.toLocaleString(undefined, { maximumFractionDigits: 2 })} Joules</span>
+            <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700">
+              <div className="flex justify-between font-bold text-slate-900">
+                <span>Total Mechanical Energy:</span>
+                <span>{results.totalMechanicalJoules.toLocaleString(undefined, { maximumFractionDigits: 2 })} Joules</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter mass, velocity, and height to calculate energy values.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -178,13 +194,18 @@ export const PressureCalculator: React.FC<BaseCalcProps> = () => {
   const [forceN, setForceN] = useState<number | ''>(500); // Newtons
   const [areaM2, setAreaM2] = useState<number | ''>(0.05); // m²
 
-  const f = typeof forceN === 'number' ? forceN : 0;
-  const a = typeof areaM2 === 'number' ? areaM2 : 0;
+  const results = useMemo(() => {
+    if (forceN === '' || areaM2 === '' || areaM2 <= 0) return null;
+    const f = forceN;
+    const a = areaM2;
 
-  const pressurePascals = a > 0 ? f / a : 0;
-  const pressurePsi = pressurePascals * 0.000145038;
-  const pressureBar = pressurePascals / 100000;
-  const pressureAtm = pressurePascals / 101325;
+    const pressurePascals = f / a;
+    const pressurePsi = pressurePascals * 0.000145038;
+    const pressureBar = pressurePascals / 100000;
+    const pressureAtm = pressurePascals / 101325;
+
+    return { pressurePascals, pressurePsi, pressureBar, pressureAtm };
+  }, [forceN, areaM2]);
 
   return (
     <div className="space-y-6">
@@ -212,20 +233,26 @@ export const PressureCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Calculated Pressure</span>
-            <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
-              {pressurePascals.toLocaleString()} Pa
+        {results ? (
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Calculated Pressure</span>
+              <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
+                {results.pressurePascals.toLocaleString()} Pa
+              </div>
+            </div>
+
+            <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between"><span>Pounds per Square Inch (PSI):</span><span className="font-bold">{results.pressurePsi.toFixed(3)} psi</span></div>
+              <div className="flex justify-between"><span>Bar:</span><span className="font-bold">{results.pressureBar.toFixed(4)} bar</span></div>
+              <div className="flex justify-between"><span>Atmospheres (atm):</span><span className="font-bold">{results.pressureAtm.toFixed(4)} atm</span></div>
             </div>
           </div>
-
-          <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between"><span>Pounds per Square Inch (PSI):</span><span className="font-bold">{pressurePsi.toFixed(3)} psi</span></div>
-            <div className="flex justify-between"><span>Bar:</span><span className="font-bold">{pressureBar.toFixed(4)} bar</span></div>
-            <div className="flex justify-between"><span>Atmospheres (atm):</span><span className="font-bold">{pressureAtm.toFixed(4)} atm</span></div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter perpendicular force and surface area to calculate pressure.
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -236,13 +263,18 @@ export const SpeedOfSoundCalculator: React.FC<BaseCalcProps> = () => {
   const [temperatureC, setTemperatureC] = useState<number | ''>(20);
   const [objectSpeedKmh, setObjectSpeedKmh] = useState<number | ''>(1235);
 
-  const tc = typeof temperatureC === 'number' ? temperatureC : 0;
-  const osk = typeof objectSpeedKmh === 'number' ? objectSpeedKmh : 0;
+  const results = useMemo(() => {
+    if (temperatureC === '' || objectSpeedKmh === '') return null;
+    const tc = temperatureC;
+    const osk = objectSpeedKmh;
 
-  const speedOfSoundMs = 331.3 * Math.sqrt(Math.max(0, 1 + tc / 273.15));
-  const speedOfSoundKmh = speedOfSoundMs * 3.6;
-  const speedOfSoundMph = speedOfSoundKmh * 0.621371;
-  const machNumber = speedOfSoundKmh > 0 ? osk / speedOfSoundKmh : 0;
+    const speedOfSoundMs = 331.3 * Math.sqrt(Math.max(0, 1 + tc / 273.15));
+    const speedOfSoundKmh = speedOfSoundMs * 3.6;
+    const speedOfSoundMph = speedOfSoundKmh * 0.621371;
+    const machNumber = speedOfSoundKmh > 0 ? osk / speedOfSoundKmh : 0;
+
+    return { tc, speedOfSoundMs, speedOfSoundKmh, speedOfSoundMph, machNumber };
+  }, [temperatureC, objectSpeedKmh]);
 
   return (
     <div className="space-y-6">
@@ -269,22 +301,28 @@ export const SpeedOfSoundCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-sky-50 to-indigo-50 p-5 rounded-xl border border-sky-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-sky-900 uppercase tracking-wider">Speed of Sound at {typeof temperatureC === 'number' ? temperatureC : 0}°C</span>
-            <div className="text-3xl font-black text-sky-950 font-mono-numbers mt-1">
-              {speedOfSoundMs.toFixed(1)} m/s
+        {results ? (
+          <div className="bg-gradient-to-br from-sky-50 to-indigo-50 p-5 rounded-xl border border-sky-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-sky-900 uppercase tracking-wider">Speed of Sound at {results.tc}°C</span>
+              <div className="text-3xl font-black text-sky-950 font-mono-numbers mt-1">
+                {results.speedOfSoundMs.toFixed(1)} m/s
+              </div>
+              <span className="text-xs text-sky-800 font-semibold">({results.speedOfSoundKmh.toFixed(1)} km/h • {results.speedOfSoundMph.toFixed(1)} mph)</span>
             </div>
-            <span className="text-xs text-sky-800 font-semibold">({speedOfSoundKmh.toFixed(1)} km/h • {speedOfSoundMph.toFixed(1)} mph)</span>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-sky-100 text-xs text-slate-700">
-            <div className="flex justify-between font-bold text-slate-900">
-              <span>Mach Equivalent:</span>
-              <span className="text-blue-700">Mach {machNumber.toFixed(2)}</span>
+            <div className="bg-white p-3 rounded-lg border border-sky-100 text-xs text-slate-700">
+              <div className="flex justify-between font-bold text-slate-900">
+                <span>Mach Equivalent:</span>
+                <span className="text-blue-700">Mach {results.machNumber.toFixed(2)}</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter air temperature and object speed to calculate speed of sound and Mach number.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -299,19 +337,34 @@ export const TimeCardCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
   const [hoursThu, setHoursThu] = useState<number | ''>(8.5);
   const [hoursFri, setHoursFri] = useState<number | ''>(9);
 
-  const hw = typeof hourlyWage === 'number' ? hourlyWage : 0;
-  const hM = typeof hoursMon === 'number' ? hoursMon : 0;
-  const hTu = typeof hoursTue === 'number' ? hoursTue : 0;
-  const hW = typeof hoursWed === 'number' ? hoursWed : 0;
-  const hTh = typeof hoursThu === 'number' ? hoursThu : 0;
-  const hF = typeof hoursFri === 'number' ? hoursFri : 0;
+  const results = useMemo(() => {
+    if (
+      hourlyWage === '' ||
+      hoursMon === '' ||
+      hoursTue === '' ||
+      hoursWed === '' ||
+      hoursThu === '' ||
+      hoursFri === ''
+    ) {
+      return null;
+    }
 
-  const totalHours = hM + hTu + hW + hTh + hF;
-  const regularHours = Math.min(40, totalHours);
-  const overtimeHours = Math.max(0, totalHours - 40);
-  const regularPay = regularHours * hw;
-  const overtimePay = overtimeHours * (hw * 1.5);
-  const totalGrossPay = regularPay + overtimePay;
+    const hw = hourlyWage;
+    const hM = hoursMon;
+    const hTu = hoursTue;
+    const hW = hoursWed;
+    const hTh = hoursThu;
+    const hF = hoursFri;
+
+    const totalHours = hM + hTu + hW + hTh + hF;
+    const regularHours = Math.min(40, totalHours);
+    const overtimeHours = Math.max(0, totalHours - 40);
+    const regularPay = regularHours * hw;
+    const overtimePay = overtimeHours * (hw * 1.5);
+    const totalGrossPay = regularPay + overtimePay;
+
+    return { totalHours, regularHours, overtimeHours, regularPay, overtimePay, totalGrossPay, hw };
+  }, [hourlyWage, hoursMon, hoursTue, hoursWed, hoursThu, hoursFri]);
 
   return (
     <div className="space-y-6">
@@ -349,20 +402,26 @@ export const TimeCardCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Total Weekly Gross Pay</span>
-            <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
-              {currencySymbol}{totalGrossPay.toFixed(2)}
+        {results ? (
+          <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Total Weekly Gross Pay</span>
+              <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
+                {currencySymbol}{results.totalGrossPay.toFixed(2)}
+              </div>
+              <span className="text-xs text-orange-700 font-semibold">{results.totalHours} Total Clocked Hours</span>
             </div>
-            <span className="text-xs text-orange-700 font-semibold">{totalHours} Total Clocked Hours</span>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between"><span>Regular Pay ({regularHours} hrs @ {currencySymbol}{hw}):</span><span>{currencySymbol}{regularPay.toFixed(2)}</span></div>
-            <div className="flex justify-between"><span>Overtime Pay ({overtimeHours} hrs @ 1.5x):</span><span className="font-bold text-orange-700">+{currencySymbol}{overtimePay.toFixed(2)}</span></div>
+            <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between"><span>Regular Pay ({results.regularHours} hrs @ {currencySymbol}{results.hw}):</span><span>{currencySymbol}{results.regularPay.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span>Overtime Pay ({results.overtimeHours} hrs @ 1.5x):</span><span className="font-bold text-orange-700">+{currencySymbol}{results.overtimePay.toFixed(2)}</span></div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter clocked hours for each day and hourly base wage to calculate pay.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -375,8 +434,9 @@ export const ExactAgeCalculator: React.FC<BaseCalcProps> = () => {
   const [birthDay, setBirthDay] = useState<number | ''>(15);
 
   const results = useMemo(() => {
-    const by = typeof birthYear === 'number' ? birthYear : 1995;
-    const bd = typeof birthDay === 'number' ? birthDay : 15;
+    if (birthYear === '' || birthDay === '') return null;
+    const by = birthYear;
+    const bd = birthDay;
     const birth = new Date(by, birthMonth - 1, bd);
     const now = new Date();
     const diffMs = Math.max(0, now.getTime() - birth.getTime());
@@ -430,21 +490,27 @@ export const ExactAgeCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">Exact Elapsed Lifespan</span>
-            <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-1">
-              {results.years} Years
+        {results ? (
+          <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">Exact Elapsed Lifespan</span>
+              <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-1">
+                {results.years} Years
+              </div>
+              <span className="text-xs text-indigo-700 font-semibold">{results.totalDays.toLocaleString()} Days lived</span>
             </div>
-            <span className="text-xs text-indigo-700 font-semibold">{results.totalDays.toLocaleString()} Days lived</span>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-indigo-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between"><span>Total Hours:</span><span className="font-bold">{results.totalHours.toLocaleString()} hrs</span></div>
-            <div className="flex justify-between"><span>Total Seconds:</span><span className="font-bold">{results.totalSeconds.toLocaleString()} s</span></div>
-            <div className="flex justify-between border-t pt-1"><span>Estimated Heartbeats:</span><span className="font-bold text-red-600">~{results.heartbeats.toLocaleString()} beats</span></div>
+            <div className="bg-white p-3 rounded-lg border border-indigo-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between"><span>Total Hours:</span><span className="font-bold">{results.totalHours.toLocaleString()} hrs</span></div>
+              <div className="flex justify-between"><span>Total Seconds:</span><span className="font-bold">{results.totalSeconds.toLocaleString()} s</span></div>
+              <div className="flex justify-between border-t pt-1"><span>Estimated Heartbeats:</span><span className="font-bold text-red-600">~{results.heartbeats.toLocaleString()} beats</span></div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter your date of birth to calculate exact elapsed lifespan.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -466,7 +532,11 @@ export const TimeZoneCalculator: React.FC<BaseCalcProps> = () => {
     { name: 'Sydney (AEST)', offset: 10 }
   ];
 
-  const bHour = typeof baseTimeHour === 'number' ? baseTimeHour : 12;
+  const results = useMemo(() => {
+    if (baseTimeHour === '') return null;
+    const bHour = baseTimeHour;
+    return { bHour };
+  }, [baseTimeHour]);
 
   return (
     <div className="space-y-6">
@@ -496,23 +566,29 @@ export const TimeZoneCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-slate-900 to-indigo-950 text-white p-5 rounded-xl flex flex-col justify-between space-y-3">
-          <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider">World Converted Times</span>
-          <div className="space-y-1.5 text-xs">
-            {zones.map((z) => {
-              const diff = z.offset - originZoneOffset;
-              let targetHour = (bHour + diff) % 24;
-              if (targetHour < 0) targetHour += 24;
-              const formatted = `${Math.floor(targetHour)}:${(targetHour % 1 === 0.5 ? '30' : '00')}`;
-              return (
-                <div key={z.name} className="flex justify-between border-b border-white/10 pb-1">
-                  <span className="text-slate-300">{z.name}:</span>
-                  <span className="font-mono font-bold text-white">{formatted}</span>
-                </div>
-              );
-            })}
+        {results ? (
+          <div className="bg-gradient-to-br from-slate-900 to-indigo-950 text-white p-5 rounded-xl flex flex-col justify-between space-y-3">
+            <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider">World Converted Times</span>
+            <div className="space-y-1.5 text-xs">
+              {zones.map((z) => {
+                const diff = z.offset - originZoneOffset;
+                let targetHour = (results.bHour + diff) % 24;
+                if (targetHour < 0) targetHour += 24;
+                const formatted = `${Math.floor(targetHour)}:${(targetHour % 1 === 0.5 ? '30' : '00')}`;
+                return (
+                  <div key={z.name} className="flex justify-between border-b border-white/10 pb-1">
+                    <span className="text-slate-300">{z.name}:</span>
+                    <span className="font-mono font-bold text-white">{formatted}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter origin hour (0-23) to convert across world time zones.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -530,19 +606,36 @@ export const NetWorthCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
   const [carLoans, setCarLoans] = useState<number | ''>(8000);
   const [creditCardDebt, setCreditCardDebt] = useState<number | ''>(2000);
 
-  const cc = typeof cashChecking === 'number' ? cashChecking : 0;
-  const inv = typeof investments === 'number' ? investments : 0;
-  const re = typeof realEstateVal === 'number' ? realEstateVal : 0;
-  const vo = typeof vehiclesOther === 'number' ? vehiclesOther : 0;
+  const results = useMemo(() => {
+    if (
+      cashChecking === '' ||
+      investments === '' ||
+      realEstateVal === '' ||
+      vehiclesOther === '' ||
+      mortgageDebt === '' ||
+      studentDebt === '' ||
+      carLoans === '' ||
+      creditCardDebt === ''
+    ) {
+      return null;
+    }
 
-  const md = typeof mortgageDebt === 'number' ? mortgageDebt : 0;
-  const sd = typeof studentDebt === 'number' ? studentDebt : 0;
-  const cl = typeof carLoans === 'number' ? carLoans : 0;
-  const ccd = typeof creditCardDebt === 'number' ? creditCardDebt : 0;
+    const cc = cashChecking;
+    const inv = investments;
+    const re = realEstateVal;
+    const vo = vehiclesOther;
 
-  const totalAssets = cc + inv + re + vo;
-  const totalLiabilities = md + sd + cl + ccd;
-  const netWorth = totalAssets - totalLiabilities;
+    const md = mortgageDebt;
+    const sd = studentDebt;
+    const cl = carLoans;
+    const ccd = creditCardDebt;
+
+    const totalAssets = cc + inv + re + vo;
+    const totalLiabilities = md + sd + cl + ccd;
+    const netWorth = totalAssets - totalLiabilities;
+
+    return { totalAssets, totalLiabilities, netWorth };
+  }, [cashChecking, investments, realEstateVal, vehiclesOther, mortgageDebt, studentDebt, carLoans, creditCardDebt]);
 
   return (
     <div className="space-y-6">
@@ -593,19 +686,25 @@ export const NetWorthCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Total Net Worth</span>
-            <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
-              {currencySymbol}{netWorth.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+        {results ? (
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Total Net Worth</span>
+              <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
+                {currencySymbol}{results.netWorth.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              </div>
+            </div>
+
+            <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs space-y-1.5 text-slate-700">
+              <div className="flex justify-between"><span>Total Assets:</span><span className="font-bold text-orange-700">{currencySymbol}{results.totalAssets.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span>Total Liabilities:</span><span className="font-bold text-red-700">{currencySymbol}{results.totalLiabilities.toLocaleString()}</span></div>
             </div>
           </div>
-
-          <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs space-y-1.5 text-slate-700">
-            <div className="flex justify-between"><span>Total Assets:</span><span className="font-bold text-orange-700">{currencySymbol}{totalAssets.toLocaleString()}</span></div>
-            <div className="flex justify-between"><span>Total Liabilities:</span><span className="font-bold text-red-700">{currencySymbol}{totalLiabilities.toLocaleString()}</span></div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter your asset and liability values to calculate net worth.
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -617,7 +716,8 @@ export const DogAgeCalculator: React.FC<BaseCalcProps> = () => {
   const [dogSize, setDogSize] = useState<'small' | 'medium' | 'large' | 'giant'>('medium');
 
   const humanAge = useMemo(() => {
-    const da = typeof dogAge === 'number' ? dogAge : 0;
+    if (dogAge === '') return null;
+    const da = dogAge;
     if (da <= 0) return 0;
     if (da === 1) return 15;
     if (da === 2) return 24;
@@ -662,17 +762,23 @@ export const DogAgeCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-orange-100/60 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Equivalent Human Age</span>
-            <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
-              ~{humanAge} Human Years
+        {humanAge !== null ? (
+          <div className="bg-gradient-to-br from-orange-50 to-orange-100/60 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Equivalent Human Age</span>
+              <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
+                ~{humanAge} Human Years
+              </div>
+            </div>
+            <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700">
+              <p>Calculated using American Veterinary Medical Association (AVMA) size-adjusted developmental curves.</p>
             </div>
           </div>
-          <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700">
-            <p>Calculated using American Veterinary Medical Association (AVMA) size-adjusted developmental curves.</p>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter your dog's age to calculate human age equivalent.
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -684,7 +790,8 @@ export const CookingConverterCalculator: React.FC<BaseCalcProps> = () => {
   const [ingredient, setIngredient] = useState<'flour' | 'sugar' | 'butter' | 'liquid'>('flour');
 
   const conversions = useMemo(() => {
-    const c = typeof cups === 'number' ? cups : 0;
+    if (cups === '') return null;
+    const c = cups;
     const tablespoons = c * 16;
     const teaspoons = c * 48;
     const fluidOunces = c * 8;
@@ -731,21 +838,27 @@ export const CookingConverterCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Weight & Volume Equivalents</span>
-            <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
-              {conversions.grams} grams
+        {conversions ? (
+          <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Weight & Volume Equivalents</span>
+              <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
+                {conversions.grams} grams
+              </div>
+            </div>
+
+            <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between"><span>Tablespoons:</span><span className="font-bold">{conversions.tablespoons} tbsp</span></div>
+              <div className="flex justify-between"><span>Teaspoons:</span><span className="font-bold">{conversions.teaspoons} tsp</span></div>
+              <div className="flex justify-between"><span>Fluid Ounces:</span><span className="font-bold">{conversions.fluidOunces} fl oz</span></div>
+              <div className="flex justify-between"><span>Milliliters:</span><span className="font-bold">{conversions.milliliters} mL</span></div>
             </div>
           </div>
-
-          <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between"><span>Tablespoons:</span><span className="font-bold">{conversions.tablespoons} tbsp</span></div>
-            <div className="flex justify-between"><span>Teaspoons:</span><span className="font-bold">{conversions.teaspoons} tsp</span></div>
-            <div className="flex justify-between"><span>Fluid Ounces:</span><span className="font-bold">{conversions.fluidOunces} fl oz</span></div>
-            <div className="flex justify-between"><span>Milliliters:</span><span className="font-bold">{conversions.milliliters} mL</span></div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter measuring cup volume to calculate kitchen equivalents.
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -758,9 +871,10 @@ export const CryptoDcaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
   const [expectedAnnualGrowth, setExpectedAnnualGrowth] = useState<number | ''>(25);
 
   const results = useMemo(() => {
-    const md = typeof monthlyDeposit === 'number' ? monthlyDeposit : 0;
-    const mo = typeof months === 'number' ? months : 0;
-    const eag = typeof expectedAnnualGrowth === 'number' ? expectedAnnualGrowth : 0;
+    if (monthlyDeposit === '' || months === '' || expectedAnnualGrowth === '') return null;
+    const md = monthlyDeposit;
+    const mo = months;
+    const eag = expectedAnnualGrowth;
 
     const totalInvested = md * mo;
     const monthlyRate = eag / 100 / 12;
@@ -812,19 +926,25 @@ export const CryptoDcaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">Projected Portfolio Value</span>
-            <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-1">
-              {currencySymbol}{results.portfolioValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+        {results ? (
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">Projected Portfolio Value</span>
+              <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-1">
+                {currencySymbol}{results.portfolioValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+              </div>
+              <span className="text-xs text-indigo-700 font-semibold">Total Profit: +{currencySymbol}{results.profit.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({results.roiPct.toFixed(1)}% ROI)</span>
             </div>
-            <span className="text-xs text-indigo-700 font-semibold">Total Profit: +{currencySymbol}{results.profit.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({results.roiPct.toFixed(1)}% ROI)</span>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-indigo-100 text-xs text-slate-700">
-            <div className="flex justify-between"><span>Total Out-of-Pocket Cash Invested:</span><span className="font-bold">{currencySymbol}{results.totalInvested.toLocaleString()}</span></div>
+            <div className="bg-white p-3 rounded-lg border border-indigo-100 text-xs text-slate-700">
+              <div className="flex justify-between"><span>Total Out-of-Pocket Cash Invested:</span><span className="font-bold">{currencySymbol}{results.totalInvested.toLocaleString()}</span></div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter deposit amount, duration, and expected growth rate to calculate DCA projection.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -836,13 +956,18 @@ export const StakingRewardsCalculator: React.FC<BaseCalcProps> = ({ currencySymb
   const [apyPercent, setApyPercent] = useState<number | ''>(6.5);
   const [stakingDays, setStakingDays] = useState<number | ''>(365);
 
-  const sa = typeof stakedAmount === 'number' ? stakedAmount : 0;
-  const apy = typeof apyPercent === 'number' ? apyPercent : 0;
-  const sd = typeof stakingDays === 'number' ? stakingDays : 0;
+  const results = useMemo(() => {
+    if (stakedAmount === '' || apyPercent === '' || stakingDays === '') return null;
+    const sa = stakedAmount;
+    const apy = apyPercent;
+    const sd = stakingDays;
 
-  const dailyRate = apy / 100 / 365;
-  const endingAmount = sa * Math.pow(1 + dailyRate, sd);
-  const rewardEarned = endingAmount - sa;
+    const dailyRate = apy / 100 / 365;
+    const endingAmount = sa * Math.pow(1 + dailyRate, sd);
+    const rewardEarned = endingAmount - sa;
+
+    return { endingAmount, rewardEarned };
+  }, [stakedAmount, apyPercent, stakingDays]);
 
   return (
     <div className="space-y-6">
@@ -881,15 +1006,21 @@ export const StakingRewardsCalculator: React.FC<BaseCalcProps> = ({ currencySymb
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Compounded Staking Yield</span>
-            <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
-              +{rewardEarned.toFixed(2)}
+        {results ? (
+          <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Compounded Staking Yield</span>
+              <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
+                +{results.rewardEarned.toFixed(2)}
+              </div>
+              <span className="text-xs text-orange-700 font-semibold">Total Balance: {results.endingAmount.toFixed(2)} tokens</span>
             </div>
-            <span className="text-xs text-orange-700 font-semibold">Total Balance: {endingAmount.toFixed(2)} tokens</span>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter staked amount, APY, and staking days to calculate yield.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -901,8 +1032,9 @@ export const ImpermanentLossCalculator: React.FC<BaseCalcProps> = () => {
   const [priceChangeB, setPriceChangeB] = useState<number | ''>(0); // 0% stable
 
   const results = useMemo(() => {
-    const pca = typeof priceChangeA === 'number' ? priceChangeA : 0;
-    const pcb = typeof priceChangeB === 'number' ? priceChangeB : 0;
+    if (priceChangeA === '' || priceChangeB === '') return null;
+    const pca = priceChangeA;
+    const pcb = priceChangeB;
 
     // Relative price ratio change k
     const ratioA = 1 + pca / 100;
@@ -942,15 +1074,21 @@ export const ImpermanentLossCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-red-50 to-orange-50 p-5 rounded-xl border border-red-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-red-900 uppercase tracking-wider">Impermanent Loss (IL)</span>
-            <div className="text-3xl font-black text-red-950 font-mono-numbers mt-1">
-              -{results.ilPct}%
+        {results ? (
+          <div className="bg-gradient-to-br from-red-50 to-orange-50 p-5 rounded-xl border border-red-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-red-900 uppercase tracking-wider">Impermanent Loss (IL)</span>
+              <div className="text-3xl font-black text-red-950 font-mono-numbers mt-1">
+                -{results.ilPct}%
+              </div>
+              <p className="text-xs text-red-800 mt-1">Loss compared to simply holding both assets outside the liquidity pool.</p>
             </div>
-            <p className="text-xs text-red-800 mt-1">Loss compared to simply holding both assets outside the liquidity pool.</p>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter asset price change percentages to calculate impermanent loss.
+          </div>
+        )}
       </div>
     </div>
   );

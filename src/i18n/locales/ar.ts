@@ -105,7 +105,7 @@ export const arLocale: TranslationDictionary = {
 
   home: {
     badge: 'حاسبات مجانية وموثوقة عبر الإنترنت',
-    heroHeadline: 'مرحباً بك في كالكوليو — حسابات بسيطة ونتائج واضحة',
+    heroHeadline: 'استكشف حاسبات سهلة الاستخدام للمال والصحة والرياضيات والتحويلات والمزيد.',
     heroSubtitleClean: 'استكشف حاسبات سهلة الاستخدام للمال والصحة والرياضيات والتحويلات والمزيد.',
     searchPlaceholderClean: 'ابحث عن حاسبة (مثل: القرض العقاري، كتلة الجسم، النسبة المئوية)...',
     popularCalculatorsHeading: 'الحاسبات الشائعة',
@@ -113,8 +113,8 @@ export const arLocale: TranslationDictionary = {
     categoryGridSubtitleClean: 'استكشف أدوات الحساب المتخصصة المنظمة حسب المجال العملي.',
     viewAllCalculators: 'عرض جميع الحاسبات ←',
     exploreCalculators: 'استكشف الحاسبات',
-    heroTitlePrefix: 'مرحباً بك في كالكوليو — ',
-    heroTitleHighlight: 'حسابات بسيطة ونتائج واضحة',
+    heroTitlePrefix: 'كالكيوليو — ',
+    heroTitleHighlight: 'حاسبات عبر الإنترنت',
     heroSubtitle: 'استكشف حاسبات سهلة الاستخدام للمال والصحة والرياضيات والتحويلات والمزيد.',
     searchPlaceholder: 'ابحث عن حاسبة (مثل: التمويل العقاري، مؤشر كتلة الجسم، الفائدة، الراتب)...',
     featuredTitle: 'الحاسبات الشائعة',
@@ -131,7 +131,7 @@ export const arLocale: TranslationDictionary = {
     eduCard1Desc: 'تتم جميع العمليات الحسابية داخل المتصفح مباشرة. يُعاد الحساب فوراً عند تعديل أي مدخلات دون إعادة تحميل الصفحة.',
     eduCard2Title: 'شفافية كاملة في المعادلات',
     eduCard2Desc: 'توفر كل حاسبة الصيغة الرياضية الأساسية وتعريف المتغيرات وأمثلة عملية خطوة بخطوة.',
-    eduCard3Title: 'خصوصية وأمان 100%',
+    eduCard3Title: 'خصوصية وأمان كامل',
     eduCard3Desc: 'لا تُرسل أي بيانات مالية أو شخصية إلى خوادم تتبع خارجية. تبقى بياناتك وحساباتك على جهازك فقط.',
     eduCard4Title: 'جاهزة للطباعة والتصدير',
     eduCard4Desc: 'حمّل جداول السداد والتقسيط الشاملة بصيغة CSV أو اطبع تقارير واضحة ومنسقة بنقرة واحدة.',
@@ -141,7 +141,7 @@ export const arLocale: TranslationDictionary = {
     statCategories: 'تصنيف رئيسي',
     statAccuracy: 'دقة الحسابات',
     statCost: 'التكلفة',
-    statCostValue: 'مجاني 100%'
+    statCostValue: 'مجاني دائماً'
   },
 
   trust: {

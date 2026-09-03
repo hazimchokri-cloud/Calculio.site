@@ -11,7 +11,7 @@ export const frLocale: TranslationDictionary = {
     about: 'À propos',
     contact: 'Contact',
     sitemap: 'Plan du site',
-    searchPlaceholder: 'Rechercher parmi 100+ calculateurs...',
+    searchPlaceholder: 'Rechercher des calculateurs...',
     searchShortcut: '⌘K',
     savedCalculations: 'Historique des calculs enregistrés',
     allCalculators: 'Tous les calculateurs',
@@ -104,17 +104,17 @@ export const frLocale: TranslationDictionary = {
   },
 
   home: {
-    badge: '100+ Moteurs de calcul gratuits en ligne',
-    heroHeadline: 'Bienvenue sur Calculio — Calculs Simples, Résultats Clairs',
-    heroSubtitleClean: 'Explorez des calculateurs faciles à utiliser pour la finance, la santé, les maths, les conversions et plus.',
+    badge: 'Moteurs de calcul gratuits en ligne',
+    heroHeadline: 'Explorez des calculateurs faciles à utiliser pour la finance, la santé, les maths, les conversions et plus.',
+    heroSubtitleClean: 'Outils de calcul gratuits et précis avec formules transparentes, explications étape par étape et résultats instantanés.',
     searchPlaceholderClean: 'Rechercher un calculateur (ex. prêt immobilier, IMC, crédit, pourcentage)...',
     popularCalculatorsHeading: 'Calculateurs Populaires',
     browseByCategoryHeading: 'Parcourir par Catégorie',
     categoryGridSubtitleClean: 'Explorez des outils de calcul spécialisés organisés par domaine pratique.',
     viewAllCalculators: 'Voir tous les calculateurs →',
     exploreCalculators: 'Explorer les Calculateurs',
-    heroTitlePrefix: 'Bienvenue sur Calculio — ',
-    heroTitleHighlight: 'Calculs Simples, Résultats Clairs',
+    heroTitlePrefix: 'Calculio — ',
+    heroTitleHighlight: 'Calculateurs en Ligne',
     heroSubtitle: 'Explorez des calculateurs faciles à utiliser pour la finance, la santé, les maths, les conversions et plus.',
     searchPlaceholder: 'Rechercher un calculateur (ex. prêt immobilier, IMC, crédit, pourcentage, salaire)...',
     featuredTitle: 'Calculateurs Populaires',
@@ -126,7 +126,7 @@ export const frLocale: TranslationDictionary = {
     recentlyAddedTitle: 'Calculateurs Récemment Ajoutés',
     recentlyAddedSubtitle: 'Nouveaux moteurs de calcul pour l\'immobilier avancé, la gestion d\'entreprise et la santé.',
     eduSectionTitle: 'Pourquoi des Millions d\'Utilisateurs Font Confiance à Calculio',
-    eduSectionSubtitle: 'Conçu avec rigueur mathématique, respect absolu de la vie privée, sans abonnement et avec des résultats instantanés vérifiés.',
+    eduSectionSubtitle: 'Conçu avec rigueur mathématique, respect absolu de la vie privée, sans abonnement et avec des résultats instantanés.',
     eduCard1Title: 'Mathématiques Instantanées Sans Délai',
     eduCard1Desc: 'Toutes les opérations s\'exécutent instantanément dans votre navigateur. Les curseurs et champs recalculent les formules en temps réel sans rechargement.',
     eduCard2Title: 'Transparence Totale des Formules',
@@ -141,7 +141,7 @@ export const frLocale: TranslationDictionary = {
     statCategories: 'Disciplines',
     statAccuracy: 'Précision des formules',
     statCost: 'Modèle d\'accès',
-    statCostValue: '100% Gratuit à Vie'
+    statCostValue: 'Gratuit à Vie'
   },
 
   trust: {
@@ -159,7 +159,7 @@ export const frLocale: TranslationDictionary = {
 
   searchModal: {
     title: 'Recherche Rapide de Calculateurs',
-    placeholder: 'Rechercher parmi 100+ calculateurs par nom, domaine ou mot-clé...',
+    placeholder: 'Rechercher des calculateurs par nom, domaine ou mot-clé...',
     allCategories: 'Toutes les catégories',
     filterByCategory: 'Filtrer par catégorie',
     noResultsTitle: 'Aucun calculateur correspondant',
@@ -286,7 +286,7 @@ export const frLocale: TranslationDictionary = {
 
   footer: {
     aboutTitle: 'À Propos de Calculio',
-    aboutText: 'Calculio est votre plateforme gratuite et transparente proposant plus de 100 outils de calcul de précision couvrant l\'immobilier, les prêts, la retraite, la santé, les conversions et les mathématiques appliquées.',
+    aboutText: 'Calculio est votre plateforme gratuite et transparente proposant des outils de calcul de précision couvrant l\'immobilier, les prêts, la retraite, la santé, les conversions et les mathématiques appliquées.',
     calculatorsHeading: 'Calculateurs',
     resourcesHeading: 'Ressources',
     companyHeading: 'Entreprise',
@@ -456,7 +456,7 @@ export const frLocale: TranslationDictionary = {
   },
 
   seo: {
-    homeTitle: 'Calculio - 100+ Calculateurs Gratuits en Ligne (Finance, Santé, Maths & Conversions)',
+    homeTitle: 'Calculio - Calculateurs Gratuits en Ligne (Finance, Santé, Maths & Conversions)',
     homeDescription: 'Calculateurs en ligne gratuits, rapides et mathématiquement vérifiés pour prêts immobiliers, crédits, intérêts composés, IMC, masse grasse et conversions.',
     calcSuffix: 'Calculateur Gratuit en Ligne | Calculio',
     categorySuffix: 'Outils de Calcul Gratuits en Ligne | Calculio',
@@ -467,6 +467,6 @@ export const frLocale: TranslationDictionary = {
     contactTitle: 'Contactez-nous & Proposez un Calculateur | Support Calculio',
     contactDescription: 'Suggérez de nouveaux calculateurs, signalez une anomalie de calcul ou contactez les analystes et ingénieurs de Calculio.',
     sitemapTitle: 'Plan du Site XML & Répertoire Complet des Outils | Calculio',
-    sitemapDescription: 'Plan du site XML complet et répertoire de l\'ensemble des 100+ calculateurs, guides éducatifs et outils mathématiques sur Calculio.'
+    sitemapDescription: 'Plan du site XML complet et répertoire de l\'ensemble des calculateurs, guides éducatifs et outils mathématiques sur Calculio.'
   }
 };

@@ -16,11 +16,22 @@ export const CacLtvCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
   const [churnRatePct, setChurnRatePct] = useState<number | ''>(4.0); // 4% monthly churn
 
   const results = useMemo(() => {
-    const smc = typeof salesMarketingCost === 'number' ? salesMarketingCost : 0;
-    const nc = typeof newCustomers === 'number' ? newCustomers : 0;
-    const arpu = typeof avgRevenuePerUser === 'number' ? avgRevenuePerUser : 0;
-    const gm = typeof grossMarginPct === 'number' ? grossMarginPct : 0;
-    const cr = typeof churnRatePct === 'number' ? churnRatePct : 0;
+    if (
+      salesMarketingCost === '' ||
+      newCustomers === '' ||
+      avgRevenuePerUser === '' ||
+      grossMarginPct === '' ||
+      churnRatePct === '' ||
+      newCustomers <= 0
+    ) {
+      return null;
+    }
+
+    const smc = salesMarketingCost;
+    const nc = newCustomers;
+    const arpu = avgRevenuePerUser;
+    const gm = grossMarginPct;
+    const cr = churnRatePct;
 
     const cac = nc > 0 ? smc / nc : 0;
     const avgLifespanMonths = cr > 0 ? 1 / (cr / 100) : 24;
@@ -102,34 +113,40 @@ export const CacLtvCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">LTV : CAC Ratio</span>
-              <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${results.badgeColor}`}>
-                {results.healthStatus}
-              </span>
+        {results ? (
+          <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
+            <div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">LTV : CAC Ratio</span>
+                <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${results.badgeColor}`}>
+                  {results.healthStatus}
+                </span>
+              </div>
+              <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-2">
+                {results.ltvCacRatio.toFixed(2)}x
+              </div>
             </div>
-            <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-2">
-              {results.ltvCacRatio.toFixed(2)}x
-            </div>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-indigo-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>Customer Acquisition Cost (CAC):</span>
-              <span className="font-bold text-red-700">{currencySymbol}{results.cac.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Customer Lifetime Value (LTV):</span>
-              <span className="font-bold text-orange-700">{currencySymbol}{results.ltv.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between border-t pt-1">
-              <span>Average Customer Lifetime:</span>
-              <span className="font-bold">{results.avgLifespanMonths.toFixed(1)} months</span>
+            <div className="bg-white p-3 rounded-lg border border-indigo-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <span>Customer Acquisition Cost (CAC):</span>
+                <span className="font-bold text-red-700">{currencySymbol}{results.cac.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Customer Lifetime Value (LTV):</span>
+                <span className="font-bold text-orange-700">{currencySymbol}{results.ltv.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between border-t pt-1">
+                <span>Average Customer Lifetime:</span>
+                <span className="font-bold">{results.avgLifespanMonths.toFixed(1)} months</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter your acquisition and customer metrics to calculate LTV:CAC.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -140,12 +157,15 @@ export const MarkupMarginCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
   const [cost, setCost] = useState<number | ''>(50);
   const [sellingPrice, setSellingPrice] = useState<number | ''>(80);
 
-  const c = typeof cost === 'number' ? cost : 0;
-  const sp = typeof sellingPrice === 'number' ? sellingPrice : 0;
-
-  const profit = sp - c;
-  const markupPct = c > 0 ? (profit / c) * 100 : 0;
-  const marginPct = sp > 0 ? (profit / sp) * 100 : 0;
+  const results = useMemo(() => {
+    if (cost === '' || sellingPrice === '') return null;
+    const c = cost;
+    const sp = sellingPrice;
+    const profit = sp - c;
+    const markupPct = c > 0 ? (profit / c) * 100 : 0;
+    const marginPct = sp > 0 ? (profit / sp) * 100 : 0;
+    return { profit, markupPct, marginPct };
+  }, [cost, sellingPrice]);
 
   return (
     <div className="space-y-6">
@@ -174,25 +194,31 @@ export const MarkupMarginCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Gross Margin</span>
-              <div className="text-2xl font-black text-orange-950 font-mono-numbers mt-1">{marginPct.toFixed(2)}%</div>
+        {results ? (
+          <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Gross Margin</span>
+                <div className="text-2xl font-black text-orange-950 font-mono-numbers mt-1">{results.marginPct.toFixed(2)}%</div>
+              </div>
+              <div>
+                <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Cost Markup</span>
+                <div className="text-2xl font-black text-blue-950 font-mono-numbers mt-1">{results.markupPct.toFixed(2)}%</div>
+              </div>
             </div>
-            <div>
-              <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Cost Markup</span>
-              <div className="text-2xl font-black text-blue-950 font-mono-numbers mt-1">{markupPct.toFixed(2)}%</div>
-            </div>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>Gross Profit per Unit:</span>
-              <span className="font-bold text-orange-700">{currencySymbol}{profit.toFixed(2)}</span>
+            <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <span>Gross Profit per Unit:</span>
+                <span className="font-bold text-orange-700">{currencySymbol}{results.profit.toFixed(2)}</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter your cost basis and selling price to calculate margins.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -204,13 +230,16 @@ export const InventoryTurnoverCalculator: React.FC<BaseCalcProps> = ({ currencyS
   const [beginningInventory, setBeginningInventory] = useState<number | ''>(80000);
   const [endingInventory, setEndingInventory] = useState<number | ''>(100000);
 
-  const c = typeof cogs === 'number' ? cogs : 0;
-  const bi = typeof beginningInventory === 'number' ? beginningInventory : 0;
-  const ei = typeof endingInventory === 'number' ? endingInventory : 0;
-
-  const avgInventory = (bi + ei) / 2;
-  const turnoverRatio = avgInventory > 0 ? c / avgInventory : 0;
-  const daysToSell = turnoverRatio > 0 ? 365 / turnoverRatio : 0;
+  const results = useMemo(() => {
+    if (cogs === '' || beginningInventory === '' || endingInventory === '') return null;
+    const c = cogs;
+    const bi = beginningInventory;
+    const ei = endingInventory;
+    const avgInventory = (bi + ei) / 2;
+    const turnoverRatio = avgInventory > 0 ? c / avgInventory : 0;
+    const daysToSell = turnoverRatio > 0 ? 365 / turnoverRatio : 0;
+    return { avgInventory, turnoverRatio, daysToSell };
+  }, [cogs, beginningInventory, endingInventory]);
 
   return (
     <div className="space-y-6">
@@ -248,25 +277,31 @@ export const InventoryTurnoverCalculator: React.FC<BaseCalcProps> = ({ currencyS
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Inventory Turnover Ratio</span>
-            <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
-              {turnoverRatio.toFixed(2)} times / year
+        {results ? (
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Inventory Turnover Ratio</span>
+              <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
+                {results.turnoverRatio.toFixed(2)} times / year
+              </div>
             </div>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>Days Sales of Inventory (DSI):</span>
-              <span className="font-bold">{daysToSell.toFixed(1)} days</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Average Inventory Level:</span>
-              <span className="font-bold">{currencySymbol}{avgInventory.toLocaleString()}</span>
+            <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <span>Days Sales of Inventory (DSI):</span>
+                <span className="font-bold">{results.daysToSell.toFixed(1)} days</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Average Inventory Level:</span>
+                <span className="font-bold">{currencySymbol}{results.avgInventory.toLocaleString()}</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter your COGS and inventory levels to calculate turnover.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -280,16 +315,30 @@ export const EbitdaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
   const [depreciation, setDepreciation] = useState<number | ''>(45000);
   const [amortization, setAmortization] = useState<number | ''>(15000);
 
-  const rev = typeof revenue === 'number' ? revenue : 0;
-  const costG = typeof cogs === 'number' ? cogs : 0;
-  const opex = typeof operatingExpenses === 'number' ? operatingExpenses : 0;
-  const dep = typeof depreciation === 'number' ? depreciation : 0;
-  const amort = typeof amortization === 'number' ? amortization : 0;
+  const results = useMemo(() => {
+    if (
+      revenue === '' ||
+      cogs === '' ||
+      operatingExpenses === '' ||
+      depreciation === '' ||
+      amortization === ''
+    ) {
+      return null;
+    }
 
-  const grossProfit = rev - costG;
-  const operatingIncome = grossProfit - opex; // EBIT
-  const ebitda = operatingIncome + dep + amort;
-  const ebitdaMargin = rev > 0 ? (ebitda / rev) * 100 : 0;
+    const rev = revenue;
+    const costG = cogs;
+    const opex = operatingExpenses;
+    const dep = depreciation;
+    const amort = amortization;
+
+    const grossProfit = rev - costG;
+    const operatingIncome = grossProfit - opex; // EBIT
+    const ebitda = operatingIncome + dep + amort;
+    const ebitdaMargin = rev > 0 ? (ebitda / rev) * 100 : 0;
+
+    return { grossProfit, operatingIncome, ebitda, ebitdaMargin };
+  }, [revenue, cogs, operatingExpenses, depreciation, amortization]);
 
   return (
     <div className="space-y-6">
@@ -349,26 +398,32 @@ export const EbitdaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$'
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">EBITDA</span>
-            <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-1">
-              {currencySymbol}{ebitda.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+        {results ? (
+          <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">EBITDA</span>
+              <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-1">
+                {currencySymbol}{results.ebitda.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              </div>
+              <span className="text-xs text-indigo-700 font-semibold">EBITDA Margin: {results.ebitdaMargin.toFixed(1)}%</span>
             </div>
-            <span className="text-xs text-indigo-700 font-semibold">EBITDA Margin: {ebitdaMargin.toFixed(1)}%</span>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-indigo-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>Operating Income (EBIT):</span>
-              <span className="font-bold">{currencySymbol}{operatingIncome.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Gross Profit:</span>
-              <span className="font-bold text-orange-700">{currencySymbol}{grossProfit.toLocaleString()}</span>
+            <div className="bg-white p-3 rounded-lg border border-indigo-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <span>Operating Income (EBIT):</span>
+                <span className="font-bold">{currencySymbol}{results.operatingIncome.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Gross Profit:</span>
+                <span className="font-bold text-orange-700">{currencySymbol}{results.grossProfit.toLocaleString()}</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter your P&L operating figures to calculate EBITDA.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -380,13 +435,18 @@ export const BurnRateCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
   const [monthlyRevenue, setMonthlyRevenue] = useState<number | ''>(15000);
   const [monthlyExpenses, setMonthlyExpenses] = useState<number | ''>(45000);
 
-  const cash = typeof cashBalance === 'number' ? cashBalance : 0;
-  const rev = typeof monthlyRevenue === 'number' ? monthlyRevenue : 0;
-  const exp = typeof monthlyExpenses === 'number' ? monthlyExpenses : 0;
+  const results = useMemo(() => {
+    if (cashBalance === '' || monthlyRevenue === '' || monthlyExpenses === '') return null;
+    const cash = cashBalance;
+    const rev = monthlyRevenue;
+    const exp = monthlyExpenses;
 
-  const grossBurn = exp;
-  const netBurn = exp - rev;
-  const runwayMonths = netBurn > 0 ? cash / netBurn : Infinity;
+    const grossBurn = exp;
+    const netBurn = exp - rev;
+    const runwayMonths = netBurn > 0 ? cash / netBurn : Infinity;
+
+    return { grossBurn, netBurn, runwayMonths };
+  }, [cashBalance, monthlyRevenue, monthlyExpenses]);
 
   return (
     <div className="space-y-6">
@@ -424,25 +484,31 @@ export const BurnRateCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-5 rounded-xl border border-amber-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">Estimated Cash Runway</span>
-            <div className="text-3xl font-black text-amber-950 font-mono-numbers mt-1">
-              {runwayMonths === Infinity ? 'Profitable (Infinite)' : `${runwayMonths.toFixed(1)} Months`}
+        {results ? (
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-5 rounded-xl border border-amber-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">Estimated Cash Runway</span>
+              <div className="text-3xl font-black text-amber-950 font-mono-numbers mt-1">
+                {results.runwayMonths === Infinity ? 'Profitable (Infinite)' : `${results.runwayMonths.toFixed(1)} Months`}
+              </div>
             </div>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-amber-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>Net Monthly Burn:</span>
-              <span className="font-bold text-red-700">{currencySymbol}{netBurn.toLocaleString()} / mo</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Gross Monthly Burn:</span>
-              <span className="font-bold">{currencySymbol}{grossBurn.toLocaleString()} / mo</span>
+            <div className="bg-white p-3 rounded-lg border border-amber-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <span>Net Monthly Burn:</span>
+                <span className="font-bold text-red-700">{currencySymbol}{results.netBurn.toLocaleString()} / mo</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Gross Monthly Burn:</span>
+                <span className="font-bold">{currencySymbol}{results.grossBurn.toLocaleString()} / mo</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter your cash balance, expenses, and revenue to calculate runway.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -458,12 +524,13 @@ export const PaintCalculator: React.FC<BaseCalcProps> = () => {
   const [coats, setCoats] = useState<number | ''>(2);
 
   const results = useMemo(() => {
-    const rl = typeof roomLength === 'number' ? roomLength : 0;
-    const rw = typeof roomWidth === 'number' ? roomWidth : 0;
-    const ch = typeof ceilingHeight === 'number' ? ceilingHeight : 0;
+    if (roomLength === '' || roomWidth === '' || ceilingHeight === '') return null;
+    const rl = roomLength;
+    const rw = roomWidth;
+    const ch = ceilingHeight;
     const d = typeof doors === 'number' ? doors : 0;
     const w = typeof windows === 'number' ? windows : 0;
-    const c = typeof coats === 'number' ? coats : 1;
+    const c = typeof coats === 'number' && coats > 0 ? coats : 1;
 
     const wallPerimeter = 2 * (rl + rw);
     const grossWallArea = wallPerimeter * ch;
@@ -475,7 +542,7 @@ export const PaintCalculator: React.FC<BaseCalcProps> = () => {
     // Standard 1 gallon covers approx 350-400 sq ft
     const gallonsNeeded = Math.ceil(totalSqFtToPaint / 350);
 
-    return { grossWallArea, netArea, totalSqFtToPaint, gallonsNeeded };
+    return { grossWallArea, netArea, totalSqFtToPaint, gallonsNeeded, coats: c };
   }, [roomLength, roomWidth, ceilingHeight, doors, windows, coats]);
 
   return (
@@ -544,26 +611,32 @@ export const PaintCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-sky-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Paint Required</span>
-            <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
-              {results.gallonsNeeded} Gallons
+        {results ? (
+          <div className="bg-gradient-to-br from-blue-50 to-sky-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Paint Required</span>
+              <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
+                {results.gallonsNeeded} Gallons
+              </div>
+              <p className="text-xs text-blue-800 mt-1">Based on {results.coats} coats ({results.totalSqFtToPaint} sq ft total coverage)</p>
             </div>
-            <p className="text-xs text-blue-800 mt-1">Based on {coats || 1} coats ({results.totalSqFtToPaint} sq ft total coverage)</p>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>Net Wall Area:</span>
-              <span className="font-bold">{results.netArea} sq ft</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Coverage per Gallon:</span>
-              <span>~350 sq ft</span>
+            <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <span>Net Wall Area:</span>
+                <span className="font-bold">{results.netArea} sq ft</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Coverage per Gallon:</span>
+                <span>~350 sq ft</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter room length, width, and ceiling height to calculate paint gallons.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -575,14 +648,18 @@ export const DrywallCalculator: React.FC<BaseCalcProps> = () => {
   const [sheetSize, setSheetSize] = useState<'4x8' | '4x12'>('4x8');
   const [wastePct, setWastePct] = useState<number | ''>(10);
 
-  const wSqFt = typeof wallSqFt === 'number' ? wallSqFt : 0;
-  const waste = typeof wastePct === 'number' ? wastePct : 0;
+  const results = useMemo(() => {
+    if (wallSqFt === '' || wallSqFt <= 0) return null;
+    const wSqFt = wallSqFt;
+    const waste = typeof wastePct === 'number' ? wastePct : 0;
+    const sheetSqFt = sheetSize === '4x8' ? 32 : 48;
+    const totalSqFtWithWaste = wSqFt * (1 + waste / 100);
+    const sheetsNeeded = Math.ceil(totalSqFtWithWaste / sheetSqFt);
+    const screwsNeeded = sheetsNeeded * 32; // ~32 screws per 4x8 sheet
+    const compoundGallons = Math.ceil(sheetsNeeded * 0.05); // ~0.05 gal joint compound per sheet
 
-  const sheetSqFt = sheetSize === '4x8' ? 32 : 48;
-  const totalSqFtWithWaste = wSqFt * (1 + waste / 100);
-  const sheetsNeeded = Math.ceil(totalSqFtWithWaste / sheetSqFt);
-  const screwsNeeded = sheetsNeeded * 32; // ~32 screws per 4x8 sheet
-  const compoundGallons = Math.ceil(sheetsNeeded * 0.05); // ~0.05 gal joint compound per sheet
+    return { sheetsNeeded, screwsNeeded, compoundGallons };
+  }, [wallSqFt, sheetSize, wastePct]);
 
   return (
     <div className="space-y-6">
@@ -622,25 +699,31 @@ export const DrywallCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Drywall Sheets Needed</span>
-            <div className="text-3xl font-black text-slate-900 font-mono-numbers mt-1">
-              {sheetsNeeded} Sheets ({sheetSize})
+        {results ? (
+          <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Drywall Sheets Needed</span>
+              <div className="text-3xl font-black text-slate-900 font-mono-numbers mt-1">
+                {results.sheetsNeeded} Sheets ({sheetSize})
+              </div>
             </div>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-slate-200 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>Drywall Screws (~32/sheet):</span>
-              <span className="font-bold">{screwsNeeded.toLocaleString()} screws</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Joint Compound Mud:</span>
-              <span className="font-bold">~{compoundGallons} Gallons</span>
+            <div className="bg-white p-3 rounded-lg border border-slate-200 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <span>Drywall Screws (~32/sheet):</span>
+                <span className="font-bold">{results.screwsNeeded.toLocaleString()} screws</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Joint Compound Mud:</span>
+                <span className="font-bold">~{results.compoundGallons} Gallons</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter total surface area to calculate drywall sheets.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -651,13 +734,18 @@ export const MulchGravelCalculator: React.FC<BaseCalcProps> = () => {
   const [areaSqFt, setAreaSqFt] = useState<number | ''>(300);
   const [depthInches, setDepthInches] = useState<number | ''>(3);
 
-  const aSqFt = typeof areaSqFt === 'number' ? areaSqFt : 0;
-  const dInches = typeof depthInches === 'number' ? depthInches : 0;
+  const results = useMemo(() => {
+    if (areaSqFt === '' || depthInches === '') return null;
+    const aSqFt = areaSqFt;
+    const dInches = depthInches;
 
-  const cubicFeet = aSqFt * (dInches / 12);
-  const cubicYards = cubicFeet / 27;
-  const tonsOfGravel = cubicYards * 1.4; // standard ~1.4 tons per cubic yard of gravel
-  const bagsTwoCuFt = Math.ceil(cubicFeet / 2); // 2 cu ft mulch bags
+    const cubicFeet = aSqFt * (dInches / 12);
+    const cubicYards = cubicFeet / 27;
+    const tonsOfGravel = cubicYards * 1.4; // standard ~1.4 tons per cubic yard of gravel
+    const bagsTwoCuFt = Math.ceil(cubicFeet / 2); // 2 cu ft mulch bags
+
+    return { cubicFeet, cubicYards, tonsOfGravel, bagsTwoCuFt };
+  }, [areaSqFt, depthInches]);
 
   return (
     <div className="space-y-6">
@@ -685,26 +773,32 @@ export const MulchGravelCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-5 rounded-xl border border-amber-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">Bulk Volume Required</span>
-            <div className="text-3xl font-black text-amber-950 font-mono-numbers mt-1">
-              {cubicYards.toFixed(2)} Cubic Yards
+        {results ? (
+          <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-5 rounded-xl border border-amber-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">Bulk Volume Required</span>
+              <div className="text-3xl font-black text-amber-950 font-mono-numbers mt-1">
+                {results.cubicYards.toFixed(2)} Cubic Yards
+              </div>
+              <span className="text-xs text-amber-800 font-semibold">({results.cubicFeet.toFixed(1)} cu ft)</span>
             </div>
-            <span className="text-xs text-amber-800 font-semibold">({cubicFeet.toFixed(1)} cu ft)</span>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-amber-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>Standard 2 cu ft Bags (Mulch):</span>
-              <span className="font-bold text-slate-900">{bagsTwoCuFt} bags</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Weight if Gravel (~1.4 tons/yd³):</span>
-              <span className="font-bold text-slate-900">{tonsOfGravel.toFixed(2)} Tons</span>
+            <div className="bg-white p-3 rounded-lg border border-amber-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <span>Standard 2 cu ft Bags (Mulch):</span>
+                <span className="font-bold text-slate-900">{results.bagsTwoCuFt} bags</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Weight if Gravel (~1.4 tons/yd³):</span>
+                <span className="font-bold text-slate-900">{results.tonsOfGravel.toFixed(2)} Tons</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter area and depth to calculate mulch or gravel requirements.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -716,13 +810,18 @@ export const DeckLumberCalculator: React.FC<BaseCalcProps> = () => {
   const [deckWidth, setDeckWidth] = useState<number | ''>(12); // ft
   const [boardWidthInches, setBoardWidthInches] = useState<number>(5.5); // standard 5.5" (nominal 6")
 
-  const dL = typeof deckLength === 'number' ? deckLength : 0;
-  const dW = typeof deckWidth === 'number' ? deckWidth : 0;
+  const results = useMemo(() => {
+    if (deckLength === '' || deckWidth === '') return null;
+    const dL = deckLength;
+    const dW = deckWidth;
 
-  const totalDeckSqFt = dL * dW;
-  const boardWidthFeet = boardWidthInches / 12;
-  const linearFeetNeeded = boardWidthFeet > 0 ? totalDeckSqFt / boardWidthFeet : 0;
-  const standard16FtBoards = Math.ceil(linearFeetNeeded / 16 * 1.1); // with 10% waste
+    const totalDeckSqFt = dL * dW;
+    const boardWidthFeet = boardWidthInches / 12;
+    const linearFeetNeeded = boardWidthFeet > 0 ? totalDeckSqFt / boardWidthFeet : 0;
+    const standard16FtBoards = Math.ceil((linearFeetNeeded / 16) * 1.1); // with 10% waste
+
+    return { totalDeckSqFt, linearFeetNeeded, standard16FtBoards };
+  }, [deckLength, deckWidth, boardWidthInches]);
 
   return (
     <div className="space-y-6">
@@ -763,22 +862,28 @@ export const DeckLumberCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Total Linear Footage</span>
-            <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
-              {Math.ceil(linearFeetNeeded)} Linear Feet
+        {results ? (
+          <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
+            <div>
+              <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Total Linear Footage</span>
+              <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
+                {Math.ceil(results.linearFeetNeeded)} Linear Feet
+              </div>
+              <span className="text-xs text-orange-700">{results.totalDeckSqFt} sq ft deck area</span>
             </div>
-            <span className="text-xs text-orange-700">{totalDeckSqFt} sq ft deck area</span>
-          </div>
 
-          <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1">
-            <div className="flex justify-between">
-              <span>16-Foot Boards Needed (10% waste):</span>
-              <span className="font-bold text-slate-900">{standard16FtBoards} Boards</span>
+            <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <span>16-Foot Boards Needed (10% waste):</span>
+                <span className="font-bold text-slate-900">{results.standard16FtBoards} Boards</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
+            Enter deck length and width to calculate board requirements.
+          </div>
+        )}
       </div>
     </div>
   );

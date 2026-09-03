@@ -126,7 +126,7 @@ export const Footer: React.FC<FooterProps> = ({
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#F8FAFC] border border-[#E2E8F0] text-[11px] font-medium text-[#475569]">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#F97316]" />
-                <span>100% Free</span>
+                <span>Free Access</span>
               </span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#F8FAFC] border border-[#E2E8F0] text-[11px] font-medium text-[#475569]">
                 <Lock className="w-3.5 h-3.5 text-[#F97316]" />

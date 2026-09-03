@@ -87,7 +87,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           id="hero-headline"
           className="text-[32px] sm:text-[42px] md:text-[48px] lg:text-[52px] font-[800] tracking-tight text-[#d60a00] italic leading-[1.18] max-w-4xl mx-auto"
         >
-          {t('home.heroHeadline', 'Welcome to Calculio — Simple Calculations, Clear Results')}
+          {t('home.heroHeadline', 'Explore easy-to-use calculators for finance, health, math, conversions and more.')}
         </h1>
 
         {/* Subtitle Description */}
@@ -95,7 +95,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           id="hero-description"
           className="text-[17px] sm:text-[19px] md:text-[20px] text-[#1a1a1a] max-w-[720px] mx-auto leading-[1.6] font-[400]"
         >
-          {t('home.heroSubtitleClean', 'Explore easy-to-use calculators for finance, health, math, conversions and more.')}
+          {t('home.heroSubtitleClean', 'Free, accurate calculation tools with transparent formulas, step-by-step breakdowns, and instant results.')}
         </p>
 
         {/* Primary CTA Button: Explore Calculators */}
@@ -209,27 +209,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </>
           )}
         </div>
-
-        {/* Stats & Trust Badges */}
-        <div className="flex items-center justify-center pt-2">
-          <div className="inline-flex flex-wrap items-center justify-center gap-2 sm:gap-4 px-4 sm:px-6 py-2 rounded-full bg-[#FFFFFF] border border-[#E2E8F0] text-[12px] sm:text-[13px] font-[500] text-[#475569] shadow-xs">
-            <span className="inline-flex items-center gap-1.5 font-[600] text-[#0F172A]">
-              <Check className="w-3.5 h-3.5 text-[#F97316]" />
-              {calculators.length} Calculators
-            </span>
-            <span className="text-[#CBD5E1] hidden sm:inline">•</span>
-            <span className="inline-flex items-center gap-1.5 font-[600] text-[#0F172A]">
-              <Check className="w-3.5 h-3.5 text-[#F97316]" />
-              {categories.length} Categories
-            </span>
-            <span className="text-[#CBD5E1] hidden sm:inline">•</span>
-            <span className="inline-flex items-center gap-1.5 font-[600] text-[#F97316]">
-              <Check className="w-3.5 h-3.5 text-[#F97316]" />
-              100% Free & No Sign-up
-            </span>
-          </div>
-        </div>
-
       </div>
     </section>
   );

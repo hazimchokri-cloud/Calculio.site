@@ -49,20 +49,17 @@ export const DebtPayoffCalculator: React.FC<DebtPayoffCalculatorProps> = ({
 
   const calculations = useMemo(() => {
     try {
-      const totalBalance = debts.reduce((sum, d) => sum + (typeof d.balance === 'number' ? d.balance : 0), 0);
-      const totalMinPayments = debts.reduce((sum, d) => sum + (typeof d.minPayment === 'number' ? d.minPayment : 0), 0);
+      const hasValidDebts = debts.some(d => typeof d.balance === 'number' && d.balance > 0 && typeof d.minPayment === 'number' && d.minPayment > 0);
+      if (!hasValidDebts) {
+        return null;
+      }
+
+      const totalBalance = debts.reduce((sum, d) => sum + (typeof d.balance === 'number' && d.balance > 0 ? d.balance : 0), 0);
+      const totalMinPayments = debts.reduce((sum, d) => sum + (typeof d.minPayment === 'number' && d.minPayment > 0 ? d.minPayment : 0), 0);
       const totalMonthlyBudget = totalMinPayments + numExtraMonthly;
 
       if (totalBalance <= 0 || totalMinPayments <= 0) {
-        return {
-          totalBalance: 0,
-          totalMinPayments: 0,
-          totalMonthlyBudget: numExtraMonthly,
-          monthsToPayoff: 0,
-          yearsToPayoff: '0.0',
-          totalInterestPaid: 0,
-          totalPaid: 0
-        };
+        return null;
       }
 
       // Simulate payoff order
@@ -73,13 +70,17 @@ export const DebtPayoffCalculator: React.FC<DebtPayoffCalculatorProps> = ({
         balance: typeof d.balance === 'number' ? Math.max(0, d.balance) : 0,
         rate: typeof d.rate === 'number' ? Math.max(0, d.rate) : 0,
         minPayment: typeof d.minPayment === 'number' ? Math.max(0, d.minPayment) : 0
-      })).sort((a, b) => {
+      })).filter(d => d.balance > 0).sort((a, b) => {
         if (strategy === 'avalanche') {
           return b.rate - a.rate;
         } else {
           return a.balance - b.balance;
         }
       });
+
+      if (sortedDebts.length === 0) {
+        return null;
+      }
 
       // Run monthly simulation
       let currentDebts = sortedDebts.map(d => ({ ...d, currentBal: d.balance }));
@@ -131,19 +132,12 @@ export const DebtPayoffCalculator: React.FC<DebtPayoffCalculatorProps> = ({
         totalPaid: totalBalance + totalInterestPaid
       };
     } catch {
-      return {
-        totalBalance: 0,
-        totalMinPayments: 0,
-        totalMonthlyBudget: numExtraMonthly,
-        monthsToPayoff: 0,
-        yearsToPayoff: '0.0',
-        totalInterestPaid: 0,
-        totalPaid: 0
-      };
+      return null;
     }
   }, [debts, numExtraMonthly, strategy]);
 
   const handleCopy = async () => {
+    if (!calculations) return;
     const text = `Debt Payoff Strategy (${strategy.toUpperCase()}):
 Total Debt Balance: ${formatCurrency(calculations.totalBalance, currencySymbol)}
 Total Monthly Payment Budget: ${formatCurrency(calculations.totalMonthlyBudget, currencySymbol)}/mo (inc. +${formatCurrency(numExtraMonthly, currencySymbol)} extra)
@@ -169,6 +163,7 @@ Total Repayment: ${formatCurrency(calculations.totalPaid, currencySymbol)}`;
   };
 
   const handleSave = () => {
+    if (!calculations) return;
     if (onSaveCalculation) {
       onSaveCalculation(
         `Debt Freedom: ${formatCurrency(calculations.totalBalance, currencySymbol)} paid off in ${calculations.monthsToPayoff} mo via ${strategy.toUpperCase()} (${formatCurrency(calculations.totalMonthlyBudget, currencySymbol)}/mo)`,
@@ -307,52 +302,58 @@ Total Repayment: ${formatCurrency(calculations.totalPaid, currencySymbol)}`;
 
         {/* Right Output */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
-            <div className="space-y-4">
-              <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300">
-                  Total Debt Freedom in
-                </span>
-                <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1">
-                  {calculations.monthsToPayoff} Months
-                  <span className="text-sm font-normal text-slate-300 ml-1">({calculations.yearsToPayoff} yrs)</span>
+          {calculations ? (
+            <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative">
+              <div className="space-y-4">
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300">
+                    Total Debt Freedom in
+                  </span>
+                  <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1">
+                    {calculations.monthsToPayoff} Months
+                    <span className="text-sm font-normal text-slate-300 ml-1">({calculations.yearsToPayoff} yrs)</span>
+                  </div>
+                  <div className="text-xs font-medium text-orange-300 mt-1">
+                    Total Monthly Budget: {formatCurrency(calculations.totalMonthlyBudget, currencySymbol)}/mo
+                  </div>
                 </div>
-                <div className="text-xs font-medium text-orange-300 mt-1">
-                  Total Monthly Budget: {formatCurrency(calculations.totalMonthlyBudget, currencySymbol)}/mo
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-indigo-900/60">
-                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
-                  <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Debt Principal</span>
-                  <span className="text-base font-bold text-white font-mono">{formatCurrency(calculations.totalBalance, currencySymbol)}</span>
+                <div className="grid grid-cols-2 gap-3 pt-3 border-t border-indigo-900/60">
+                  <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
+                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Debt Principal</span>
+                    <span className="text-base font-bold text-white font-mono">{formatCurrency(calculations.totalBalance, currencySymbol)}</span>
+                  </div>
+                  <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
+                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Interest Paid</span>
+                    <span className="text-base font-bold text-amber-300 font-mono">{formatCurrency(calculations.totalInterestPaid, currencySymbol)}</span>
+                  </div>
                 </div>
-                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
-                  <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Interest Paid</span>
-                  <span className="text-base font-bold text-amber-300 font-mono">{formatCurrency(calculations.totalInterestPaid, currencySymbol)}</span>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2 pt-2">
-                <button
-                  onClick={handleCopy}
-                  className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? 'Copied' : 'Copy Plan'}</span>
-                </button>
-                {onSaveCalculation && (
+                <div className="flex items-center gap-2 pt-2">
                   <button
-                    onClick={handleSave}
-                    className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                    onClick={handleCopy}
+                    className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                   >
-                    <Bookmark className="w-3.5 h-3.5" />
-                    <span>{saved ? 'Saved' : 'Save'}</span>
+                    {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copied ? 'Copied' : 'Copy Plan'}</span>
                   </button>
-                )}
+                  {onSaveCalculation && (
+                    <button
+                      onClick={handleSave}
+                      className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                    >
+                      <Bookmark className="w-3.5 h-3.5" />
+                      <span>{saved ? 'Saved' : 'Save'}</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-slate-500 text-sm">
+              Enter your debt balances, interest rates, and minimum payments to calculate your payoff timeline.
+            </div>
+          )}
         </div>
       </div>
     </div>

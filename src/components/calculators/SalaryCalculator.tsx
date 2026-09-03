@@ -29,9 +29,13 @@ export const SalaryCalculator: React.FC<SalaryCalcProps> = ({
   const numFicaMedicareRate = typeof ficaMedicareRate === 'number' ? ficaMedicareRate : 0;
   const numPreTaxDeductionsAnnual = typeof preTaxDeductionsAnnual === 'number' ? preTaxDeductionsAnnual : 0;
 
-  const isInputEmpty = payAmount === '';
+  const isInputEmpty = payAmount === '' || typeof payAmount !== 'number' || payAmount <= 0;
 
   const stats = useMemo(() => {
+    if (isInputEmpty) {
+      return null;
+    }
+
     let grossAnnual = 0;
     const totalHoursPerYear = Math.max(1, numHoursPerWeek * 52);
 
@@ -73,9 +77,10 @@ export const SalaryCalculator: React.FC<SalaryCalcProps> = ({
       effectiveTaxRate: grossAnnual > 0 ? (totalTaxes / grossAnnual) * 100 : 0,
       breakdown
     };
-  }, [numPayAmount, payFrequency, numHoursPerWeek, numFederalTaxRate, numStateTaxRate, numFicaMedicareRate, numPreTaxDeductionsAnnual]);
+  }, [isInputEmpty, numPayAmount, payFrequency, numHoursPerWeek, numFederalTaxRate, numStateTaxRate, numFicaMedicareRate, numPreTaxDeductionsAnnual]);
 
   const handleCopy = async () => {
+    if (!stats) return;
     const text = `Salary & Paycheck Breakdown:
 • Gross Annual Pay: ${formatCurrency(stats.grossAnnual, currencySymbol)}
 • Estimated Net Take-Home: ${formatCurrency(stats.netAnnual, currencySymbol)}/year (${formatCurrency(stats.netAnnual / 12, currencySymbol)}/mo)
@@ -102,6 +107,7 @@ export const SalaryCalculator: React.FC<SalaryCalcProps> = ({
   };
 
   const handleSave = () => {
+    if (!stats) return;
     if (onSaveCalculation) {
       onSaveCalculation(
         `Paycheck: ${formatCurrency(stats.grossAnnual, currencySymbol)} Gross → ${formatCurrency(stats.netAnnual, currencySymbol)} Net`,
@@ -228,90 +234,100 @@ export const SalaryCalculator: React.FC<SalaryCalcProps> = ({
 
         {/* Results Box */}
         <div className="lg:col-span-5 space-y-5">
-          <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-2xl p-6 sm:p-7 shadow-lg relative overflow-hidden">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-indigo-300">
-                Net Take-Home Pay (Annual)
-              </span>
-              <span className="px-2 py-0.5 text-xs font-bold bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30">
-                {stats.effectiveTaxRate.toFixed(1)}% Tax Burden
-              </span>
+          {stats ? (
+            <>
+              <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-2xl p-6 sm:p-7 shadow-lg relative overflow-hidden">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-indigo-300">
+                    Net Take-Home Pay (Annual)
+                  </span>
+                  <span className="px-2 py-0.5 text-xs font-bold bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30">
+                    {stats.effectiveTaxRate.toFixed(1)}% Tax Burden
+                  </span>
+                </div>
+
+                <div className="flex items-baseline gap-2 mb-6">
+                  <span className="text-5xl font-black font-mono-numbers tracking-tight text-white">
+                    {formatCurrency(stats.netAnnual, currencySymbol)}
+                  </span>
+                  <span className="text-slate-300 text-sm font-medium">/ year</span>
+                </div>
+
+                <div className="border-t border-slate-700/80 pt-4 space-y-2 text-xs">
+                  <div className="flex justify-between text-slate-300">
+                    <span>Gross Annual Salary:</span>
+                    <strong className="text-white font-mono-numbers">{formatCurrency(stats.grossAnnual, currencySymbol)}</strong>
+                  </div>
+                  <div className="flex justify-between text-slate-300">
+                    <span>Estimated Monthly Net:</span>
+                    <strong className="text-orange-300 font-mono-numbers text-sm">{formatCurrency(stats.netAnnual / 12, currencySymbol)}/mo</strong>
+                  </div>
+                  <div className="flex justify-between text-slate-300">
+                    <span>Bi-Weekly Net Paycheck:</span>
+                    <strong className="text-white font-mono-numbers">{formatCurrency(stats.netAnnual / 26, currencySymbol)}</strong>
+                  </div>
+                  <div className="flex justify-between text-slate-300">
+                    <span>Total Annual Taxes:</span>
+                    <strong className="text-rose-300 font-mono-numbers">{formatCurrency(stats.totalTaxes, currencySymbol)}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCopy}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-2xs"
+                >
+                  {copied ? <Check className="w-4 h-4 text-orange-600" /> : <Copy className="w-4 h-4 text-slate-700" />}
+                  {copied ? 'Copied' : 'Copy Breakdown'}
+                </button>
+
+                <button
+                  onClick={handleSave}
+                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-2xs"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  {savedSuccess ? 'Saved!' : 'Save Result'}
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-slate-500 text-sm">
+              Enter your base wage or salary above to compute net take-home pay and tax deductions.
             </div>
-
-            <div className="flex items-baseline gap-2 mb-6">
-              <span className="text-5xl font-black font-mono-numbers tracking-tight text-white">
-                {formatCurrency(stats.netAnnual, currencySymbol)}
-              </span>
-              <span className="text-slate-300 text-sm font-medium">/ year</span>
-            </div>
-
-            <div className="border-t border-slate-700/80 pt-4 space-y-2 text-xs">
-              <div className="flex justify-between text-slate-300">
-                <span>Gross Annual Salary:</span>
-                <strong className="text-white font-mono-numbers">{formatCurrency(stats.grossAnnual, currencySymbol)}</strong>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Estimated Monthly Net:</span>
-                <strong className="text-orange-300 font-mono-numbers text-sm">{formatCurrency(stats.netAnnual / 12, currencySymbol)}/mo</strong>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Bi-Weekly Net Paycheck:</span>
-                <strong className="text-white font-mono-numbers">{formatCurrency(stats.netAnnual / 26, currencySymbol)}</strong>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Total Annual Taxes:</span>
-                <strong className="text-rose-300 font-mono-numbers">{formatCurrency(stats.totalTaxes, currencySymbol)}</strong>
-              </div>
-            </div>
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleCopy}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-2xs"
-            >
-              {copied ? <Check className="w-4 h-4 text-orange-600" /> : <Copy className="w-4 h-4 text-slate-700" />}
-              {copied ? 'Copied' : 'Copy Breakdown'}
-            </button>
-
-            <button
-              onClick={handleSave}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-2xs"
-            >
-              <ShieldCheck className="w-4 h-4" />
-              {savedSuccess ? 'Saved!' : 'Save Result'}
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
       {/* Pay Frequency Equivalent Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-        <h4 className="text-sm font-bold text-slate-900">Equivalent Paycheck Conversion Table</h4>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
-              <tr>
-                <th className="py-2.5 px-3">Pay Period</th>
-                <th className="py-2.5 px-3">Gross Earnings</th>
-                <th className="py-2.5 px-3">Taxes & Deductions</th>
-                <th className="py-2.5 px-3 text-right">Net Take-Home Pay</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 font-mono-numbers">
-              {stats.breakdown.map((row) => (
-                <tr key={row.period} className="hover:bg-slate-50/80">
-                  <td className="py-2 px-3 font-semibold text-slate-900 font-sans">{row.period}</td>
-                  <td className="py-2 px-3 text-slate-700">{formatCurrency(row.gross, currencySymbol)}</td>
-                  <td className="py-2 px-3 text-rose-600">-{formatCurrency(row.taxes, currencySymbol)}</td>
-                  <td className="py-2 px-3 text-right font-bold text-orange-700">{formatCurrency(row.net, currencySymbol)}</td>
+      {stats && (
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4">
+          <h4 className="text-sm font-bold text-slate-900">Equivalent Paycheck Conversion Table</h4>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                <tr>
+                  <th className="py-2.5 px-3">Pay Period</th>
+                  <th className="py-2.5 px-3">Gross Earnings</th>
+                  <th className="py-2.5 px-3">Taxes & Deductions</th>
+                  <th className="py-2.5 px-3 text-right">Net Take-Home Pay</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-mono-numbers">
+                {stats.breakdown.map((row) => (
+                  <tr key={row.period} className="hover:bg-slate-50/80">
+                    <td className="py-2 px-3 font-semibold text-slate-900 font-sans">{row.period}</td>
+                    <td className="py-2 px-3 text-slate-700">{formatCurrency(row.gross, currencySymbol)}</td>
+                    <td className="py-2 px-3 text-rose-600">-{formatCurrency(row.taxes, currencySymbol)}</td>
+                    <td className="py-2 px-3 text-right font-bold text-orange-700">{formatCurrency(row.net, currencySymbol)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

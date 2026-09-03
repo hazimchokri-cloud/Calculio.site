@@ -49,18 +49,25 @@ export const GpaCalculator: React.FC<GpaCalculatorProps> = ({ onSaveCalculation 
     let semesterCredits = 0;
 
     courses.forEach(c => {
-      const pts = GRADE_POINTS[c.grade] ?? 0;
-      semesterQualityPoints += pts * c.credits;
-      semesterCredits += c.credits;
+      const creditsNum = typeof c.credits === 'number' ? c.credits : 0;
+      if (creditsNum > 0) {
+        const pts = GRADE_POINTS[c.grade] ?? 0;
+        semesterQualityPoints += pts * creditsNum;
+        semesterCredits += creditsNum;
+      }
     });
+
+    const numPriorGpa = typeof priorGpa === 'number' ? priorGpa : 0;
+    const numPriorCredits = typeof priorCredits === 'number' ? priorCredits : 0;
+
+    if (semesterCredits <= 0 && (!includePrior || numPriorCredits <= 0)) {
+      return null;
+    }
 
     const semesterGpa = semesterCredits > 0 ? semesterQualityPoints / semesterCredits : 0;
 
     let cumulativeGpa = semesterGpa;
     let cumulativeCredits = semesterCredits;
-
-    const numPriorGpa = typeof priorGpa === 'number' ? priorGpa : 0;
-    const numPriorCredits = typeof priorCredits === 'number' ? priorCredits : 0;
 
     if (includePrior && numPriorCredits > 0) {
       const totalPoints = (numPriorGpa * numPriorCredits) + semesterQualityPoints;
@@ -119,7 +126,7 @@ export const GpaCalculator: React.FC<GpaCalculatorProps> = ({ onSaveCalculation 
 
   const handleCalculate = () => {
     setPulse(true);
-    if (stats.semesterGpa >= 3.5) {
+    if (stats && stats.semesterGpa >= 3.5) {
       confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
     }
     setTimeout(() => setPulse(false), 400);
@@ -138,6 +145,7 @@ export const GpaCalculator: React.FC<GpaCalculatorProps> = ({ onSaveCalculation 
   };
 
   const handleCopy = async () => {
+    if (!stats) return;
     const text = `GPA Calculation:
 • Semester GPA: ${stats.semesterGpa} (${stats.semesterCredits} Credits)
 • Academic Standing: ${stats.standing}
@@ -151,6 +159,7 @@ ${includePrior ? `• Cumulative GPA: ${stats.cumulativeGpa} (${stats.cumulative
   };
 
   const handleSave = () => {
+    if (!stats) return;
     if (onSaveCalculation) {
       onSaveCalculation(
         `GPA: ${stats.semesterGpa} (${stats.semesterCredits} Credits) - ${stats.standing}`,
@@ -308,73 +317,79 @@ ${includePrior ? `• Cumulative GPA: ${stats.cumulativeGpa} (${stats.cumulative
 
         {/* Results Card */}
         <div className="lg:col-span-5 space-y-4">
-          <div className={`bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-2xl p-6 sm:p-7 shadow-lg relative overflow-hidden transition-transform ${pulse ? 'scale-[1.01]' : ''}`}>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-indigo-300">
-                Semester Grade Point Average
-              </span>
-              <span className={`px-2.5 py-1 text-xs font-bold rounded-lg border ${stats.badgeColor}`}>
-                {stats.standing}
-              </span>
-            </div>
-
-            <div className="flex items-baseline gap-2 mb-4">
-              <span className="text-5xl font-black font-mono tracking-tight text-white">
-                {stats.semesterGpa.toFixed(2)}
-              </span>
-              <span className="text-slate-300 text-sm font-medium">/ 4.00</span>
-            </div>
-
-            {/* Visual Gauge Bar */}
-            <div className="space-y-1.5 mb-5">
-              <div className="flex justify-between text-[11px] text-slate-300">
-                <span>0.0 (F)</span>
-                <span>2.0 (C)</span>
-                <span>3.0 (B)</span>
-                <span className="text-orange-300 font-bold">4.0 (A)</span>
-              </div>
-              <div className="h-3 bg-white/10 rounded-full overflow-hidden p-0.5">
-                <div
-                  className="h-full bg-gradient-to-r from-amber-400 via-blue-400 to-orange-400 rounded-full transition-all duration-500"
-                  style={{ width: `${stats.gaugePct}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="border-t border-slate-700/80 pt-4 space-y-2 text-xs">
-              <div className="flex justify-between text-slate-300">
-                <span>Semester Course Credits:</span>
-                <strong className="text-white font-mono">{stats.semesterCredits} Credits</strong>
+          {stats ? (
+            <div className={`bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-2xl p-6 sm:p-7 shadow-lg relative overflow-hidden transition-transform ${pulse ? 'scale-[1.01]' : ''}`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-indigo-300">
+                  Semester Grade Point Average
+                </span>
+                <span className={`px-2.5 py-1 text-xs font-bold rounded-lg border ${stats.badgeColor}`}>
+                  {stats.standing}
+                </span>
               </div>
 
-              {includePrior && (
-                <div className="flex justify-between text-slate-300 pt-2 border-t border-slate-700">
-                  <span>Overall Cumulative GPA:</span>
-                  <strong className="text-orange-300 font-mono text-base">{stats.cumulativeGpa.toFixed(2)} ({stats.cumulativeCredits} Credits)</strong>
+              <div className="flex items-baseline gap-2 mb-4">
+                <span className="text-5xl font-black font-mono tracking-tight text-white">
+                  {stats.semesterGpa.toFixed(2)}
+                </span>
+                <span className="text-slate-300 text-sm font-medium">/ 4.00</span>
+              </div>
+
+              {/* Visual Gauge Bar */}
+              <div className="space-y-1.5 mb-5">
+                <div className="flex justify-between text-[11px] text-slate-300">
+                  <span>0.0 (F)</span>
+                  <span>2.0 (C)</span>
+                  <span>3.0 (B)</span>
+                  <span className="text-orange-300 font-bold">4.0 (A)</span>
                 </div>
-              )}
-            </div>
+                <div className="h-3 bg-white/10 rounded-full overflow-hidden p-0.5">
+                  <div
+                    className="h-full bg-gradient-to-r from-amber-400 via-blue-400 to-orange-400 rounded-full transition-all duration-500"
+                    style={{ width: `${stats.gaugePct}%` }}
+                  />
+                </div>
+              </div>
 
-            {/* Action Bar */}
-            <div className="flex items-center gap-2 pt-4 border-t border-slate-700">
-              <button
-                onClick={handleCopy}
-                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Copied' : 'Copy GPA Summary'}</span>
-              </button>
-              {onSaveCalculation && (
+              <div className="border-t border-slate-700/80 pt-4 space-y-2 text-xs">
+                <div className="flex justify-between text-slate-300">
+                  <span>Semester Course Credits:</span>
+                  <strong className="text-white font-mono">{stats.semesterCredits} Credits</strong>
+                </div>
+
+                {includePrior && (
+                  <div className="flex justify-between text-slate-300 pt-2 border-t border-slate-700">
+                    <span>Overall Cumulative GPA:</span>
+                    <strong className="text-orange-300 font-mono text-base">{stats.cumulativeGpa.toFixed(2)} ({stats.cumulativeCredits} Credits)</strong>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Bar */}
+              <div className="flex items-center gap-2 pt-4 border-t border-slate-700">
                 <button
-                  onClick={handleSave}
-                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  onClick={handleCopy}
+                  className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                 >
-                  <Bookmark className="w-3.5 h-3.5" />
-                  <span>{saved ? 'Saved' : 'Save'}</span>
+                  {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? 'Copied' : 'Copy GPA Summary'}</span>
                 </button>
-              )}
+                {onSaveCalculation && (
+                  <button
+                    onClick={handleSave}
+                    className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  >
+                    <Bookmark className="w-3.5 h-3.5" />
+                    <span>{saved ? 'Saved' : 'Save'}</span>
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-slate-500 text-sm">
+              Enter your course credits and grades to compute your Grade Point Average.
+            </div>
+          )}
         </div>
       </div>
     </div>

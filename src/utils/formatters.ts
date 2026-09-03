@@ -1,20 +1,26 @@
-export function formatCurrency(amount: number, currency: string = '$', maximumFractionDigits = 2): string {
-  if (isNaN(amount) || !isFinite(amount)) return `${currency}0.00`;
+export function formatCurrency(amount: number | null | undefined, currency: string = '$', maximumFractionDigits = 2): string {
+  if (amount === null || amount === undefined || typeof amount !== 'number' || isNaN(amount) || !isFinite(amount)) {
+    return `${currency}0.00`;
+  }
   return `${currency}${amount.toLocaleString('en-US', {
     minimumFractionDigits: maximumFractionDigits > 0 ? 2 : 0,
     maximumFractionDigits: maximumFractionDigits
   })}`;
 }
 
-export function formatNumber(num: number, maxDigits = 2): string {
-  if (isNaN(num) || !isFinite(num)) return '0';
+export function formatNumber(num: number | null | undefined, maxDigits = 2): string {
+  if (num === null || num === undefined || typeof num !== 'number' || isNaN(num) || !isFinite(num)) {
+    return '0';
+  }
   return num.toLocaleString('en-US', {
     maximumFractionDigits: maxDigits
   });
 }
 
-export function formatPercent(val: number, maxDigits = 2): string {
-  if (isNaN(val) || !isFinite(val)) return '0%';
+export function formatPercent(val: number | null | undefined, maxDigits = 2): string {
+  if (val === null || val === undefined || typeof val !== 'number' || isNaN(val) || !isFinite(val)) {
+    return '0%';
+  }
   return `${val.toLocaleString('en-US', { maximumFractionDigits: maxDigits })}%`;
 }
 

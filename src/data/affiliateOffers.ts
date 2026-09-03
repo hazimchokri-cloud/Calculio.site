@@ -278,7 +278,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
     title: 'Maximum Refund Guarantee & CPA Assistance',
     provider: 'TurboTax Live',
     badge: 'Save 20% on Filing',
-    highlight: 'Get 100% Accurate Expert Tax Review',
+    highlight: 'Get Expert CPA Tax Review',
     description: 'File federal and state taxes with automatic crypto, stock gain, and deduction imports backed by certified CPAs.',
     keyFeatures: [
       'Automatic W-2 & 1099 form importing',

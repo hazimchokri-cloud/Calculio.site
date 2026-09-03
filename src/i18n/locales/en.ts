@@ -11,7 +11,7 @@ export const enLocale: TranslationDictionary = {
     about: 'About',
     contact: 'Contact',
     sitemap: 'Sitemap',
-    searchPlaceholder: 'Search 100+ calculators...',
+    searchPlaceholder: 'Search calculators...',
     searchShortcut: '⌘K',
     savedCalculations: 'Saved Calculations History',
     allCalculators: 'All Calculators',
@@ -104,17 +104,17 @@ export const enLocale: TranslationDictionary = {
   },
 
   home: {
-    badge: '100+ Free Online Calculation Engines',
-    heroHeadline: 'Welcome to Calculio — Simple Calculations, Clear Results',
-    heroSubtitleClean: 'Explore easy-to-use calculators for finance, health, math, conversions and more.',
+    badge: 'Free Online Calculation Engines',
+    heroHeadline: 'Explore easy-to-use calculators for finance, health, math, conversions and more.',
+    heroSubtitleClean: 'Free, accurate calculation tools with transparent formulas, step-by-step breakdowns, and instant results.',
     searchPlaceholderClean: 'Search calculators (e.g. mortgage, BMI, loan, percentage)...',
     popularCalculatorsHeading: 'Popular Calculators',
     browseByCategoryHeading: 'Browse by Category',
     categoryGridSubtitleClean: 'Explore specialized calculation tools organized by practical domain.',
     viewAllCalculators: 'View all calculators →',
     exploreCalculators: 'Explore Calculators',
-    heroTitlePrefix: 'Welcome to Calculio — ',
-    heroTitleHighlight: 'Simple Calculations, Clear Results',
+    heroTitlePrefix: 'Calculio — ',
+    heroTitleHighlight: 'Online Calculators',
     heroSubtitle: 'Explore easy-to-use calculators for finance, health, math, conversions and more.',
     searchPlaceholder: 'Search calculators (e.g. mortgage, BMI, loan, percentage, salary)...',
     featuredTitle: 'Popular Calculators',
@@ -126,7 +126,7 @@ export const enLocale: TranslationDictionary = {
     recentlyAddedTitle: 'Recently Added Tools',
     recentlyAddedSubtitle: 'Freshly updated calculation engines for advanced real estate, business, and health modeling.',
     eduSectionTitle: 'Why Millions Rely on Calculio Calculation Engines',
-    eduSectionSubtitle: 'Engineered for mathematical rigor, complete privacy, zero paywalls, and instant verified results.',
+    eduSectionSubtitle: 'Engineered for mathematical rigor, complete privacy, zero paywalls, and instant results.',
     eduCard1Title: 'Zero-Lag Instant Mathematics',
     eduCard1Desc: 'All mathematical operations run client-side in pure real-time. Sliders and inputs recompute equations instantly without page reloads.',
     eduCard2Title: 'Full Formula Transparency',
@@ -141,7 +141,7 @@ export const enLocale: TranslationDictionary = {
     statCategories: 'Disciplines',
     statAccuracy: 'Formula Accuracy',
     statCost: 'Access Model',
-    statCostValue: '100% Free Forever'
+    statCostValue: 'Free Forever'
   },
 
   trust: {
@@ -159,7 +159,7 @@ export const enLocale: TranslationDictionary = {
 
   searchModal: {
     title: 'Quick Search Calculators',
-    placeholder: 'Search 100+ calculators by name, category, or keyword...',
+    placeholder: 'Search calculators by name, category, or keyword...',
     allCategories: 'All Categories',
     filterByCategory: 'Filter by Category',
     noResultsTitle: 'No Matching Calculators Found',
@@ -339,7 +339,7 @@ export const enLocale: TranslationDictionary = {
 
   footer: {
     aboutTitle: 'About Calculio',
-    aboutText: 'Calculio is your free, transparent destination for 100+ precision calculation tools spanning mortgages, retirement, fitness, chemistry, geometry, and daily conversions.',
+    aboutText: 'Calculio is your free, transparent destination for precision calculation tools spanning mortgages, retirement, fitness, chemistry, geometry, and daily conversions.',
     calculatorsHeading: 'Calculators',
     resourcesHeading: 'Resources',
     companyHeading: 'Company',
@@ -509,7 +509,7 @@ export const enLocale: TranslationDictionary = {
   },
 
   seo: {
-    homeTitle: 'Calculio - 100+ Free Online Calculators (Finance, Health, Math & Conversions)',
+    homeTitle: 'Calculio - Free Online Calculators (Finance, Health, Math & Conversions)',
     homeDescription: 'Free, fast, and mathematically verified online calculators for mortgages, loans, compound interest, BMI, body fat, scientific math, and unit conversions.',
     calcSuffix: 'Free Online Calculator | Calculio',
     categorySuffix: 'Free Online Calculation Tools | Calculio',
@@ -520,6 +520,6 @@ export const enLocale: TranslationDictionary = {
     contactTitle: 'Contact Us & Request a Calculator | Calculio Community Support',
     contactDescription: 'Suggest new calculators, report calculation bugs, or connect with Calculio quantitative analysts and mathematical engineers.',
     sitemapTitle: 'XML Sitemap & Complete Directory Index | Calculio',
-    sitemapDescription: 'Complete XML sitemap and directory index of all 100+ calculation engines, educational guides, and mathematical tools on Calculio.'
+    sitemapDescription: 'Complete XML sitemap and directory index of all calculation engines, educational guides, and mathematical tools on Calculio.'
   }
 };

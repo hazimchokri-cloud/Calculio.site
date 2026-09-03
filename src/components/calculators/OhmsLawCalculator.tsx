@@ -18,15 +18,25 @@ export const OhmsLawCalculator: React.FC<OhmsLawCalculatorProps> = ({
   const [copied, setCopied] = useState(false);
 
   const results = useMemo(() => {
-    const v = parseFloat(voltage);
-    const i = parseFloat(current);
-    const r = parseFloat(resistance);
-    const p = parseFloat(power);
+    const v = voltage.trim() === '' ? null : parseFloat(voltage);
+    const i = current.trim() === '' ? null : parseFloat(current);
+    const r = resistance.trim() === '' ? null : parseFloat(resistance);
+    const p = power.trim() === '' ? null : parseFloat(power);
 
-    let calcV = isNaN(v) ? null : v;
-    let calcI = isNaN(i) ? null : i;
-    let calcR = isNaN(r) ? null : r;
-    let calcP = isNaN(p) ? null : p;
+    const validV = v !== null && !isNaN(v) && v > 0;
+    const validI = i !== null && !isNaN(i) && i > 0;
+    const validR = r !== null && !isNaN(r) && r > 0;
+    const validP = p !== null && !isNaN(p) && p > 0;
+
+    const count = [validV, validI, validR, validP].filter(Boolean).length;
+    if (count < 2) {
+      return null;
+    }
+
+    let calcV = validV ? v : null;
+    let calcI = validI ? i : null;
+    let calcR = validR ? r : null;
+    let calcP = validP ? p : null;
 
     // Case 1: V and I known
     if (calcV !== null && calcI !== null && calcI !== 0) {
@@ -68,6 +78,7 @@ export const OhmsLawCalculator: React.FC<OhmsLawCalculatorProps> = ({
   }, [voltage, current, resistance, power]);
 
   const handleCopy = () => {
+    if (!results) return;
     const text = `Ohm's Law Calculation:
 Voltage (V): ${results.voltage} V
 Current (I): ${results.current} A
@@ -174,35 +185,41 @@ Power (P): ${results.power} W`;
         </div>
 
         {/* Dynamic Computed Results Banner */}
-        <div className="p-5 rounded-2xl bg-gradient-to-r from-violet-900 to-indigo-950 text-white flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full md:w-auto text-center md:text-left">
-            <div>
-              <span className="text-[10px] uppercase text-violet-200 block font-semibold">Voltage</span>
-              <span className="text-xl font-black font-mono-numbers text-white">{results.voltage} V</span>
+        {results ? (
+          <div className="p-5 rounded-2xl bg-gradient-to-r from-violet-900 to-indigo-950 text-white flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full md:w-auto text-center md:text-left">
+              <div>
+                <span className="text-[10px] uppercase text-violet-200 block font-semibold">Voltage</span>
+                <span className="text-xl font-black font-mono-numbers text-white">{results.voltage} V</span>
+              </div>
+              <div>
+                <span className="text-[10px] uppercase text-violet-200 block font-semibold">Current</span>
+                <span className="text-xl font-black font-mono-numbers text-amber-300">{results.current} A</span>
+              </div>
+              <div>
+                <span className="text-[10px] uppercase text-violet-200 block font-semibold">Resistance</span>
+                <span className="text-xl font-black font-mono-numbers text-orange-300">{results.resistance} Ω</span>
+              </div>
+              <div>
+                <span className="text-[10px] uppercase text-violet-200 block font-semibold">Power</span>
+                <span className="text-xl font-black font-mono-numbers text-rose-300">{results.power} W</span>
+              </div>
             </div>
-            <div>
-              <span className="text-[10px] uppercase text-violet-200 block font-semibold">Current</span>
-              <span className="text-xl font-black font-mono-numbers text-amber-300">{results.current} A</span>
-            </div>
-            <div>
-              <span className="text-[10px] uppercase text-violet-200 block font-semibold">Resistance</span>
-              <span className="text-xl font-black font-mono-numbers text-orange-300">{results.resistance} Ω</span>
-            </div>
-            <div>
-              <span className="text-[10px] uppercase text-violet-200 block font-semibold">Power</span>
-              <span className="text-xl font-black font-mono-numbers text-rose-300">{results.power} W</span>
-            </div>
-          </div>
 
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="w-full md:w-auto px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-all shrink-0"
-          >
-            {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? 'Copied' : 'Copy All'}</span>
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="w-full md:w-auto px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-all shrink-0"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copied ? 'Copied' : 'Copy All'}</span>
+            </button>
+          </div>
+        ) : (
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center text-slate-500 text-xs">
+            Enter any two valid electrical values above to calculate the remaining parameters.
+          </div>
+        )}
       </div>
     </div>
   );

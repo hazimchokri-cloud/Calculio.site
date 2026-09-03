@@ -142,7 +142,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
             </div>
             <div className="space-y-0.5">
               <span className="text-xs text-[#64748B] font-medium block">{t('about.metricCost', 'Cost to Use')}</span>
-              <span className="text-base sm:text-lg font-bold text-[#F97316]">100% Free</span>
+              <span className="text-base sm:text-lg font-bold text-[#F97316]">Free to Use</span>
             </div>
             <div className="space-y-0.5">
               <span className="text-xs text-[#64748B] font-medium block">{t('about.metricAccess', 'Account Required')}</span>

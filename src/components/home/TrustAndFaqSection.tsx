@@ -41,7 +41,7 @@ export const TrustAndFaqSection: React.FC = () => {
 
   const faqs = [
     {
-      q: t('faq.q1', 'Are all calculators on Calculio 100% free to use?'),
+      q: t('faq.q1', 'Are all calculators on Calculio free to use?'),
       a: t('faq.a1', 'Yes, every calculator, amortization schedule, formula breakdown, and export tool on Calculio is completely free with no paywalls or sign-ups required.')
     },
     {
