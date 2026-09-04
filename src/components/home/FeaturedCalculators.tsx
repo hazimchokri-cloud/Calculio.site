@@ -124,7 +124,7 @@ export const FeaturedCalculators: React.FC<FeaturedCalculatorsProps> = ({
         {/* 3px high, 48px wide centered orange underline */}
         <div className="w-[48px] h-[3px] bg-[#F97316] rounded-full mx-auto my-3" />
         <p className="text-[15px] sm:text-[16px] text-[#475569] leading-[1.6]">
-          {t('home.featuredSubtitle', 'Frequently used tools for fast, accurate calculations.')}
+          {t('home.featuredSubtitle', 'Popular tools for everyday calculations.')}
         </p>
       </div>
 

@@ -95,7 +95,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           id="hero-description"
           className="text-[17px] sm:text-[19px] md:text-[20px] text-[#1a1a1a] max-w-[720px] mx-auto leading-[1.6] font-[400]"
         >
-          {t('home.heroSubtitleClean', 'Free, accurate calculation tools with transparent formulas, step-by-step breakdowns, and instant results.')}
+          {t('home.heroSubtitleClean', 'Free calculation tools with transparent formulas, step-by-step breakdowns, and instant results.')}
         </p>
 
         {/* Primary CTA Button: Explore Calculators */}

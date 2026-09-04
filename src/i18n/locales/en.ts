@@ -106,7 +106,7 @@ export const enLocale: TranslationDictionary = {
   home: {
     badge: 'Free Online Calculation Engines',
     heroHeadline: 'Explore easy-to-use calculators for finance, health, math, conversions and more.',
-    heroSubtitleClean: 'Free, accurate calculation tools with transparent formulas, step-by-step breakdowns, and instant results.',
+    heroSubtitleClean: 'Free calculation tools with transparent formulas, step-by-step breakdowns, and instant results.',
     searchPlaceholderClean: 'Search calculators (e.g. mortgage, BMI, loan, percentage)...',
     popularCalculatorsHeading: 'Popular Calculators',
     browseByCategoryHeading: 'Browse by Category',
@@ -118,7 +118,7 @@ export const enLocale: TranslationDictionary = {
     heroSubtitle: 'Explore easy-to-use calculators for finance, health, math, conversions and more.',
     searchPlaceholder: 'Search calculators (e.g. mortgage, BMI, loan, percentage, salary)...',
     featuredTitle: 'Popular Calculators',
-    featuredSubtitle: 'Frequently used tools for fast, accurate calculations.',
+    featuredSubtitle: 'Popular tools for everyday calculations.',
     popularTitle: 'Popular Calculation Tools',
     popularSubtitle: 'Explore the high-precision tools most utilized by students, professionals, and homeowners.',
     categoryGridTitle: 'Browse by Category',
