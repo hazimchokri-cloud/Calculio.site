@@ -19,6 +19,7 @@ const LegalView = React.lazy(() => import('./components/views/LegalView').then(m
 const QuickSearchModal = React.lazy(() => import('./components/shared/QuickSearchModal').then(m => ({ default: m.QuickSearchModal })));
 const SavedHistoryDrawer = React.lazy(() => import('./components/shared/SavedHistoryDrawer').then(m => ({ default: m.SavedHistoryDrawer })));
 
+import { NotFoundView } from './components/common/NotFoundView';
 import type { LegalTab } from './components/views/LegalView';
 import { CALCULATORS } from './data/calculatorDirectory';
 import { CATEGORIES } from './data/categories';
@@ -129,6 +130,8 @@ function AppContent() {
           setViewMode('blog-post');
           return;
         }
+        setViewMode('not-found');
+        return;
       }
       setViewMode('blog');
       return;
@@ -181,6 +184,8 @@ function AppContent() {
           setViewMode('calculator');
           return;
         }
+        setViewMode('not-found');
+        return;
       }
       setSelectedCategoryId(catId);
       setViewMode('category');
@@ -196,8 +201,8 @@ function AppContent() {
       return;
     }
 
-    // Default fallback
-    setViewMode('home');
+    // Default fallback - genuine 404
+    setViewMode('not-found');
   }, []);
 
   // Initialize from browser URL and listen to popstate
@@ -462,6 +467,12 @@ function AppContent() {
         description: 'Read the Calculio Disclaimer covering calculator results, informational content, third-party data, and use of our online tools.',
         canonicalUrl: '/disclaimer'
       });
+    } else if (viewMode === 'not-found') {
+      updateDocumentSeo({
+        title: 'Page Not Found (404) | Calculio',
+        description: 'The calculation tool or page you requested could not be found.',
+        robots: 'noindex, follow'
+      });
     } else {
       updateDocumentSeo({
         title: t('seo.homeTitle', 'Calculio - Free Online Calculators (Finance, Health, Math & Conversions)'),
@@ -648,6 +659,15 @@ function AppContent() {
               onGoToAllCalculators={handleGoToAllCalculators}
             />
           </Suspense>
+        )}
+
+        {/* VIEW 11: 404 Page Not Found View */}
+        {viewMode === 'not-found' && (
+          <NotFoundView
+            onNavigateHome={handleGoHome}
+            onNavigateCalculators={handleGoToAllCalculators}
+            onSearchOpen={() => setIsSearchOpen(true)}
+          />
         )}
         </ErrorBoundary>
       </main>

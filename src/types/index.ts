@@ -189,7 +189,8 @@ export type AppViewMode =
   | 'sitemap'
   | 'privacy'
   | 'terms'
-  | 'disclaimer';
+  | 'disclaimer'
+  | 'not-found';
 
 export interface BreadcrumbItem {
   label: string;

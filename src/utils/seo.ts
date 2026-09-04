@@ -6,6 +6,7 @@ export interface SeoConfig {
   description: string;
   keywords?: string[];
   canonicalUrl?: string;
+  robots?: string;
   ogType?: 'website' | 'article' | 'profile';
   ogImage?: string;
   author?: string;
@@ -118,6 +119,16 @@ export function updateDocumentSeo(config: SeoConfig) {
       }
       kwEl.content = config.keywords.join(', ');
     }
+
+    // Robots tag
+    const robotsContent = config.robots || 'index, follow';
+    let robotsEl = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+    if (!robotsEl) {
+      robotsEl = document.createElement('meta');
+      robotsEl.name = 'robots';
+      document.head.appendChild(robotsEl);
+    }
+    robotsEl.content = robotsContent;
 
     // Canonical link
     const CANONICAL_ORIGIN = 'https://calculio.site';
