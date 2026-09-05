@@ -215,6 +215,19 @@ export function updateDocumentSeo(config: SeoConfig) {
       : defaultBaseSchema;
 
     schemaScript.textContent = JSON.stringify(finalSchema, null, 2);
+
+    // Notify Google Analytics (gtag.js) on dynamic page transitions
+    if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
+      try {
+        (window as any).gtag('event', 'page_view', {
+          page_title: config.title,
+          page_location: window.location.href,
+          page_path: window.location.pathname
+        });
+      } catch (err) {
+        // Ignore analytics logging errors
+      }
+    }
   } catch (e) {
     // Fail silently in restricted environment
   }
