@@ -34,6 +34,29 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
     }
   };
 
+  const handleParenthesis = (p: '(' | ')') => {
+    if (p === '(') {
+      if (display === '0' || display === 'Error' || justCalculated) {
+        setDisplay('(');
+        setJustCalculated(false);
+      } else if (display.endsWith(')')) {
+        const current = display;
+        setExpression(prev => (prev ? `${prev}${current} × ` : `${current} × `));
+        setDisplay('(');
+      } else {
+        setDisplay(prev => prev + '(');
+      }
+    } else {
+      if (display === '0' || display === 'Error' || justCalculated) {
+        setDisplay(')');
+        setJustCalculated(false);
+      } else {
+        setDisplay(prev => prev + ')');
+        setJustCalculated(false);
+      }
+    }
+  };
+
   const handleDecimal = () => {
     if (justCalculated) {
       setDisplay('0.');
@@ -44,9 +67,14 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
   };
 
   const handleOperator = (op: string) => {
-    setExpression(`${display} ${op} `);
-    setDisplay('0');
     setJustCalculated(false);
+    if (display === '0' && expression) {
+      setExpression(prev => prev.replace(/[+\-×÷^]\s*$/, `${op} `));
+      return;
+    }
+    const current = display === 'Error' ? '0' : display;
+    setExpression(prev => (prev ? `${prev}${current} ${op} ` : `${current} ${op} `));
+    setDisplay('0');
   };
 
   const handleClear = () => {
@@ -74,6 +102,37 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
   };
 
   const handleScientificFunction = (fn: string) => {
+    // If display is '0' or just calculated or error, opening function syntax like sin(
+    if (
+      (display === '0' || display === 'Error' || justCalculated) &&
+      ['sin', 'cos', 'tan', 'sqrt', 'cbrt', 'ln', 'log'].includes(fn)
+    ) {
+      const funcName = isInv && ['sin', 'cos', 'tan'].includes(fn) ? `a${fn}` : fn;
+      setDisplay(`${funcName}(`);
+      setJustCalculated(false);
+      return;
+    }
+
+    if (fn === 'pi') {
+      if (display === '0' || display === 'Error' || justCalculated) {
+        setDisplay('π');
+      } else {
+        setDisplay(prev => prev + 'π');
+      }
+      setJustCalculated(false);
+      return;
+    }
+
+    if (fn === 'e') {
+      if (display === '0' || display === 'Error' || justCalculated) {
+        setDisplay('e');
+      } else {
+        setDisplay(prev => prev + 'e');
+      }
+      setJustCalculated(false);
+      return;
+    }
+
     const val = parseFloat(display);
     if (isNaN(val)) return;
 
@@ -121,12 +180,6 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
       case 'percent':
         res = val / 100;
         break;
-      case 'pi':
-        res = Math.PI;
-        break;
-      case 'e':
-        res = Math.E;
-        break;
       default:
         return;
     }
@@ -142,23 +195,73 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
   };
 
   const handleEqual = () => {
-    if (!expression) return;
+    const fullExpr = expression ? expression + display : display;
+    if (!fullExpr || fullExpr === '0' || fullExpr === 'Error') return;
+
     try {
-      const fullExpr = expression + display;
-      // Sanitize expression for safe eval of basic math
-      const sanitized = fullExpr
+      let s = fullExpr
         .replace(/×/g, '*')
         .replace(/÷/g, '/')
-        .replace(/\^/g, '**');
+        .replace(/−/g, '-')
+        .replace(/\^/g, '**')
+        .replace(/π/g, 'Math.PI');
 
-      // Check if expression is only numbers and safe math operators
-      if (!/^[0-9+\-*/().\s**]+$/.test(sanitized)) {
+      // Auto-close open parentheses
+      const openCount = (s.match(/\(/g) || []).length;
+      const closeCount = (s.match(/\)/g) || []).length;
+      if (openCount > closeCount) {
+        s += ')'.repeat(openCount - closeCount);
+      }
+
+      // Implicit multiplication: (2+3)(4+5) -> (2+3)*(4+5), 2(3) -> 2*(3), (3)2 -> (3)*2
+      s = s.replace(/\)(\s*\()/g, ')*(');
+      s = s.replace(/(\d)(\s*\()/g, '$1*(');
+      s = s.replace(/(\))(\s*\d)/g, ')*$2');
+      s = s.replace(/(\d)\s*(sin|cos|tan|sqrt|cbrt|ln|log|asin|acos|atan|exp)\b/g, '$1*$2');
+
+      // Check allowed tokens
+      const stripped = s
+        .replace(/Math\.PI/g, '')
+        .replace(/Math\.E/g, '')
+        .replace(/\b(sin|cos|tan|asin|acos|atan|sqrt|cbrt|ln|log|exp)\b/g, '');
+
+      if (!/^[0-9+\-*/().\s*%]+$/.test(stripped)) {
         setDisplay('Error');
         return;
       }
 
-      // Safe evaluation
-      const computed = Function(`"use strict"; return (${sanitized})`)();
+      // Function name replacements to internal safe handlers
+      s = s.replace(/\bsin\b/g, '_sin');
+      s = s.replace(/\bcos\b/g, '_cos');
+      s = s.replace(/\btan\b/g, '_tan');
+      s = s.replace(/\basin\b/g, '_asin');
+      s = s.replace(/\bacos\b/g, '_acos');
+      s = s.replace(/\batan\b/g, '_atan');
+      s = s.replace(/\bsqrt\b/g, '_sqrt');
+      s = s.replace(/\bcbrt\b/g, '_cbrt');
+      s = s.replace(/\bln\b/g, '_ln');
+      s = s.replace(/\blog\b/g, '_log');
+      s = s.replace(/\bexp\b/g, '_exp');
+
+      const _sin = (x: number) => (isRad ? Math.sin(x) : Math.sin((x * Math.PI) / 180));
+      const _cos = (x: number) => (isRad ? Math.cos(x) : Math.cos((x * Math.PI) / 180));
+      const _tan = (x: number) => (isRad ? Math.tan(x) : Math.tan((x * Math.PI) / 180));
+      const _asin = (x: number) => (isRad ? Math.asin(x) : (Math.asin(x) * 180) / Math.PI);
+      const _acos = (x: number) => (isRad ? Math.acos(x) : (Math.acos(x) * 180) / Math.PI);
+      const _atan = (x: number) => (isRad ? Math.atan(x) : (Math.atan(x) * 180) / Math.PI);
+      const _sqrt = Math.sqrt;
+      const _cbrt = Math.cbrt;
+      const _ln = Math.log;
+      const _log = Math.log10;
+      const _exp = Math.exp;
+
+      const evalFn = new Function(
+        '_sin', '_cos', '_tan', '_asin', '_acos', '_atan', '_sqrt', '_cbrt', '_ln', '_log', '_exp',
+        `"use strict"; return (${s});`
+      );
+
+      const computed = evalFn(_sin, _cos, _tan, _asin, _acos, _atan, _sqrt, _cbrt, _ln, _log, _exp);
+
       if (isNaN(computed) || !isFinite(computed)) {
         setDisplay('Error');
       } else {
@@ -168,6 +271,9 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
         setDisplay(formatted);
         setExpression('');
         setJustCalculated(true);
+        if (onSaveCalculation) {
+          onSaveCalculation(historyEntry, { expression: fullExpr }, { result: formatted });
+        }
       }
     } catch {
       setDisplay('Error');
@@ -184,12 +290,20 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
         handleDigit(e.key);
       } else if (e.key === '.') {
         handleDecimal();
+      } else if (e.key === '(') {
+        handleParenthesis('(');
+      } else if (e.key === ')') {
+        handleParenthesis(')');
       } else if (e.key === '+' || e.key === '-') {
         handleOperator(e.key);
       } else if (e.key === '*') {
         handleOperator('×');
       } else if (e.key === '/') {
         handleOperator('÷');
+      } else if (e.key === '^') {
+        handleOperator('^');
+      } else if (e.key === '%') {
+        handleScientificFunction('percent');
       } else if (e.key === 'Enter' || e.key === '=') {
         e.preventDefault();
         handleEqual();
@@ -202,7 +316,7 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [display, expression, justCalculated]);
+  }, [display, expression, justCalculated, isRad, isInv]);
 
   const handleCopy = async () => {
     const ok = await copyToClipboard(display);
@@ -515,14 +629,29 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
               ±
             </button>
 
-            {/* Number Row 4: (, 0, ., +, = */}
-            <button
-              type="button"
-              onClick={() => handleDigit('(')}
-              className="h-12 sm:h-13 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 border border-slate-700/50 rounded-xl transition-all text-sm font-semibold flex items-center justify-center cursor-pointer select-none"
-            >
-              (
-            </button>
+            {/* Number Row 4: Parentheses ( & ), 0, ., +, = */}
+            <div className="grid grid-cols-2 gap-1 sm:gap-1.5 h-12 sm:h-13">
+              <button
+                type="button"
+                id="btn-paren-open"
+                onClick={() => handleParenthesis('(')}
+                className="h-full bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 hover:text-white border border-slate-700/50 rounded-xl transition-all text-sm sm:text-base font-semibold flex items-center justify-center cursor-pointer select-none"
+                title="Open parenthesis ("
+                aria-label="Open parenthesis"
+              >
+                (
+              </button>
+              <button
+                type="button"
+                id="btn-paren-close"
+                onClick={() => handleParenthesis(')')}
+                className="h-full bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 hover:text-white border border-slate-700/50 rounded-xl transition-all text-sm sm:text-base font-semibold flex items-center justify-center cursor-pointer select-none"
+                title="Close parenthesis )"
+                aria-label="Close parenthesis"
+              >
+                )
+              </button>
+            </div>
             <button
               type="button"
               onClick={() => handleDigit('0')}
