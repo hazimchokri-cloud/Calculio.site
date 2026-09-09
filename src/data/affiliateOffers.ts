@@ -33,7 +33,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'FHA, VA, Conventional & Jumbo options'
     ],
     ctaText: 'Check My Personalized Rates',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://www.lendingtree.com/mortgage/',
     rating: 4.9,
     reviewCount: 14200,
     featured: true,
@@ -54,7 +54,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Unemployment protection program included'
     ],
     ctaText: 'View Personal Loan Rates',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://www.sofi.com/personal-loans/',
     rating: 4.8,
     reviewCount: 9800,
     terms: 'Loan terms subject to credit score verification.'
@@ -74,7 +74,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Vehicles up to 10 years old eligible'
     ],
     ctaText: 'Lower My Auto Payment',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://www.autoapprove.com/',
     rating: 4.7,
     reviewCount: 6200,
     terms: 'Vehicle must be less than 10 years old with under 120,000 miles.'
@@ -96,7 +96,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Same-day transfers to external bank accounts'
     ],
     ctaText: 'Open Free Savings Account',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://www.marcus.com/us/en/savings/high-yield-savings',
     rating: 4.9,
     reviewCount: 22400,
     featured: true,
@@ -117,7 +117,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       '$0 annual fee forever'
     ],
     ctaText: 'Apply in 60 Seconds',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://creditcards.chase.com/cash-back-credit-cards/freedom/unlimited',
     rating: 4.8,
     reviewCount: 31000,
     terms: 'Variable APR after 15 months: 20.49% - 29.24% based on creditworthiness.'
@@ -137,7 +137,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Automatic dividend reinvestment (DRIP)'
     ],
     ctaText: 'Start Investing Today',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://investor.vanguard.com/',
     rating: 4.9,
     reviewCount: 18500,
     terms: 'Investing involves market risk, including possible loss of principal.'
@@ -159,7 +159,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Unbiased licensed agent support on demand'
     ],
     ctaText: 'Get Free Life Insurance Quotes',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://www.policygenius.com/life-insurance/',
     rating: 4.9,
     reviewCount: 16700,
     featured: true,
@@ -180,7 +180,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Giveback program donates unclaimed money to charity'
     ],
     ctaText: 'Check Home Insurance Quote',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://www.lemonade.com/homeowners',
     rating: 4.7,
     reviewCount: 12400,
     terms: 'Availability varies by state. Subject to underwriting review.'
@@ -202,7 +202,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Multi-user automatic recognition (up to 8 users)'
     ],
     ctaText: 'View Product on Amazon / Official Store',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://www.withings.com/us/en/body-smart',
     rating: 4.8,
     reviewCount: 8900,
     featured: true,
@@ -223,7 +223,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Flexible weekly menu with 35+ customizable meals'
     ],
     ctaText: 'Claim $130 Meal Prep Discount',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://www.factor75.com/',
     rating: 4.8,
     reviewCount: 15300,
     terms: 'Offer valid for new subscribers only. Discount distributed over 5 deliveries.'
@@ -243,7 +243,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Waterproof design with wireless on-body battery pack'
     ],
     ctaText: 'Get WHOOP 4.0 Free Trial',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://www.whoop.com/',
     rating: 4.7,
     reviewCount: 11200,
     terms: 'Subscription required after trial. Cancel anytime.'
@@ -265,7 +265,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Web, iOS, and Android real-time sync'
     ],
     ctaText: 'Start Free Analysis Trial',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://dealcheck.io/',
     rating: 4.9,
     reviewCount: 7800,
     featured: true
@@ -287,7 +287,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Maximum refund guarantee or money back'
     ],
     ctaText: 'File Taxes with TurboTax',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://turbotax.intuit.com/',
     rating: 4.8,
     reviewCount: 42000,
     featured: true
@@ -309,7 +309,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Mileage tracking and receipt capture app'
     ],
     ctaText: 'Claim 50% Business Discount',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://quickbooks.intuit.com/',
     rating: 4.8,
     reviewCount: 38500,
     featured: true
@@ -331,7 +331,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Exclusive tool rental discounts and perks'
     ],
     ctaText: 'Join Pro Xtra Free',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://www.homedepot.com/c/pro_xtra',
     rating: 4.7,
     reviewCount: 9400,
     featured: true
@@ -353,7 +353,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Self-paced learning with flexible deadlines'
     ],
     ctaText: 'Explore Coursera Plus Free',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://www.coursera.org/courseraplus',
     rating: 4.9,
     reviewCount: 31000,
     featured: true
@@ -375,7 +375,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
       'Backup seed phrase recovery system'
     ],
     ctaText: 'Order Ledger Hardware Wallet',
-    ctaUrl: 'https://google.com',
+    ctaUrl: 'https://www.ledger.com/',
     rating: 4.9,
     reviewCount: 19800,
     featured: true

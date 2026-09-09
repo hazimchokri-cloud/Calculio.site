@@ -141,7 +141,11 @@ export const LegalView: React.FC<LegalViewProps> = ({
                 </div>
                 <p className="text-xs sm:text-sm text-[#475569] leading-relaxed">
                   Calculio (accessible at{' '}
-                  <a href="https://calculio.site" className="text-[#F97316] font-semibold hover:underline">
+                  <a 
+                    href="https://calculio.site" 
+                    onClick={(e) => { e.preventDefault(); onGoHome(); }} 
+                    className="text-[#F97316] font-semibold hover:underline cursor-pointer"
+                  >
                     https://calculio.site
                   </a>
                   ) is committed to protecting your privacy and delivering transparent, non-intrusive mathematical, financial, health, and unit conversion tools. This Privacy Policy explains our practices regarding information collection, usage, and security when you use our website, tools, and educational guides.
@@ -250,9 +254,9 @@ export const LegalView: React.FC<LegalViewProps> = ({
                   <p className="text-xs sm:text-sm text-[#475569]">
                     Third-party vendors, including Google, may use cookies to serve ads based on prior visits to Calculio or other websites across the Internet. You can manage or opt out of personalized advertising by visiting{' '}
                     <a 
-                      href="https://www.google.com/settings/ads" 
+                      href="https://adssettings.google.com/" 
                       target="_blank" 
-                      rel="noreferrer" 
+                      rel="noopener noreferrer" 
                       className="text-[#F97316] underline font-semibold inline-flex items-center gap-1 hover:text-[#EA580C]"
                     >
                       Google Ads Settings <ExternalLink className="w-3 h-3 inline" />
@@ -261,7 +265,7 @@ export const LegalView: React.FC<LegalViewProps> = ({
                     <a 
                       href="https://www.aboutads.info/choices/" 
                       target="_blank" 
-                      rel="noreferrer" 
+                      rel="noopener noreferrer" 
                       className="text-[#F97316] underline font-semibold inline-flex items-center gap-1 hover:text-[#EA580C]"
                     >
                       aboutads.info <ExternalLink className="w-3 h-3 inline" />
@@ -373,7 +377,11 @@ export const LegalView: React.FC<LegalViewProps> = ({
                   <div className="space-y-1.5 text-xs sm:text-sm">
                     <div className="flex items-center gap-2">
                       <strong className="text-[#0F172A] min-w-[60px]">Website:</strong>
-                      <a href="https://calculio.site" className="text-[#F97316] font-semibold hover:underline">
+                      <a 
+                        href="https://calculio.site" 
+                        onClick={(e) => { e.preventDefault(); onGoHome(); }}
+                        className="text-[#F97316] font-semibold hover:underline cursor-pointer"
+                      >
                         https://calculio.site
                       </a>
                     </div>
@@ -411,7 +419,11 @@ export const LegalView: React.FC<LegalViewProps> = ({
                 </div>
                 <p className="text-xs sm:text-sm text-[#475569] leading-relaxed">
                   Welcome to Calculio (accessible at{' '}
-                  <a href="https://calculio.site" className="text-[#F97316] font-semibold hover:underline">
+                  <a 
+                    href="https://calculio.site" 
+                    onClick={(e) => { e.preventDefault(); onGoHome(); }}
+                    className="text-[#F97316] font-semibold hover:underline cursor-pointer"
+                  >
                     https://calculio.site
                   </a>
                   ). These Terms of Use (&quot;Terms&quot;) govern your access to and use of our online calculators, conversion tools, educational articles, and web services. By accessing or using Calculio, you agree to comply with and be bound by these Terms.
@@ -674,7 +686,11 @@ export const LegalView: React.FC<LegalViewProps> = ({
                   <div className="space-y-1.5 text-xs sm:text-sm">
                     <div className="flex items-center gap-2">
                       <strong className="text-[#0F172A] min-w-[60px]">Website:</strong>
-                      <a href="https://calculio.site" className="text-[#F97316] font-semibold hover:underline">
+                      <a 
+                        href="https://calculio.site" 
+                        onClick={(e) => { e.preventDefault(); onGoHome(); }}
+                        className="text-[#F97316] font-semibold hover:underline cursor-pointer"
+                      >
                         https://calculio.site
                       </a>
                     </div>
@@ -712,7 +728,11 @@ export const LegalView: React.FC<LegalViewProps> = ({
                 </div>
                 <p className="text-xs sm:text-sm text-[#475569] leading-relaxed">
                   Welcome to Calculio (accessible at{' '}
-                  <a href="https://calculio.site" className="text-[#F97316] font-semibold hover:underline">
+                  <a 
+                    href="https://calculio.site" 
+                    onClick={(e) => { e.preventDefault(); onGoHome(); }}
+                    className="text-[#F97316] font-semibold hover:underline cursor-pointer"
+                  >
                     https://calculio.site
                   </a>
                   ). This Disclaimer outlines the scope, limitations, and terms governing your use of our online calculators, conversion tools, informational articles, and website resources. By accessing Calculio, you understand and agree to the disclaimers set forth on this page.
@@ -923,7 +943,11 @@ export const LegalView: React.FC<LegalViewProps> = ({
                   <div className="space-y-1.5 text-xs sm:text-sm">
                     <div className="flex items-center gap-2">
                       <strong className="text-[#0F172A] min-w-[60px]">Website:</strong>
-                      <a href="https://calculio.site" className="text-[#F97316] font-semibold hover:underline">
+                      <a 
+                        href="https://calculio.site" 
+                        onClick={(e) => { e.preventDefault(); onGoHome(); }}
+                        className="text-[#F97316] font-semibold hover:underline cursor-pointer"
+                      >
                         https://calculio.site
                       </a>
                     </div>

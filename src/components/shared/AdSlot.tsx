@@ -16,13 +16,17 @@ interface AdSlotProps {
   className?: string;
   adClient?: string;
   showPlaceholderInfo?: boolean;
+  destinationUrl?: string;
+  ctaText?: string;
 }
 
 export const AdSlot: React.FC<AdSlotProps> = ({ 
   type = 'in-content',
   slotId,
   className = '',
-  adClient = 'ca-pub-XXXXXXXXXXXXXXXX'
+  adClient = 'ca-pub-XXXXXXXXXXXXXXXX',
+  destinationUrl,
+  ctaText
 }) => {
   // Normalize type
   const normalizedType: 'header-banner' | 'in-content' | 'sidebar' | 'footer-banner' = 
@@ -89,14 +93,21 @@ export const AdSlot: React.FC<AdSlotProps> = ({
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={() => window.open('https://google.com', '_blank', 'noopener,noreferrer')}
-              className="px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] hover:border-[#F97316] text-[#475569] text-xs font-semibold rounded-lg border border-[#CBD5E1] transition-all flex items-center gap-1 cursor-pointer"
-            >
-              <span>Explore</span>
-              <ArrowUpRight className="w-3 h-3 text-[#94A3B8]" />
-            </button>
+            {destinationUrl && destinationUrl.startsWith('http') && !destinationUrl.includes('google.com') && destinationUrl !== '#' ? (
+              <a
+                href={destinationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] hover:border-[#F97316] text-[#475569] text-xs font-semibold rounded-lg border border-[#CBD5E1] transition-all flex items-center gap-1 cursor-pointer no-underline"
+              >
+                <span>{ctaText || 'Explore'}</span>
+                <ArrowUpRight className="w-3 h-3 text-[#94A3B8]" />
+              </a>
+            ) : (
+              <span className="px-3 py-1.5 bg-[#FFFFFF] text-[#94A3B8] text-xs font-semibold rounded-lg border border-[#CBD5E1] flex items-center gap-1 select-none">
+                <span>Sponsored</span>
+              </span>
+            )}
           </div>
         </div>
       </aside>
@@ -134,14 +145,21 @@ export const AdSlot: React.FC<AdSlotProps> = ({
           </div>
 
           <div className="pt-1">
-            <button
-              type="button"
-              onClick={() => window.open('https://google.com', '_blank', 'noopener,noreferrer')}
-              className="w-full py-1.5 bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] hover:border-[#F97316] text-[#475569] text-xs font-semibold rounded-lg border border-[#CBD5E1] transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
-            >
-              <span>View Rates</span>
-              <ArrowUpRight className="w-3 h-3 text-[#94A3B8]" />
-            </button>
+            {destinationUrl && destinationUrl.startsWith('http') && !destinationUrl.includes('google.com') && destinationUrl !== '#' ? (
+              <a
+                href={destinationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-1.5 bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] hover:border-[#F97316] text-[#475569] text-xs font-semibold rounded-lg border border-[#CBD5E1] transition-all text-center flex items-center justify-center gap-1 cursor-pointer no-underline"
+              >
+                <span>{ctaText || 'View Rates'}</span>
+                <ArrowUpRight className="w-3 h-3 text-[#94A3B8]" />
+              </a>
+            ) : (
+              <span className="w-full py-1.5 bg-[#FFFFFF] text-[#94A3B8] text-xs font-semibold rounded-lg border border-[#CBD5E1] text-center flex items-center justify-center gap-1 select-none">
+                <span>Partner Slot</span>
+              </span>
+            )}
           </div>
 
           <div className="pt-1.5 border-t border-[#E2E8F0] flex items-center justify-center text-[9px] text-[#94A3B8] gap-1">
@@ -186,14 +204,21 @@ export const AdSlot: React.FC<AdSlotProps> = ({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => window.open('https://google.com', '_blank', 'noopener,noreferrer')}
-            className="shrink-0 px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#FFF7ED] text-[#475569] hover:text-[#F97316] hover:border-[#F97316] border border-[#CBD5E1] text-xs font-semibold rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
-          >
-            <span>Learn More</span>
-            <ExternalLink className="w-3 h-3 text-[#94A3B8]" />
-          </button>
+          {destinationUrl && destinationUrl.startsWith('http') && !destinationUrl.includes('google.com') && destinationUrl !== '#' ? (
+            <a
+              href={destinationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#FFF7ED] text-[#475569] hover:text-[#F97316] hover:border-[#F97316] border border-[#CBD5E1] text-xs font-semibold rounded-lg transition-colors flex items-center gap-1 cursor-pointer no-underline"
+            >
+              <span>{ctaText || 'Learn More'}</span>
+              <ExternalLink className="w-3 h-3 text-[#94A3B8]" />
+            </a>
+          ) : (
+            <span className="shrink-0 px-3 py-1.5 bg-[#FFFFFF] text-[#94A3B8] border border-[#CBD5E1] text-xs font-semibold rounded-lg flex items-center gap-1 select-none">
+              <span>Sponsored</span>
+            </span>
+          )}
         </div>
       </aside>
     );
@@ -231,14 +256,21 @@ export const AdSlot: React.FC<AdSlotProps> = ({
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => window.open('https://google.com', '_blank', 'noopener,noreferrer')}
-          className="shrink-0 px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] hover:border-[#F97316] text-[#475569] text-xs font-semibold rounded-lg border border-[#CBD5E1] transition-all flex items-center gap-1 cursor-pointer"
-        >
-          <span>Get Started</span>
-          <ArrowUpRight className="w-3 h-3 text-[#94A3B8]" />
-        </button>
+        {destinationUrl && destinationUrl.startsWith('http') && !destinationUrl.includes('google.com') && destinationUrl !== '#' ? (
+          <a
+            href={destinationUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] hover:border-[#F97316] text-[#475569] text-xs font-semibold rounded-lg border border-[#CBD5E1] transition-all flex items-center gap-1 cursor-pointer no-underline"
+          >
+            <span>{ctaText || 'Get Started'}</span>
+            <ArrowUpRight className="w-3 h-3 text-[#94A3B8]" />
+          </a>
+        ) : (
+          <span className="shrink-0 px-3 py-1.5 bg-[#FFFFFF] text-[#94A3B8] text-xs font-semibold rounded-lg border border-[#CBD5E1] flex items-center gap-1 select-none">
+            <span>Sponsored</span>
+          </span>
+        )}
       </div>
     </aside>
   );

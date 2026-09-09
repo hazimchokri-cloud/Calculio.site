@@ -4,10 +4,12 @@ import { Sparkles, X, ChevronUp, ChevronDown, ArrowUpRight } from 'lucide-react'
 interface StickyMobileAdProps {
   slotId?: string;
   adClient?: string;
+  destinationUrl?: string;
 }
 
 export const StickyMobileAd: React.FC<StickyMobileAdProps> = ({
-  slotId = '6382910475'
+  slotId = '6382910475',
+  destinationUrl = 'https://www.marcus.com/us/en/savings/high-yield-savings'
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -75,14 +77,21 @@ export const StickyMobileAd: React.FC<StickyMobileAdProps> = ({
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => window.open('https://google.com', '_blank', 'noopener,noreferrer')}
-              className="shrink-0 px-2.5 py-1.5 bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] text-[#475569] text-[11px] font-semibold rounded-lg border border-[#CBD5E1] transition-transform active:scale-95 flex items-center gap-1 cursor-pointer"
-            >
-              <span>View</span>
-              <ArrowUpRight className="w-3 h-3 text-[#94A3B8]" />
-            </button>
+            {destinationUrl && destinationUrl.startsWith('http') && !destinationUrl.includes('google.com') && destinationUrl !== '#' ? (
+              <a
+                href={destinationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 px-2.5 py-1.5 bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] text-[#475569] text-[11px] font-semibold rounded-lg border border-[#CBD5E1] transition-transform active:scale-95 flex items-center gap-1 cursor-pointer no-underline"
+              >
+                <span>View</span>
+                <ArrowUpRight className="w-3 h-3 text-[#94A3B8]" />
+              </a>
+            ) : (
+              <span className="shrink-0 px-2.5 py-1.5 bg-[#FFFFFF] text-[#94A3B8] text-[11px] font-semibold rounded-lg border border-[#CBD5E1] flex items-center gap-1 select-none">
+                <span>View</span>
+              </span>
+            )}
           </div>
         ) : (
           <div className="px-3 py-1 text-[11px] text-[#64748B] flex items-center justify-between bg-[#F8FAFC]">
