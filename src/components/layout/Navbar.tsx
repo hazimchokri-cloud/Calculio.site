@@ -130,21 +130,18 @@ export const Navbar: React.FC<NavbarProps> = ({
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div 
-          style={{ width: '920px', maxWidth: '100%' }}
-          className="flex items-center justify-between h-[68px] gap-4 sm:gap-8 w-[920px] max-w-full mx-auto"
-        >
+        <div className="flex items-center justify-between h-[60px] gap-3 sm:gap-6 w-full">
           
           {/* Logo: Calcul in #0F172A, io in #F97316, font 800, 24px */}
           <div 
             id="nav-brand-logo"
             onClick={onGoHome}
-            className="flex items-center gap-2 cursor-pointer shrink-0 py-1 select-none"
+            className="flex items-center gap-2 cursor-pointer shrink-0 select-none"
           >
             <div className="w-8 h-8 rounded-[8px] bg-[#F97316] flex items-center justify-center text-white shadow-xs">
               <Calculator className="w-4.5 h-4.5 stroke-[2.5]" />
             </div>
-            <span className="text-[24px] font-[800] tracking-tight leading-none">
+            <span className="text-[22px] sm:text-[24px] font-[800] tracking-tight leading-none">
               <span className="text-[#0F172A]">Calcul</span>
               <span className="text-[#F97316]">io</span>
             </span>
@@ -154,27 +151,20 @@ export const Navbar: React.FC<NavbarProps> = ({
           <nav 
             id="desktop-navigation-links"
             aria-label="Main Navigation"
-            style={{
-              fontWeight: 'bold',
-              textDecorationLine: 'none',
-              fontStyle: 'italic',
-              fontSize: '20px',
-              lineHeight: '28px'
-            }}
-            className="hidden md:flex items-center gap-7 lg:gap-8 h-full font-bold italic no-underline text-[20px] leading-[28px]"
+            className="hidden md:flex items-center gap-3.5 md:gap-4 lg:gap-6 xl:gap-7 h-full whitespace-nowrap shrink-0"
           >
             {navLinks.map((link) => (
               <button
                 key={link.id}
                 id={`nav-link-${link.id}`}
                 onClick={link.onClick}
-                className={`relative h-full flex items-center transition-colors cursor-pointer duration-150 ${
+                className={`relative h-full flex items-center px-1 text-[13px] md:text-[14px] lg:text-[15px] transition-colors cursor-pointer duration-150 whitespace-nowrap select-none ${
                   link.isActive
-                    ? 'text-[#F97316]'
-                    : 'text-[#475569] hover:text-[#F97316]'
+                    ? 'text-[#F97316] font-semibold'
+                    : 'text-[#475569] hover:text-[#F97316] font-medium'
                 }`}
               >
-                <span>{link.label}</span>
+                <span className="whitespace-nowrap">{link.label}</span>
                 {link.isActive && (
                   <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#F97316] rounded-full" />
                 )}
@@ -183,7 +173,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {/* Right Controls: Search, Language, Currency, Get Started, Mobile Hamburger */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-2.5 lg:gap-3 shrink-0">
             
             {/* Inline Search Expansion */}
             <div className="relative flex items-center">
@@ -196,7 +186,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       value={inlineSearchQuery}
                       onChange={(e) => setInlineSearchQuery(e.target.value)}
                       placeholder={t('home.searchPlaceholderClean', 'Search calculators...')}
-                      className="w-48 sm:w-60 h-9 pl-8.5 pr-7 text-sm bg-[#F8FAFC] border border-[#E2E8F0] rounded-[8px] focus:outline-none focus:border-[#F97316] focus:ring-2 focus:ring-[#F97316]/20 text-[#0F172A] placeholder:text-[#64748B] transition-all"
+                      className="w-44 sm:w-56 h-9 pl-8.5 pr-7 text-xs sm:text-sm bg-[#F8FAFC] border border-[#E2E8F0] rounded-[8px] focus:outline-none focus:border-[#F97316] focus:ring-2 focus:ring-[#F97316]/20 text-[#0F172A] placeholder:text-[#64748B] transition-all"
                     />
                     <Search className="w-4 h-4 text-[#64748B] absolute left-2.5 pointer-events-none" />
                     <button
@@ -230,7 +220,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={onGoToAllCalculators || onGoHome}
-              className="hidden sm:inline-flex items-center px-4 py-2 rounded-[8px] bg-[#F97316] hover:bg-[#EA580C] text-white text-sm font-semibold transition-all duration-150 shadow-xs hover:shadow-md cursor-pointer active:scale-[0.98]"
+              className="hidden sm:inline-flex items-center justify-center h-9 px-3.5 sm:px-4 rounded-[8px] bg-[#F97316] hover:bg-[#EA580C] text-white text-xs sm:text-sm font-semibold transition-all duration-150 shadow-xs hover:shadow-md cursor-pointer active:scale-[0.98] whitespace-nowrap"
             >
               Get Started
             </button>
@@ -239,7 +229,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden w-10 h-10 flex items-center justify-center rounded-[8px] text-[#475569] hover:text-[#0F172A] bg-[#F8FAFC] hover:bg-[#FFF7ED] border border-[#E2E8F0] transition-colors cursor-pointer"
+              className="md:hidden w-9 h-9 flex items-center justify-center rounded-[8px] text-[#475569] hover:text-[#0F172A] bg-[#F8FAFC] hover:bg-[#FFF7ED] border border-[#E2E8F0] transition-colors cursor-pointer"
               aria-label="Toggle navigation menu"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

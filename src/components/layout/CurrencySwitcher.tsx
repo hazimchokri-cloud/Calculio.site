@@ -47,7 +47,7 @@ export const CurrencySwitcher: React.FC<CurrencySwitcherProps> = ({
         id="currency-switcher-button"
         type="button"
         onClick={() => setIsOpen(prev => !prev)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-[#0F172A] bg-[#F8FAFC] hover:bg-[#FFF7ED] border border-[#E2E8F0] hover:border-[#FDBA74] rounded-[8px] transition-colors cursor-pointer shadow-xs focus:outline-none focus:ring-2 focus:ring-[#F97316]/20"
+        className="h-9 flex items-center gap-1.5 px-2.5 text-xs font-semibold text-[#0F172A] bg-[#F8FAFC] hover:bg-[#FFF7ED] border border-[#E2E8F0] hover:border-[#FDBA74] rounded-[8px] transition-colors cursor-pointer shadow-xs focus:outline-none focus:ring-2 focus:ring-[#F97316]/20"
         aria-haspopup="true"
         aria-expanded={isOpen}
         aria-label="Change Currency"
