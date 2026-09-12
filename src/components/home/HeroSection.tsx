@@ -85,7 +85,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         {/* Main Headline */}
         <h1 
           id="hero-headline"
-          className="text-[32px] sm:text-[42px] md:text-[48px] lg:text-[52px] font-[800] tracking-tight text-[#d60a00] italic leading-[1.18] max-w-4xl mx-auto"
+          style={{
+            fontSize: '23px',
+            lineHeight: '26.759999999999998px',
+            fontFamily: 'Georgia'
+          }}
+          className="font-[800] tracking-tight text-[#d60a00] italic max-w-4xl mx-auto"
         >
           {t('home.heroHeadline', 'Explore easy-to-use calculators for finance, health, math, conversions and more.')}
         </h1>
@@ -93,7 +98,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         {/* Subtitle Description */}
         <p 
           id="hero-description"
-          className="text-[17px] sm:text-[19px] md:text-[20px] text-[#1a1a1a] max-w-[720px] mx-auto leading-[1.6] font-[400]"
+          style={{
+            fontSize: '12px',
+            lineHeight: '22.2px',
+            fontWeight: 'bold',
+            fontStyle: 'italic',
+            fontFamily: 'Georgia'
+          }}
+          className="text-[#1a1a1a] max-w-[720px] mx-auto"
         >
           {t('home.heroSubtitleClean', 'Free calculation tools with transparent formulas, step-by-step breakdowns, and instant results.')}
         </p>
