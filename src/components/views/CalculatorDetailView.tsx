@@ -514,7 +514,9 @@ export const CalculatorDetailView: React.FC<CalculatorDetailProps> = ({
       <section 
         id="calculator-interactive-container"
         aria-label="Calculator Interactive Controls and Results"
-        className="bg-[#FFFFFF] rounded-2xl p-4 sm:p-8 border border-[#E2E8F0] shadow-xs"
+        className={`bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] shadow-xs ${
+          calculator.id === 'scientific-calculator' ? 'p-3 sm:p-5 lg:p-6' : 'p-4 sm:p-8'
+        }`}
       >
         <ErrorBoundary key={calculator.id}>
           <Suspense fallback={<CalculatorLoadingSkeleton />}>
