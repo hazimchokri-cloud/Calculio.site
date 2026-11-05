@@ -37,6 +37,7 @@ export interface PracticalUseCase {
 }
 
 export interface CalculatorExplanation {
+  introduction: string;
   howItWorks: {
     summary: string;
     steps: { title: string; detail: string }[];
@@ -50,8 +51,10 @@ export interface CalculatorExplanation {
     explanation: string;
   };
   examples: CalculationExample[];
+  understandingResults: string;
   useCases: PracticalUseCase[];
   faqs?: { question: string; answer: string }[];
+  importantNotes?: string[];
 }
 
 export interface CalculatorMeta {

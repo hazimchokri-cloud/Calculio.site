@@ -15,6 +15,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['mortgage', 'loan', 'real estate', 'home', 'amortization', 'property tax', 'interest'],
+    metaDescription: 'Free online mortgage calculator with amortization schedule. Calculate PITI payments, property taxes, and PMI for 15-year or 30-year fixed home loans.',
+    metaKeywords: ['mortgage calculator', 'monthly mortgage payment', 'home loan calculator', 'amortization schedule', 'piti calculator'],
     formulaSummary: 'Monthly Payment P = L * [c(1 + c)^n] / [(1 + c)^n - 1], where L is loan amount, c is monthly interest rate, and n is total monthly payments.',
     faqs: [
       {
@@ -38,6 +40,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['loan', 'principal', 'interest', 'term', 'monthly payment', 'borrowing'],
+    metaDescription: 'Versatile loan calculator for personal, auto, or student loans. Calculate monthly installments, total interest costs, and view a complete payoff schedule.',
+    metaKeywords: ['loan calculator', 'personal loan calculator', 'installment loan', 'interest calculator', 'debt calculator'],
     formulaSummary: 'P = (r * PV) / (1 - (1 + r)^(-n))'
   },
   {
@@ -51,6 +55,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: false,
     tags: ['car', 'vehicle', 'auto loan', 'financing', 'trade-in', 'dealer'],
+    metaDescription: 'Accurate car loan calculator with trade-in value and sales tax. Estimate monthly auto payments and total vehicle financing costs instantly.',
+    metaKeywords: ['auto loan calculator', 'car payment calculator', 'vehicle financing', 'car loan interest', 'auto financing'],
     formulaSummary: 'Loan = (Vehicle Price - Down Payment - Trade-in) + Sales Tax + Fees.'
   },
   {
@@ -63,7 +69,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Wallet',
     popular: true,
     featured: false,
-    tags: ['personal loan', 'debt', 'borrowing', 'origination fee', 'unsecured loan']
+    tags: ['personal loan', 'debt', 'borrowing', 'origination fee', 'unsecured loan'],
+    metaDescription: 'Calculate personal loan monthly payments and origination fees. Compare different loan terms and see the total cost of borrowing for any credit score.',
+    metaKeywords: ['personal loan calculator', 'unsecured loan', 'origination fee', 'debt consolidation calculator']
   },
   {
     id: 'interest-calculator',
@@ -75,7 +83,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Percent',
     popular: true,
     featured: false,
-    tags: ['interest', 'simple interest', 'compound interest', 'growth', 'apr']
+    tags: ['interest', 'simple interest', 'compound interest', 'growth', 'apr'],
+    metaDescription: 'Free interest calculator to compare simple vs compound interest growth. See how different compounding frequencies (daily, monthly, yearly) affect your savings.',
+    metaKeywords: ['interest calculator', 'simple interest vs compound interest', 'savings interest', 'apy calculator']
   },
   {
     id: 'compound-interest-calculator',
@@ -88,6 +98,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['investing', 'savings', 'interest', 'compound', 'growth', 'stocks', 'roi', 'retirement'],
+    metaDescription: 'Powerful compound interest calculator with monthly contributions. Visualize the growth of your investments over time with the snowball effect of compounding.',
+    metaKeywords: ['compound interest calculator', 'investment growth calculator', 'savings projection', 'future value calculator'],
     formulaSummary: 'A = P(1 + r/n)^(nt) + PMT * [((1 + r/n)^(nt) - 1) / (r/n)]'
   },
   {
@@ -100,7 +112,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'LineChart',
     popular: true,
     featured: true,
-    tags: ['investment', 'stocks', 'portfolio', 'index funds', 'inflation adjusted', 'real return']
+    tags: ['investment', 'stocks', 'portfolio', 'index funds', 'inflation adjusted', 'real return'],
+    metaDescription: 'Calculate investment returns with inflation adjustments and tax estimates. Plan your portfolio growth across stocks, bonds, and mutual funds.',
+    metaKeywords: ['investment calculator', 'portfolio growth', 'real return calculator', 'stock market calculator']
   },
   {
     id: 'savings-calculator',
@@ -112,7 +126,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'PiggyBank',
     popular: true,
     featured: false,
-    tags: ['savings', 'hysa', 'emergency fund', 'goal', 'bank', 'interest']
+    tags: ['savings', 'hysa', 'emergency fund', 'goal', 'bank', 'interest'],
+    metaDescription: 'Calculate how to reach your savings goals. Find the monthly contribution needed to hit a target balance or see your high-yield savings growth.',
+    metaKeywords: ['savings calculator', 'savings goal calculator', 'hysa calculator', 'emergency fund savings']
   },
   {
     id: 'retirement-calculator',
@@ -124,7 +140,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'ShieldCheck',
     popular: true,
     featured: true,
-    tags: ['retirement', '401k', 'ira', 'nest egg', 'fire', 'financial independence', '4 percent rule']
+    tags: ['retirement', '401k', 'ira', 'nest egg', 'fire', 'financial independence', '4 percent rule'],
+    metaDescription: 'Estimate your retirement nest egg and annual income. Evaluate the 4% withdrawal rule and see if you are on track for financial independence.',
+    metaKeywords: ['retirement calculator', '401k calculator', 'ira calculator', 'fire calculator', 'retirement nest egg']
   },
   {
     id: 'inflation-calculator',
@@ -136,7 +154,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Coins',
     popular: false,
     recentlyAdded: true,
-    tags: ['inflation', 'cpi', 'purchasing power', 'money', 'economy']
+    tags: ['inflation', 'cpi', 'purchasing power', 'money', 'economy'],
+    metaDescription: 'Calculate the impact of inflation on your money. See how purchasing power has changed over the years using CPI data models.',
+    metaKeywords: ['inflation calculator', 'cpi calculator', 'purchasing power calculator', 'value of money over time']
   },
   {
     id: 'credit-card-calculator',
@@ -148,7 +168,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'CreditCard',
     popular: true,
     featured: true,
-    tags: ['credit card', 'debt', 'minimum payment', 'revolving debt', 'apr', 'interest']
+    tags: ['credit card', 'debt', 'minimum payment', 'revolving debt', 'apr', 'interest'],
+    metaDescription: 'Free credit card payoff calculator. See how long it takes to pay off credit card debt and how much interest you can save with higher payments.',
+    metaKeywords: ['credit card payoff calculator', 'debt repayment calculator', 'credit card interest calculator']
   },
   {
     id: 'debt-payoff-calculator',
@@ -160,7 +182,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Layers',
     popular: true,
     featured: false,
-    tags: ['debt payoff', 'snowball', 'avalanche', 'credit cards', 'debt free', 'accelerator']
+    tags: ['debt payoff', 'snowball', 'avalanche', 'credit cards', 'debt free', 'accelerator'],
+    metaDescription: 'Compare the Debt Snowball vs Debt Avalanche methods. Create a custom plan to pay off your debts faster and save on total interest.',
+    metaKeywords: ['debt payoff calculator', 'debt snowball calculator', 'debt avalanche calculator', 'get out of debt']
   },
   {
     id: 'apr-calculator',
@@ -171,7 +195,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     shortDescription: 'Calculate true APR and effective borrowing cost with fees.',
     iconName: 'Percent',
     popular: false,
-    tags: ['apr', 'interest rate', 'closing costs', 'points', 'origination', 'mortgage']
+    tags: ['apr', 'interest rate', 'closing costs', 'points', 'origination', 'mortgage'],
+    metaDescription: 'Calculate the true APR of any loan. Factor in origination fees and closing costs to see the real annual cost of borrowing.',
+    metaKeywords: ['apr calculator', 'annual percentage rate', 'real interest rate', 'loan fee calculator']
   },
   {
     id: 'amortization-calculator',
@@ -183,7 +209,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Table',
     popular: true,
     featured: false,
-    tags: ['amortization', 'schedule', 'principal', 'interest', 'csv', 'table']
+    tags: ['amortization', 'schedule', 'principal', 'interest', 'csv', 'table'],
+    metaDescription: 'Generate a free printable loan amortization schedule. See exactly how much of each payment goes toward principal vs interest.',
+    metaKeywords: ['amortization calculator', 'amortization schedule', 'loan schedule', 'mortgage payoff table']
   },
   {
     id: 'roi-calculator',
@@ -194,7 +222,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     shortDescription: 'Total ROI %, net profit, and annualized Compound Annual Growth Rate (CAGR).',
     iconName: 'TrendingUp',
     popular: true,
-    tags: ['roi', 'return on investment', 'cagr', 'profit', 'yield', 'investing']
+    tags: ['roi', 'return on investment', 'cagr', 'profit', 'yield', 'investing'],
+    metaDescription: 'Calculate ROI and CAGR for any investment. Find your total profit and annualized return percentages for business or personal assets.',
+    metaKeywords: ['roi calculator', 'return on investment', 'cagr calculator', 'profit calculator']
   },
   {
     id: 'salary-calculator',
@@ -206,7 +236,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Briefcase',
     popular: true,
     featured: true,
-    tags: ['salary', 'wage', 'hourly', 'income', 'paycheck', 'taxes', 'net pay', 'gross pay']
+    tags: ['salary', 'wage', 'hourly', 'income', 'paycheck', 'taxes', 'net pay', 'gross pay'],
+    metaDescription: 'Convert hourly wage to annual salary and vice versa. Calculate take-home pay after federal and state tax estimates.',
+    metaKeywords: ['salary calculator', 'hourly to salary', 'take home pay calculator', 'paycheck calculator']
   },
 
   // ==========================================
@@ -222,7 +254,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Scale',
     popular: true,
     featured: true,
-    tags: ['bmi', 'body mass index', 'weight', 'health', 'fitness', 'diet', 'obesity', 'underweight']
+    tags: ['bmi', 'body mass index', 'weight', 'health', 'fitness', 'diet', 'obesity', 'underweight'],
+    metaDescription: 'Free online BMI calculator for adults. Find your body mass index classification and healthy weight range based on WHO standards.',
+    metaKeywords: ['bmi calculator', 'body mass index', 'weight classification', 'healthy weight range']
   },
   {
     id: 'body-fat-calculator',
