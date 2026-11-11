@@ -29,11 +29,11 @@ export const BLOG_AUTHORS: Record<string, BlogAuthor> = {
     bio: 'Certified Financial Planner with 18+ years advising families and business owners on tax-advantaged retirement withdrawals, compound growth horizons, and risk modeling.',
     credentials: 'Certified Financial Planner (CFP®), MBA in Finance'
   },
-  rachelHayes: {
-    name: 'Rachel Hayes, MBA',
-    role: 'Commercial Real Estate & Business Operations Analyst',
-    avatar: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=256&q=80',
-    bio: 'Real estate investment strategist and corporate controller specializing in unit economics, cap rate evaluations, break-even modeling, and cash flow forecasting.',
-    credentials: 'MBA in Corporate Finance, CCIM Associate'
+  calculioEditorial: {
+    name: 'Calculio Editorial Team',
+    role: 'Financial Education & Research Unit',
+    avatar: '/favicon.ico',
+    bio: 'The Calculio Editorial Team is composed of financial analysts, math educators, and technology specialists dedicated to providing accurate, accessible, and verified financial tools and educational resources.',
+    credentials: 'Verified Academic & Professional Source'
   }
 };

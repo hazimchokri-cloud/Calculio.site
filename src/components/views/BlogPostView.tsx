@@ -22,6 +22,25 @@ import { ShareModal } from '../shared/ShareModal';
 import { PrintReportHeader } from '../shared/PrintReportHeader';
 import { PrintReportFooter } from '../shared/PrintReportFooter';
 import { useLanguage } from '../../i18n/LanguageContext';
+import DOMPurify from 'dompurify';
+
+// Configure DOMPurify to allow data URLs for images and IDs for TOC anchor links
+const purifyConfig = {
+  ADD_ATTR: ['target', 'rel', 'id'],
+  ADD_TAGS: ['iframe'], 
+  ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel|data):|[^a-z0-9+.-])/i,
+};
+
+const HEADING_2_LIST = [
+  "How Do You Estimate a Future Balance?",
+  "How Does Compound Interest Work?",
+  "How Does Compounding Frequency Affect Returns?",
+  "How Do Regular Deposits and Account Choices Affect Growth?",
+  "What Mistakes Can Make Growth Estimates Misleading?",
+  "Build a Savings Plan With Realistic Assumptions",
+  "Frequently Asked Questions",
+  "Sources and Further Reading"
+];
 
 const FALLBACK_BLOG_IMAGE = 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=1200&h=675&q=80';
 const FALLBACK_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80';
@@ -47,6 +66,65 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
   const localizedPost = getBlogPost(post.slug) || post;
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+  const isEditorialTeam = localizedPost.author.name === 'Calculio Editorial Team';
+
+  // Process sections to add IDs to headings and generate TOC
+  const { processedSections, tocItems } = React.useMemo(() => {
+    const toc: { id: string; text: string; level: number }[] = [];
+    
+    const processed = localizedPost.sections.map(section => {
+      let html = section.htmlContent || '';
+      
+      if (html) {
+        // Upgrade specific h3 headings to h2 as requested by user
+        HEADING_2_LIST.forEach(h2Text => {
+          const escaped = h2Text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regex = new RegExp(`<h3>\\s*(${escaped})\\s*<\\/h3>`, 'gi');
+          html = html.replace(regex, '<h2>$1</h2>');
+        });
+
+        // Add IDs and extract TOC items
+        html = html.replace(/<(h2|h3)([^>]*)>(.*?)<\/\1>/gi, (match, tag, attrs, text) => {
+          const cleanText = text.replace(/<[^>]*>?/gm, '').trim();
+          if (!cleanText) return match;
+          
+          const id = cleanText.toLowerCase()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .substring(0, 50);
+          
+          toc.push({ id, text: cleanText, level: parseInt(tag[1]) });
+          
+          // Only add ID if not already present in attributes
+          if (attrs.includes('id=')) return match;
+          return `<${tag}${attrs} id="${id}">${text}</${tag}>`;
+        });
+        
+        // Wrap tables in container for horizontal scrolling if not already wrapped
+        // Check if table is already preceded by div class="table-container"
+        if (!html.includes('table-container')) {
+          html = html.replace(/<table/g, '<div class="table-container"><table');
+          html = html.replace(/<\/table>/g, '</table></div>');
+        }
+      } else if (section.title) {
+        const cleanTitle = section.title.replace(/^\d+\.\s*/, '');
+        toc.push({ id: section.id, text: cleanTitle, level: 2 });
+      }
+      
+      return { ...section, htmlContent: html };
+    });
+
+    // Manually add FAQs to TOC if they exist and are not already in the list
+    if (localizedPost.faqs && localizedPost.faqs.length > 0) {
+      const faqTitle = t('blog.faqTitle', 'Frequently Asked Questions');
+      if (!toc.some(item => item.text === faqTitle)) {
+        toc.push({ id: 'frequently-asked-questions', text: faqTitle, level: 2 });
+      }
+    }
+
+    return { processedSections: processed, tocItems: toc };
+  }, [localizedPost.sections, t]);
 
   // Related calculators
   const relatedCalculators = localizedPost.relatedCalculatorIds
@@ -108,8 +186,7 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
           <Breadcrumbs items={breadcrumbs} onGoHome={onGoHome} />
         </div>
 
-        {/* Top Header Ad Placement */}
-        <AdSlot type="header-banner" />
+
 
         {/* Article Header Container */}
         <header className="space-y-6 max-w-4xl">
@@ -142,28 +219,36 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
 
           {/* Author Byline Bar */}
           <div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-xs">
-            <div className="flex items-center gap-3.5">
-              <img
-                src={localizedPost.author.avatar}
-                alt={localizedPost.author.name}
-                className="w-12 h-12 rounded-full object-cover border-2 border-[#FDBA74]"
-                referrerPolicy="no-referrer"
-                onError={(e) => {
-                  const target = e.currentTarget;
-                  if (target.src !== FALLBACK_AVATAR) {
-                    target.src = FALLBACK_AVATAR;
-                  }
-                }}
-              />
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-base font-bold text-[#0F172A]">{localizedPost.author.name}</span>
-                  <ShieldCheck className="w-4.5 h-4.5 text-[#F97316]" aria-label="Verified Author & Subject Matter Expert" />
-                </div>
-                <span className="text-sm text-[#475569] block">{localizedPost.author.role}</span>
-                <span className="text-xs text-[#64748B] font-medium">{localizedPost.author.credentials}</span>
+            {isEditorialTeam ? (
+              <div className="flex items-center gap-2 py-1">
+                <span className="text-sm font-bold text-[#64748B]">{t('blog.by', 'By')}</span>
+                <span className="text-base font-black text-[#0F172A]">{localizedPost.author.name}</span>
+                <ShieldCheck className="w-4.5 h-4.5 text-[#F97316]" aria-label="Verified Source" />
               </div>
-            </div>
+            ) : (
+              <div className="flex items-center gap-3.5">
+                <img
+                  src={localizedPost.author.avatar}
+                  alt={localizedPost.author.name}
+                  className="w-12 h-12 rounded-full object-cover border-2 border-[#FDBA74]"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (target.src !== FALLBACK_AVATAR) {
+                      target.src = FALLBACK_AVATAR;
+                    }
+                  }}
+                />
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-base font-bold text-[#0F172A]">{localizedPost.author.name}</span>
+                    <ShieldCheck className="w-4.5 h-4.5 text-[#F97316]" aria-label="Verified Author & Subject Matter Expert" />
+                  </div>
+                  <span className="text-sm text-[#475569] block">{localizedPost.author.role}</span>
+                  <span className="text-xs text-[#64748B] font-medium">{localizedPost.author.credentials}</span>
+                </div>
+              </div>
+            )}
 
             {/* Actions: Share & Print */}
             <div className="flex items-center gap-2">
@@ -236,41 +321,55 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
               </div>
             )}
 
-            {/* In-Content Jump Table of Contents (Mobile & Tablet) */}
-            <div className="lg:hidden p-5 rounded-2xl bg-[#FFFFFF] border border-[#E2E8F0] space-y-2">
-              <span className="text-sm font-bold text-[#0F172A] flex items-center gap-1.5">
-                <BookOpen className="w-4 h-4 text-[#F97316]" />
-                {t('blog.toc', 'Table of Contents')}
-              </span>
-              <div className="space-y-1">
-                {localizedPost.sections.map((section, idx) => (
-                  <a
-                    key={section.id}
-                    href={`#${section.id}`}
-                    className="block text-sm text-[#475569] hover:text-[#F97316] py-1.5 border-b border-[#E2E8F0] last:border-0"
-                  >
-                    {idx + 1}. {section.title.replace(/^\d+\.\s*/, '')}
-                  </a>
-                ))}
+            {tocItems.length > 0 && (
+              <div className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E2E8F0] space-y-2">
+                <span className="text-sm font-bold text-[#0F172A] flex items-center gap-1.5">
+                  <BookOpen className="w-4 h-4 text-[#F97316]" />
+                  {t('blog.toc', 'Table of Contents')}
+                </span>
+                <div className="space-y-1">
+                  {tocItems.map((item, idx) => (
+                    <a
+                      key={`${item.id}-${idx}`}
+                      href={`#${item.id}`}
+                      className={`block text-sm py-1.5 border-b border-[#E2E8F0] last:border-0 hover:text-[#F97316] ${
+                        item.level === 3 ? 'pl-4 text-[#64748B]' : 'text-[#475569] font-semibold'
+                      }`}
+                    >
+                      {item.text}
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Article Sections */}
             <div className="space-y-10">
-              {localizedPost.sections.map((section, sectionIdx) => (
+              {processedSections.map((section, sectionIdx) => (
                 <section key={section.id} id={section.id} className="space-y-4 scroll-mt-24">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight border-b border-[#E2E8F0] pb-2.5">
-                    {section.title}
-                  </h2>
+                  {section.title && (
+                    <h2 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight border-b border-[#E2E8F0] pb-2.5">
+                      {section.title}
+                    </h2>
+                  )}
 
-                  {/* Paragraphs */}
-                  <div className="space-y-3.5 text-base sm:text-[17px] text-[#475569] leading-relaxed font-normal">
-                    {section.content.map((paragraph, pIdx) => (
-                      <p key={pIdx}>
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
+                  {/* Content (HTML or Paragraphs) */}
+                  {section.htmlContent ? (
+                    <div 
+                      className="rich-text-content text-base sm:text-[17px] text-[#475569] leading-relaxed font-normal"
+                      dangerouslySetInnerHTML={{ 
+                        __html: DOMPurify.sanitize(section.htmlContent, purifyConfig) 
+                      }}
+                    />
+                  ) : (
+                    <div className="space-y-3.5 text-base sm:text-[17px] text-[#475569] leading-relaxed font-normal">
+                      {section.content.map((paragraph, pIdx) => (
+                        <p key={pIdx}>
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Mathematical Formula Callout */}
                   {section.formula && (
@@ -360,12 +459,7 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
                     </div>
                   )}
 
-                  {/* Mid-Article In-Content Native Ad Placement (after Section 2) */}
-                  {sectionIdx === 1 && (
-                    <div className="my-6">
-                      <AdSlot type="in-content" />
-                    </div>
-                  )}
+
                 </section>
               ))}
             </div>
@@ -374,10 +468,7 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
             {relatedCalculators.length > 0 && (
               <div className="p-6 sm:p-8 rounded-3xl bg-[#FFFFFF] text-[#0F172A] space-y-5 shadow-xs border border-[#E2E8F0]">
                 <div className="space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF7ED] text-[#F97316] text-xs font-bold border border-[#FDBA74]">
-                    <Calculator className="w-4 h-4" />
-                    <span>{t('blog.interactiveToolsBadge', 'Interactive Tools Mentioned in this Guide')}</span>
-                  </div>
+
                   <h3 className="text-xl sm:text-2xl font-black text-[#0F172A]">
                     {t('blog.putFormulaToWork', 'Put This Formula to Work')}
                   </h3>
@@ -412,34 +503,36 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
             )}
 
             {/* Author Detailed Bio Card */}
-            <div className="p-6 sm:p-8 rounded-3xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-xs flex flex-col sm:flex-row gap-5 items-start">
-              <img
-                src={localizedPost.author.avatar}
-                alt={localizedPost.author.name}
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border border-[#E2E8F0] shrink-0"
-                referrerPolicy="no-referrer"
-                onError={(e) => {
-                  const target = e.currentTarget;
-                  if (target.src !== FALLBACK_AVATAR) {
-                    target.src = FALLBACK_AVATAR;
-                  }
-                }}
-              />
-              <div className="space-y-2">
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#F97316]">{t('blog.reviewedBy', 'Written & Reviewed By')}</span>
-                  <h3 className="font-black text-lg sm:text-xl text-[#0F172A]">{localizedPost.author.name}</h3>
-                  <span className="text-sm font-semibold text-[#475569]">{localizedPost.author.role} • {localizedPost.author.credentials}</span>
+            {!isEditorialTeam && (
+              <div className="p-6 sm:p-8 rounded-3xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-xs flex flex-col sm:flex-row gap-5 items-start">
+                <img
+                  src={localizedPost.author.avatar}
+                  alt={localizedPost.author.name}
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border border-[#E2E8F0] shrink-0"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (target.src !== FALLBACK_AVATAR) {
+                      target.src = FALLBACK_AVATAR;
+                    }
+                  }}
+                />
+                <div className="space-y-2">
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#F97316]">{t('blog.reviewedBy', 'Written & Reviewed By')}</span>
+                    <h3 className="font-black text-lg sm:text-xl text-[#0F172A]">{localizedPost.author.name}</h3>
+                    <span className="text-sm font-semibold text-[#475569]">{localizedPost.author.role} • {localizedPost.author.credentials}</span>
+                  </div>
+                  <p className="text-sm sm:text-base text-[#475569] leading-relaxed">
+                    {localizedPost.author.bio}
+                  </p>
                 </div>
-                <p className="text-sm sm:text-base text-[#475569] leading-relaxed">
-                  {localizedPost.author.bio}
-                </p>
               </div>
-            </div>
+            )}
 
             {/* FAQ Accordion */}
             {localizedPost.faqs && localizedPost.faqs.length > 0 && (
-              <div className="p-6 sm:p-8 rounded-3xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-xs space-y-4">
+              <div id="frequently-asked-questions" className="p-6 sm:p-8 rounded-3xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-xs space-y-4">
                 <div className="flex items-center gap-2 text-[#0F172A] font-bold text-lg sm:text-xl">
                   <HelpCircle className="w-5 h-5 text-[#F97316]" />
                   <span>{t('blog.faqTitle', 'Frequently Asked Questions')}</span>
@@ -470,85 +563,25 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
               </div>
             )}
 
-            {/* Bottom Ad Placement */}
-            <AdSlot type="banner" />
+
 
           </main>
 
           {/* Sidebar Column (4 cols) */}
           <aside className="lg:col-span-4 space-y-6">
-            
-            {/* Sticky Table of Contents Container */}
-            <div className="sticky top-24 space-y-6">
-              
-              {/* Table of Contents Card */}
-              <div className="p-5 sm:p-6 rounded-3xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-xs space-y-3">
-                <span className="text-sm font-bold uppercase tracking-wider text-[#64748B] flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-[#F97316]" />
-                  <span>{t('blog.toc', 'Table of Contents')}</span>
-                </span>
-
-                <nav className="space-y-1">
-                  {localizedPost.sections.map((section, idx) => (
-                    <a
-                      key={section.id}
-                      href={`#${section.id}`}
-                      className="block p-2 rounded-xl text-sm font-semibold text-[#475569] hover:text-[#F97316] hover:bg-[#FFF7ED] transition-colors leading-snug"
-                    >
-                      <span className="text-[#64748B] mr-1.5">{idx + 1}.</span>
-                      {section.title.replace(/^\d+\.\s*/, '')}
-                    </a>
-                  ))}
-                </nav>
+            {/* Tags Cloud */}
+            <div className="p-5 sm:p-6 rounded-3xl bg-[#FFFFFF] border border-[#E2E8F0] space-y-2">
+              <span className="text-sm font-bold uppercase tracking-wider text-[#64748B] flex items-center gap-1.5">
+                <Tag className="w-4 h-4 text-[#64748B]" />
+                <span>{t('blog.articleTags', 'Article Tags')}</span>
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {localizedPost.tags.map(tag => (
+                  <span key={tag} className="text-xs font-medium bg-[#F8FAFC] text-[#475569] border border-[#E2E8F0] px-3 py-1 rounded-lg">
+                    #{tag}
+                  </span>
+                ))}
               </div>
-
-              {/* Related Calculators Sidebar Widget */}
-              <div className="p-5 sm:p-6 rounded-3xl bg-[#FFFFFF] text-[#0F172A] shadow-xs space-y-3 border border-[#E2E8F0]">
-                <div className="flex items-center gap-2 text-sm font-bold text-[#F97316] uppercase tracking-wider">
-                  <Calculator className="w-4 h-4" />
-                  <span>{t('blog.relatedCalculators', 'Related Calculators')}</span>
-                </div>
-
-                <div className="space-y-2">
-                  {relatedCalculators.map(calc => (
-                    <button
-                      key={calc.id}
-                      onClick={() => onSelectCalculator(calc.id)}
-                      className="w-full p-3 rounded-xl bg-[#F8FAFC] hover:bg-[#FFF7ED] text-left transition-colors flex items-center justify-between text-sm font-semibold text-[#0F172A] hover:text-[#F97316] group cursor-pointer border border-[#E2E8F0] hover:border-[#FDBA74]"
-                    >
-                      <span className="truncate pr-2">{calc.name}</span>
-                      <ArrowRight className="w-4 h-4 text-[#F97316] group-hover:translate-x-0.5 transition-transform shrink-0" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sidebar Ad Placement */}
-              <AdSlot type="sidebar" />
-
-              {/* Sidebar Partner Offers */}
-              <AffiliateOffersSection
-                categoryId={localizedPost.category === 'general-education' ? 'financial' : localizedPost.category}
-                layout="compact-sidebar"
-                title={t('calcView.featuredPartnerOffers', 'Recommended Partner Deals')}
-                limit={2}
-              />
-
-              {/* Tags Cloud */}
-              <div className="p-5 sm:p-6 rounded-3xl bg-[#FFFFFF] border border-[#E2E8F0] space-y-2">
-                <span className="text-sm font-bold uppercase tracking-wider text-[#64748B] flex items-center gap-1.5">
-                  <Tag className="w-4 h-4 text-[#64748B]" />
-                  <span>{t('blog.articleTags', 'Article Tags')}</span>
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {localizedPost.tags.map(tag => (
-                    <span key={tag} className="text-xs font-medium bg-[#F8FAFC] text-[#475569] border border-[#E2E8F0] px-3 py-1 rounded-lg">
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
             </div>
           </aside>
 

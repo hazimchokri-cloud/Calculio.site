@@ -143,6 +143,7 @@ export interface BlogSection {
     rows: string[][];
     caption?: string;
   };
+  htmlContent?: string;
 }
 
 export type BlogCategory = 
