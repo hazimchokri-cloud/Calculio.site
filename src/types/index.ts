@@ -166,7 +166,7 @@ export interface BlogPost {
   imageAlt?: string;
   category: BlogCategory | string;
   categoryLabel: string;
-  author: BlogAuthor;
+  author?: BlogAuthor;
   publishedAt: string;
   updatedAt: string;
   readTimeMinutes: number;

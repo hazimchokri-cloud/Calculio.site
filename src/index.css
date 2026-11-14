@@ -118,6 +118,72 @@
   background-color: #F8FAFC;
 }
 
+.rich-text-content figure {
+  margin: 1.75rem 0;
+}
+
+.rich-text-content figure img {
+  display: block;
+  width: 100%;
+  max-width: 900px;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 0.75rem;
+}
+
+.rich-text-content figure img.wide {
+  max-width: 760px;
+}
+
+.rich-text-content figcaption {
+  margin-top: 0.5rem;
+  text-align: center;
+  color: #64748B;
+  font-size: 0.9rem;
+}
+
+.rich-text-content .table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 1.5rem 0 2rem;
+  border-radius: 1rem;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.rich-text-content .bmi-cta {
+  text-align: center;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  background-color: #FFF7ED;
+  border: 1px solid #FDBA74;
+}
+
+.rich-text-content .bmi-cta p:last-child {
+  margin-bottom: 0;
+}
+
+.rich-text-content .bmi-cta a {
+  display: inline-block;
+  padding: 0.75rem 1.75rem;
+  background-color: #C2410C;
+  color: #FFFFFF;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.rich-text-content .bmi-cta a:hover {
+  background-color: #9A3412;
+  color: #FFFFFF;
+}
+
+.rich-text-content .source-list li,
+.rich-text-content .faq-list li {
+  margin-bottom: 0.65rem;
+}
+
 @theme {
   --color-page: #F8FAFC;
   --color-surface: #FFFFFF;

@@ -124,7 +124,11 @@ function AppContent() {
     // Check blog routes
     if (segments[0] === 'blog') {
       if (segments[1]) {
-        const post = BLOG_POSTS.find(p => p.slug === segments[1]);
+        const aliasMap: Record<string, string> = {
+          'compound-interest-calculator': 'estimate-savings-growth-compound-interest'
+        };
+        const resolvedSlug = aliasMap[segments[1]] || segments[1];
+        const post = BLOG_POSTS.find(p => p.slug === resolvedSlug);
         if (post) {
           setSelectedBlogSlug(post.slug);
           setViewMode('blog-post');
@@ -290,7 +294,10 @@ function AppContent() {
   };
 
   const handleSelectPost = (slug: string) => {
-    const validSlug = typeof slug === 'string' ? slug : 'how-mortgage-calculations-work';
+    const aliasMap: Record<string, string> = {
+      'compound-interest-calculator': 'estimate-savings-growth-compound-interest'
+    };
+    const validSlug = typeof slug === 'string' ? (aliasMap[slug] || slug) : 'how-mortgage-calculations-work';
     const post = BLOG_POSTS.find(p => p.slug === validSlug) || BLOG_POSTS[0];
     setSelectedBlogSlug(post.slug);
     setViewMode('blog-post');
@@ -407,7 +414,7 @@ function AppContent() {
         canonicalUrl: getBlogPostUrl(currentBlogPost.slug),
         ogType: 'article',
         ogImage: currentBlogPost.coverImage,
-        author: currentBlogPost.author.name,
+        author: currentBlogPost.author?.name,
         publishedTime: currentBlogPost.publishedAt,
         modifiedTime: currentBlogPost.updatedAt,
         schema: [articleSchema, breadcrumbSchema]

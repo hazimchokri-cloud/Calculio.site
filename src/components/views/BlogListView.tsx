@@ -57,7 +57,7 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
         post.title.toLowerCase().includes(q) ||
         post.excerpt.toLowerCase().includes(q) ||
         post.tags.some(t => t.toLowerCase().includes(q)) ||
-        post.author.name.toLowerCase().includes(q);
+        (post.author?.name || '').toLowerCase().includes(q);
       
       return matchCat && matchQuery;
     });
@@ -165,28 +165,32 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
                 </div>
 
                 <div className="pt-4 border-t border-[#E2E8F0] flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <img 
-                      src={featuredPost.author.avatar} 
-                      alt={featuredPost.author.name}
-                      width={40}
-                      height={40}
-                      loading="lazy"
-                      decoding="async"
-                      className="w-10 h-10 rounded-full object-cover border border-[#E2E8F0]"
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        if (target.src !== FALLBACK_AVATAR) {
-                          target.src = FALLBACK_AVATAR;
-                        }
-                      }}
-                    />
-                    <div>
-                      <span className="text-sm font-bold text-[#0F172A] block">{featuredPost.author.name}</span>
-                      <span className="text-xs text-[#64748B] block truncate max-w-[180px]">{featuredPost.author.role}</span>
+                  {featuredPost.author ? (
+                    <div className="flex items-center gap-3">
+                      <img 
+                        src={featuredPost.author.avatar} 
+                        alt={featuredPost.author.name}
+                        width={40}
+                        height={40}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-10 h-10 rounded-full object-cover border border-[#E2E8F0]"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (target.src !== FALLBACK_AVATAR) {
+                            target.src = FALLBACK_AVATAR;
+                          }
+                        }}
+                      />
+                      <div>
+                        <span className="text-sm font-bold text-[#0F172A] block">{featuredPost.author.name}</span>
+                        <span className="text-xs text-[#64748B] block truncate max-w-[180px]">{featuredPost.author.role}</span>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <span className="text-sm font-semibold text-[#64748B]">{featuredPost.categoryLabel}</span>
+                  )}
 
                   <div className="w-9 h-9 rounded-full bg-[#FFF7ED] text-[#F97316] group-hover:bg-[#F97316] group-hover:text-[#FFFFFF] flex items-center justify-center transition-all">
                     <ArrowRight className="w-4.5 h-4.5" />
@@ -362,23 +366,29 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
 
               {/* Author & Footer Action */}
               <div className="p-5 sm:p-6 pt-3 border-t border-[#E2E8F0] flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <img 
-                    src={post.author.avatar} 
-                    alt={post.author.name}
-                    className="w-8 h-8 rounded-full object-cover border border-[#E2E8F0]"
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      if (target.src !== FALLBACK_AVATAR) {
-                        target.src = FALLBACK_AVATAR;
-                      }
-                    }}
-                  />
-                  <span className="text-sm font-semibold text-[#475569] truncate max-w-[140px]">
-                    {post.author.name}
+                {post.author ? (
+                  <div className="flex items-center gap-2.5">
+                    <img 
+                      src={post.author.avatar} 
+                      alt={post.author.name}
+                      className="w-8 h-8 rounded-full object-cover border border-[#E2E8F0]"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (target.src !== FALLBACK_AVATAR) {
+                          target.src = FALLBACK_AVATAR;
+                        }
+                      }}
+                    />
+                    <span className="text-sm font-semibold text-[#475569] truncate max-w-[140px]">
+                      {post.author.name}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-xs font-semibold text-[#64748B]">
+                    {post.categoryLabel}
                   </span>
-                </div>
+                )}
 
                 <span className="text-sm font-bold text-[#F97316] group-hover:translate-x-1 transition-transform flex items-center gap-1">
                   {t('blog.readGuide', 'Read Guide')} <ArrowRight className="w-4 h-4" />

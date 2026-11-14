@@ -777,5 +777,321 @@ export const HEALTH_FITNESS_POSTS: BlogPost[] = [
         }
       }
     ]
+  },
+  {
+    slug: 'bmi-calculator',
+    title: 'BMI Calculator: Calculate and Understand Your Results',
+    excerpt: 'Use a BMI Calculator to calculate your body mass index (BMI) from height and weight, apply the metric or US formula, interpret adult categories and child percentiles, and understand key health limitations.',
+    coverImage: '/assets/bmi-cover.webp',
+    imageAlt: 'BMI calculator cover showing a gauge with an example BMI of 22.9, healthy weight',
+    category: 'health-fitness',
+    categoryLabel: 'Health & Fitness',
+    publishedAt: '2026-11-14',
+    updatedAt: '2026-11-14',
+    readTimeMinutes: 10,
+    featured: false,
+    tags: ['BMI Calculator', 'Body Mass Index', 'Adult BMI Categories', 'Child BMI Percentiles', 'Health Screening'],
+    relatedCalculatorIds: ['bmi-calculator', 'body-fat-calculator', 'ideal-weight-calculator', 'bmr-calculator'],
+    metaDescription: 'Calculate your body mass index (BMI) from height and weight, understand metric and US BMI formulas, interpret adult categories and child percentiles, and learn key limitations.',
+    metaKeywords: ['bmi calculator', 'body mass index', 'bmi formula', 'adult bmi categories', 'child bmi percentiles', 'healthy weight range'],
+    keyTakeaways: [],
+    faqs: [],
+    sections: [
+      {
+        id: 'main-content',
+        title: '',
+        content: [],
+        htmlContent: `<p>You use a BMI Calculator to calculate your body mass index (BMI) from your height and weight, then compare the result with the appropriate adult category or child growth reference. Your result gives you a starting point for assessing weight status.</p>
+
+<p>With <a href="/health-calculators/bmi-calculator">Calculio's free BMI Calculator</a>, you can skip the arithmetic. The important next step is choosing the right interpretation: adult BMI uses fixed thresholds, while a child's result needs age- and sex-specific percentiles.</p>
+
+<p>Your BMI also needs context. Muscle mass, pregnancy, and changes with aging affect how closely that number reflects your body fat and health.</p>
+
+<h2>How Do You Calculate BMI From Height and Weight?</h2>
+
+<p>You calculate BMI by entering your measured height and weight into a calculator with the matching units selected. Accurate measurements and correct unit entry help you avoid misleading results.</p>
+
+<h3>What Measurements Do You Need?</h3>
+
+<p>For an adult calculation, you need your current height and weight. Your age determines whether adult or pediatric interpretation applies; your age and sex do not change the adult arithmetic.</p>
+
+<figure>
+  <img src="/assets/bmi-measure-height-weight.webp" alt="How to measure height and weight accurately for a BMI calculation: stand upright without shoes and use a level floor" width="1200" height="675" loading="lazy">
+</figure>
+
+<p>To improve your measurements:</p>
+<ul>
+  <li>Measure your height without shoes, standing upright against a flat surface.</li>
+  <li>Use a scale on a firm, level floor.</li>
+  <li>Weigh yourself without shoes and heavy clothing.</li>
+  <li>If you track changes, use similar clothing and measurement conditions each time.</li>
+</ul>
+
+<p>Check a surprising result against your original measurements before drawing conclusions. A mistyped height has a substantial effect because the calculation squares that measurement.</p>
+
+<h3>How Do You Enter Metric or US Units?</h3>
+
+<p>With metric units, enter your weight in kilograms and your height in centimeters or meters, depending on the field label. For example, you enter 175 in a centimeters field or 1.75 in a meters field.</p>
+
+<p>With US units, enter your weight in pounds and your height in feet and inches if separate boxes are available. If the calculator asks for total inches, multiply your feet by 12 and add the remaining inches.</p>
+
+<p>At 5 feet 8 inches, your total height is 68 inches. Avoid entering 5.8 as decimal feet: 5 feet 8 inches and 5.8 feet represent different heights.</p>
+
+<h2>What Is the BMI Formula?</h2>
+
+<p>The BMI formula divides weight in kilograms by height in meters squared. When you use pounds and inches, a conversion factor of 703 gives you approximately the same result.</p>
+
+<figure>
+  <img src="/assets/bmi-formula.webp" alt="BMI formula in metric units (kg and m) and US units (lb and in) with worked examples" width="1200" height="675" loading="lazy">
+</figure>
+
+<h3>Calculating BMI in Kilograms and Meters</h3>
+
+<p>Use this metric formula:</p>
+<p><strong>Your BMI = your weight in kilograms ÷ (your height in meters × your height in meters)</strong></p>
+
+<p>The squared symbol in kg/m² means you multiply your height by itself. If you measure your height in centimeters, divide by 100 before using the formula.</p>
+
+<p>Keep the full height value during your BMI calculation and round the final answer. Early rounding introduces unnecessary error, especially when your result sits near a category boundary.</p>
+
+<h3>Calculating BMI in Pounds and Inches</h3>
+
+<p>For US measurements, use:</p>
+<p><strong>Your BMI = 703 × your weight in pounds ÷ (your height in inches × your height in inches)</strong></p>
+
+<p>Convert your full height to inches first. You then square that total, multiply your weight by 703, and divide.</p>
+
+<p>You might see a tiny difference between metric and US results because 703 is a rounded conversion factor. For routine interpretation, that difference is usually smaller than the effect of rounding your measurements.</p>
+
+<h3>Worked Examples With Realistic Measurements</h3>
+
+<p>If you weigh 70 kg and measure 1.75 m:</p>
+<ol>
+  <li>Square your height: 1.75 × 1.75 = 3.0625.</li>
+  <li>Divide your weight by that value: 70 ÷ 3.0625 = 22.857…</li>
+  <li>Round your result to one decimal place: 22.9.</li>
+</ol>
+
+<p>If you weigh 160 lb and measure 5 feet 8 inches:</p>
+<ol>
+  <li>Convert your height: (5 × 12) + 8 = 68 inches.</li>
+  <li>Square your height: 68 × 68 = 4,624.</li>
+  <li>Calculate: (703 × 160) ÷ 4,624 = 24.325…</li>
+  <li>Round your result to one decimal place: 24.3.</li>
+</ol>
+
+<p>If you are an adult aged 20 or older, both example results fall within the standard healthy weight category.</p>
+
+<p><strong>Want to skip the math?</strong> Use the <a href="/health-calculators/bmi-calculator">BMI Calculator</a>.</p>
+
+<h2>What Does Your Adult BMI Result Mean?</h2>
+
+<p>Your adult BMI places your weight relative to your height into a screening category. Under CDC guidance, you use adult BMI categories from age 20 onward.</p>
+
+<h3>Adult BMI Classification Table and Chart</h3>
+
+<p>You can locate your result in this BMI chart for adults. Each boundary belongs to one category, so a BMI of exactly 25 falls in the overweight category and exactly 30 falls in the obesity category.</p>
+
+<figure>
+  <img src="/assets/bmi-adult-categories.webp" alt="Adult BMI categories scale: underweight below 18.5, healthy weight 18.5 to below 25, overweight 25 to below 30, obesity 30 or higher" width="1200" height="675" loading="lazy">
+</figure>
+
+<div class="table-scroll" role="region" aria-label="Adult BMI classification table" tabindex="0">
+<table>
+  <thead>
+    <tr><th>Your adult BMI</th><th>Your BMI category</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Below 18.5</td><td>Underweight</td></tr>
+    <tr><td>18.5 to below 25</td><td>Healthy weight</td></tr>
+    <tr><td>25 to below 30</td><td>Overweight</td></tr>
+    <tr><td>30 or higher</td><td>Obesity</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Read the chart from lower to higher BMI as:</p>
+<p>Underweight (&lt;18.5) → Healthy weight (18.5–&lt;25) → Overweight (25–&lt;30) → Obesity (≥30)</p>
+
+<p>You might also see "normal weight" used for the healthy weight category. These labels describe a screening range; your result still needs interpretation alongside your medical history and other measurements.</p>
+
+<p>Use the unrounded result when a calculation sits very close to a cutoff. A displayed value rounded to 25.0, for example, might come from a value just below 25.</p>
+
+<h3>How Can You Estimate a Healthy Weight Range?</h3>
+
+<p>You can rearrange the formula to estimate the weights corresponding to the adult healthy BMI range at your height:</p>
+<ul>
+  <li>Lower boundary in kilograms: 18.5 × your height in meters squared.</li>
+  <li>Upper boundary in kilograms: 25 × your height in meters squared, with that boundary excluded.</li>
+  <li>For pounds: multiply either BMI boundary by your height in inches squared, then divide by 703.</li>
+</ul>
+
+<p>At 1.75 m, these calculations give a lower boundary of <strong>56.65625 kg</strong> and an excluded upper boundary of <strong>76.5625 kg</strong>. That is, from 56.65625 kg up to, but not including, 76.5625 kg. Use the exact values for boundary checks rather than rounded figures.</p>
+
+<p>Treat this as a height-based reference range. A suitable healthy body weight for you also takes account of your health history, body composition, and nutritional needs. You do not need to aim for the middle of the range automatically.</p>
+
+<h3>Are Standard Adult BMI Categories Different for Men and Women?</h3>
+
+<p>You use the same standard adult BMI thresholds regardless of whether you are a man or woman. Your height and weight determine the calculation, with no sex-specific adjustment.</p>
+
+<p>Your body-fat percentage and fat distribution can differ from someone else's at the same BMI. The NHLBI notes that BMI does not account for muscle mass, bone density, or body composition.</p>
+
+<p>Your clinician also considers your individual risk profile. Body composition and risk can vary between individuals and populations, so BMI alone is not enough.</p>
+
+<h2>How Is BMI Interpreted for Children and Teens?</h2>
+
+<p>For your child or teen, you interpret BMI using age- and sex-specific percentiles. The CDC uses this approach for ages 2 through 19.</p>
+
+<figure>
+  <img src="/assets/bmi-child-percentiles.webp" alt="BMI-for-age percentile categories for children and teens: underweight, healthy weight, overweight, and obesity" width="1200" height="675" loading="lazy">
+</figure>
+
+<h3>Why Age and Sex Matter for Growing Children</h3>
+
+<p>As your child grows, expected BMI changes with age, and growth patterns differ by sex. A fixed adult cutoff would miss that developmental context.</p>
+
+<p>You still calculate the raw BMI from height and weight using the same formula. You then compare it with the appropriate growth reference, using accurate age and the sex-specific chart.</p>
+
+<div class="table-scroll" role="region" aria-label="Adult and child BMI assessment comparison" tabindex="0">
+<table>
+  <thead>
+    <tr><th>Assessment detail</th><th>If you are age 20 or older</th><th>If your child is age 2–19</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Basic calculation</td><td>Weight relative to height squared</td><td>Same calculation</td></tr>
+    <tr><td>Interpretation</td><td>Fixed adult BMI categories</td><td>Sex-specific BMI-for-age percentiles</td></tr>
+    <tr><td>Additional information needed</td><td>Age to select the adult approach</td><td>Accurate age and sex</td></tr>
+    <tr><td>Follow-up context</td><td>Health history and clinical assessment</td><td>Growth pattern and pediatric assessment</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>If your child is under 2, ask your pediatric clinician about the appropriate growth assessment. The CDC child and teen BMI calculator starts at age 2.</p>
+
+<h3>Understanding CDC BMI-for-Age Percentiles</h3>
+
+<p>Your child's BMI-for-age percentile describes their relative position within the growth-chart reference. The Centers for Disease Control and Prevention (CDC) compares BMI with children of the same age and sex in that reference population.</p>
+
+<p>You interpret BMI-for-age percentiles using these categories:</p>
+
+<div class="table-scroll" role="region" aria-label="Child and teen BMI-for-age percentile categories" tabindex="0">
+<table>
+  <thead>
+    <tr><th>Your child's BMI-for-age percentile</th><th>Weight-status category</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Below the 5th percentile</td><td>Underweight</td></tr>
+    <tr><td>5th to below the 85th percentile</td><td>Healthy weight</td></tr>
+    <tr><td>85th to below the 95th percentile</td><td>Overweight</td></tr>
+    <tr><td>95th percentile or higher</td><td>Obesity</td></tr>
+    <tr><td>120% of the 95th percentile or higher, or BMI ≥ 35 kg/m²</td><td>Severe obesity (a subset of obesity)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>A result at the 85th percentile means your child's BMI is as high as or higher than that of approximately 85% of children of the same age and sex in the reference group. It does not mean your child has 85% body fat.</p>
+
+<p>Discuss your child's pattern over time with their pediatric clinician, especially if growth changes substantially. Avoid using adult target weights or starting a weight-loss plan from a percentile result alone.</p>
+
+<h2>What Can BMI Tell You About Your Health?</h2>
+
+<p>Your BMI helps flag whether your weight relative to height deserves closer assessment. Its health value comes from combining the result with information about your body composition and clinical health.</p>
+
+<h3>Why BMI Does Not Directly Measure Body Fat</h3>
+
+<p>Your BMI calculation uses total body weight, including muscle, bone, fat, and water. It contains no measurement that separates those components.</p>
+
+<p>You therefore cannot convert a BMI result directly into your personal body-fat percentage. Two people with the same height and weight receive the same BMI even when their body composition differs substantially.</p>
+
+<p>A higher BMI is associated with higher risk of several weight-related conditions across populations, but your individual risk requires additional assessment. A low result also warrants attention when it accompanies unintentional weight loss, inadequate intake, or symptoms.</p>
+
+<h3>When Muscle Mass, Pregnancy, and Aging Affect Interpretation</h3>
+
+<p>If you have substantial muscle mass, your BMI might fall in a higher category despite relatively low body fat. Your training history and body-composition assessment help explain that result.</p>
+
+<p>During pregnancy, your weight includes pregnancy-related changes. Use your prenatal clinician's guidance for weight monitoring; standard adult categories alone do not provide a pregnancy weight-gain assessment.</p>
+
+<p>As you age, loss of muscle and changes in fat distribution affect interpretation. Your BMI might stay similar while your body composition changes, so discuss changes in strength or function alongside your weight.</p>
+
+<h3>How Waist Measurements and Clinical Assessment Add Context</h3>
+
+<p>Your waist measurement adds information about abdominal fat distribution that BMI leaves out. To take a consistent measurement, keep the tape horizontal around your abdomen, use the same anatomical location each time, and avoid compressing your skin.</p>
+
+<figure>
+  <img src="/assets/bmi-measure-waist.webp" alt="How to measure waist circumference with a tape measure held horizontally around the abdomen" width="1200" height="675" loading="lazy">
+</figure>
+
+<p>Ask your clinician which measurement method and thresholds suit your assessment. Pregnancy and some medical conditions require a different approach.</p>
+
+<p>Your clinical assessment also considers blood pressure, blood glucose or A1C, cholesterol, medications, and family history. If your BMI and health measurements point in different directions, discuss them together before setting a weight goal.</p>
+
+<h2>Do BMI Prime and Ponderal Index Add Useful Information?</h2>
+
+<p>BMI Prime expresses your BMI relative to the standard adult upper healthy-weight boundary. You calculate BMI Prime = your BMI ÷ 25.</p>
+
+<p>If your BMI is 22.9, your BMI Prime is 0.916, or approximately 0.92. A value of 1 corresponds to a BMI of 25; it's the same measurement expressed on a different scale.</p>
+
+<p>The ponderal index uses your weight in kilograms ÷ your height in meters cubed. Cubing your height means multiplying it by itself twice.</p>
+
+<p>You might encounter this index in growth or body-proportion discussions. Neither calculation separates your fat mass from other tissue, and neither provides a diagnosis. For routine adult screening, use the established BMI categories and your clinical context.</p>
+
+<h2>Use Your BMI as a Starting Point, Not a Diagnosis</h2>
+
+<p>Use your BMI result to guide a conversation about your weight status and health. The CDC describes BMI as a screening measure that does not diagnose disease or illness.</p>
+
+<figure>
+  <img src="/assets/bmi-at-a-glance.webp" alt="BMI at a glance: adult categories, limits of BMI, and a reminder that BMI is a starting point, not a diagnosis" width="1000" height="1000" loading="lazy" class="wide">
+</figure>
+
+<p>Check your measurements and unit entries, then apply the interpretation appropriate for your age. For your child or teen, use BMI-for-age percentiles and review their growth pattern with a pediatric clinician.</p>
+
+<p>If your result concerns you, bring your height, weight, and any recent weight changes to an appointment. Ask how your waist measurement and clinical findings affect a healthy weight plan for you.</p>
+
+<div class="bmi-cta">
+  <p><strong>Ready to check your result?</strong></p>
+  <p><a href="/health-calculators/bmi-calculator">Calculate Your BMI Now</a></p>
+</div>
+
+<h2>Frequently Asked Questions</h2>
+
+<div class="faq-list">
+  <h3>What is a BMI Calculator?</h3>
+  <p>A BMI Calculator uses your height and weight to calculate your body mass index. For adults aged 20 and older, the result is compared with standard adult BMI categories. For children and teens aged 2 through 19, BMI is interpreted using age- and sex-specific percentiles.</p>
+
+  <h3>How do I calculate BMI using height and weight?</h3>
+  <p>For metric measurements, divide your weight in kilograms by your height in meters squared. For US measurements, multiply your weight in pounds by 703, then divide by your height in inches squared.</p>
+
+  <h3>What is a healthy BMI for adults?</h3>
+  <p>For adults aged 20 and older, a BMI from 18.5 to less than 25 is classified as healthy weight under standard CDC categories. BMI is a screening measure, so this range should be considered alongside your health history and other clinical information.</p>
+
+  <h3>Are BMI categories different for men and women?</h3>
+  <p>No. Standard adult BMI category thresholds are the same for men and women. However, BMI does not account for individual differences in muscle mass, body composition, or fat distribution.</p>
+
+  <h3>Does BMI measure body fat?</h3>
+  <p>No. BMI is calculated from height and weight and does not directly measure body fat. It also cannot distinguish fat from muscle, bone, or other body tissue.</p>
+
+  <h3>Can children use adult BMI categories?</h3>
+  <p>No. Children and teens aged 2 through 19 need BMI-for-age percentiles based on age and sex because their bodies are still growing. Adult BMI cutoffs are not appropriate for interpreting a child's result.</p>
+
+  <h3>Can someone with a lot of muscle have a high BMI?</h3>
+  <p>Yes. Muscle contributes to body weight, so a muscular person may have a higher BMI without having the same body-fat level as another person with that BMI. A broader assessment can help put the result in context.</p>
+
+  <h3>Is BMI enough to assess my health?</h3>
+  <p>No. BMI is one screening measure, not a diagnosis. A healthcare professional may also consider waist measurement, blood pressure, blood glucose or A1C, cholesterol, medications, family history, and your overall health.</p>
+</div>
+
+<h2>Sources and Further Reading</h2>
+
+<p>The following health resources provide the official BMI categories and guidance referenced in this article:</p>
+<ul class="source-list">
+  <li><a href="https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html" target="_blank" rel="noopener noreferrer">CDC – Adult BMI Categories</a>: adult BMI ranges and guidance for adults aged 20 and older.</li>
+  <li><a href="https://www.cdc.gov/bmi/child-teen-calculator/" target="_blank" rel="noopener noreferrer">CDC – Child and Teen BMI Calculator</a>: BMI-for-age percentiles for children and teens aged 2 through 19.</li>
+  <li><a href="https://www.cdc.gov/bmi/child-teen-calculator/bmi-categories.html" target="_blank" rel="noopener noreferrer">CDC – Child and Teen BMI Categories</a>: percentile ranges, including severe obesity criteria.</li>
+  <li><a href="https://www.nhlbi.nih.gov/sites/default/files/publications/are_you_at_a_healthy_weight.pdf" target="_blank" rel="noopener noreferrer">National Heart, Lung, and Blood Institute (NHLBI) – Are You at a Healthy Weight?</a>: explains how BMI relates to other measures of health and body composition.</li>
+</ul>
+
+<p><em>Health note: BMI is a screening tool, not a diagnosis or a substitute for personalized medical advice. If you have questions about your result, discuss it with a qualified healthcare professional.</em></p>`
+      }
+    ]
   }
 ];

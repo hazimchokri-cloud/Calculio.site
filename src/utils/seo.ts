@@ -279,11 +279,16 @@ export function buildArticleSchema(post: BlogPost, origin: string = 'https://cal
     headline: post.title,
     description: post.excerpt,
     image: post.coverImage,
-    author: {
-      '@type': 'Person',
-      name: post.author.name,
-      jobTitle: post.author.role
-    },
+    author: post.author?.name
+      ? {
+          '@type': 'Person',
+          name: post.author.name,
+          jobTitle: post.author.role
+        }
+      : {
+          '@type': 'Organization',
+          name: 'Calculio'
+        },
     publisher: {
       '@type': 'Organization',
       name: 'Calculio Editorial Team',

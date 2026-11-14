@@ -16,8 +16,6 @@ import {
 } from 'lucide-react';
 import { BlogPost, CalculatorMeta } from '../../types';
 import { Breadcrumbs } from '../shared/Breadcrumbs';
-import { AdSlot } from '../shared/AdSlot';
-import { AffiliateOffersSection } from '../shared/AffiliateOffersSection';
 import { ShareModal } from '../shared/ShareModal';
 import { PrintReportHeader } from '../shared/PrintReportHeader';
 import { PrintReportFooter } from '../shared/PrintReportFooter';
@@ -67,7 +65,8 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
-  const isEditorialTeam = localizedPost.author.name === 'Calculio Editorial Team';
+  const hasAuthor = Boolean(localizedPost.author?.name);
+  const isEditorialTeam = localizedPost.author?.name === 'Calculio Editorial Team';
 
   // Process sections to add IDs to headings and generate TOC
   const { processedSections, tocItems } = React.useMemo(() => {
@@ -102,8 +101,8 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
         });
         
         // Wrap tables in container for horizontal scrolling if not already wrapped
-        // Check if table is already preceded by div class="table-container"
-        if (!html.includes('table-container')) {
+        // Check if table is already wrapped in table-container or table-scroll
+        if (!html.includes('table-container') && !html.includes('table-scroll')) {
           html = html.replace(/<table/g, '<div class="table-container"><table');
           html = html.replace(/<\/table>/g, '</table></div>');
         }
@@ -177,7 +176,7 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
           title={localizedPost.title}
           category={localizedPost.categoryLabel}
           description={localizedPost.excerpt}
-          author={`${localizedPost.author.name} (${localizedPost.author.role})`}
+          author={hasAuthor && localizedPost.author ? (isEditorialTeam ? localizedPost.author.name : `${localizedPost.author.name} (${localizedPost.author.role})`) : undefined}
           date={new Date(localizedPost.publishedAt).toLocaleDateString(dateLocale, { month: 'long', day: 'numeric', year: 'numeric' })}
         />
 
@@ -217,37 +216,39 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
             {localizedPost.excerpt}
           </p>
 
-          {/* Author Byline Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-xs">
-            {isEditorialTeam ? (
-              <div className="flex items-center gap-2 py-1">
-                <span className="text-sm font-bold text-[#64748B]">{t('blog.by', 'By')}</span>
-                <span className="text-base font-black text-[#0F172A]">{localizedPost.author.name}</span>
-                <ShieldCheck className="w-4.5 h-4.5 text-[#F97316]" aria-label="Verified Source" />
-              </div>
-            ) : (
-              <div className="flex items-center gap-3.5">
-                <img
-                  src={localizedPost.author.avatar}
-                  alt={localizedPost.author.name}
-                  className="w-12 h-12 rounded-full object-cover border-2 border-[#FDBA74]"
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    if (target.src !== FALLBACK_AVATAR) {
-                      target.src = FALLBACK_AVATAR;
-                    }
-                  }}
-                />
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-base font-bold text-[#0F172A]">{localizedPost.author.name}</span>
-                    <ShieldCheck className="w-4.5 h-4.5 text-[#F97316]" aria-label="Verified Author & Subject Matter Expert" />
-                  </div>
-                  <span className="text-sm text-[#475569] block">{localizedPost.author.role}</span>
-                  <span className="text-xs text-[#64748B] font-medium">{localizedPost.author.credentials}</span>
+          {/* Author Byline & Actions Bar */}
+          <div className={`flex flex-wrap items-center gap-4 ${hasAuthor ? 'justify-between p-4 sm:p-5 rounded-2xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-xs' : 'justify-start'}`}>
+            {hasAuthor && localizedPost.author && (
+              isEditorialTeam ? (
+                <div className="flex items-center gap-2 py-1">
+                  <span className="text-sm font-bold text-[#64748B]">{t('blog.by', 'By')}</span>
+                  <span className="text-base font-black text-[#0F172A]">{localizedPost.author.name}</span>
+                  <ShieldCheck className="w-4.5 h-4.5 text-[#F97316]" aria-label="Verified Source" />
                 </div>
-              </div>
+              ) : (
+                <div className="flex items-center gap-3.5">
+                  <img
+                    src={localizedPost.author.avatar}
+                    alt={localizedPost.author.name}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-[#FDBA74]"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (target.src !== FALLBACK_AVATAR) {
+                        target.src = FALLBACK_AVATAR;
+                      }
+                    }}
+                  />
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-base font-bold text-[#0F172A]">{localizedPost.author.name}</span>
+                      <ShieldCheck className="w-4.5 h-4.5 text-[#F97316]" aria-label="Verified Author & Subject Matter Expert" />
+                    </div>
+                    <span className="text-sm text-[#475569] block">{localizedPost.author.role}</span>
+                    <span className="text-xs text-[#64748B] font-medium">{localizedPost.author.credentials}</span>
+                  </div>
+                </div>
+              )
             )}
 
             {/* Actions: Share & Print */}
@@ -278,14 +279,14 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
         </header>
 
         {/* Featured Image */}
-        <div className="w-full max-w-5xl rounded-3xl overflow-hidden shadow-md border border-[#E2E8F0] relative bg-[#F1F5F9] aspect-[16/9] max-h-[440px]">
+        <div className={`w-full max-w-4xl rounded-3xl overflow-hidden shadow-md border border-[#E2E8F0] relative ${localizedPost.coverImage.includes('bmi-cover') ? 'bg-[#FFFFFF]' : 'bg-[#F1F5F9] aspect-[16/9]'}`}>
           <img
             src={localizedPost.coverImage}
             alt={localizedPost.imageAlt || localizedPost.title}
             width={1200}
-            height={675}
+            height={localizedPost.coverImage.includes('bmi-cover') ? 630 : 675}
             fetchPriority="high"
-            className="w-full h-full object-cover"
+            className={`w-full ${localizedPost.coverImage.includes('bmi-cover') ? 'h-auto object-contain' : 'h-full object-cover'}`}
             referrerPolicy="no-referrer"
             onError={(e) => {
               const target = e.currentTarget;
@@ -294,7 +295,9 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
               }
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+          {!localizedPost.coverImage.includes('bmi-cover') && !localizedPost.coverImage.includes('compound-interest-hero') && (
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+          )}
         </div>
 
         {/* Main Two-Column Layout: Article Body + Sticky Sidebar */}
@@ -357,6 +360,24 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
                   {section.htmlContent ? (
                     <div 
                       className="rich-text-content text-base sm:text-[17px] text-[#475569] leading-relaxed font-normal"
+                      onClick={(e) => {
+                        const anchor = (e.target as HTMLElement).closest('a');
+                        if (!anchor) return;
+                        const href = anchor.getAttribute('href');
+                        if (!href || href.startsWith('http') || href.startsWith('#')) return;
+                        const clean = href.replace(/^\/+|\/+$/g, '');
+                        const parts = clean.split('/');
+                        if (parts[0] === 'blog' && parts[1]) {
+                          e.preventDefault();
+                          onSelectPost(parts[1]);
+                          return;
+                        }
+                        const possibleCalcId = parts[1] || parts[0];
+                        if (calculators.some(c => c.id === possibleCalcId)) {
+                          e.preventDefault();
+                          onSelectCalculator(possibleCalcId);
+                        }
+                      }}
                       dangerouslySetInnerHTML={{ 
                         __html: DOMPurify.sanitize(section.htmlContent, purifyConfig) 
                       }}
@@ -503,7 +524,7 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
             )}
 
             {/* Author Detailed Bio Card */}
-            {!isEditorialTeam && (
+            {hasAuthor && !isEditorialTeam && localizedPost.author && (
               <div className="p-6 sm:p-8 rounded-3xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-xs flex flex-col sm:flex-row gap-5 items-start">
                 <img
                   src={localizedPost.author.avatar}
