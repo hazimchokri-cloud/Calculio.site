@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeftRight, Copy, Check, Sparkles, RefreshCw, Info } from 'lucide-react';
+import { ArrowLeftRight, Copy, Check, Info } from 'lucide-react';
 import { formatNumber, copyToClipboard } from '../../utils/formatters';
 import { useCurrency } from '../../context/CurrencyContext';
+import { DecimalInput } from '../shared/DecimalInput';
 
 type CategoryKey = 'length' | 'weight' | 'temperature' | 'area' | 'volume' | 'speed' | 'digital' | 'time' | 'energy' | 'currency';
 
@@ -148,6 +149,9 @@ export const UnitConverter: React.FC = () => {
   // When category changes, reset units cleanly
   const handleCategoryChange = (cat: CategoryKey) => {
     setActiveCategory(cat);
+    if (cat !== 'temperature' && typeof inputValue === 'number' && inputValue < 0) {
+      setInputValue(1);
+    }
     const units = CONVERSION_CATEGORIES[cat].units;
     setFromUnitId(units[0].id);
     setToUnitId(units[1] ? units[1].id : units[0].id);
@@ -241,11 +245,10 @@ export const UnitConverter: React.FC = () => {
         {/* From Box */}
         <div className="lg:col-span-5 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-3">
           <label className="text-xs font-bold uppercase tracking-wider text-slate-700">From</label>
-          <input
-            type="number"
-            step="any"
+          <DecimalInput
+            allowNegative={activeCategory === 'temperature'}
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value === '' ? '' : parseFloat(e.target.value))}
+            onValueChange={(val) => setInputValue(val)}
             placeholder="1"
             className="w-full px-4 py-3 text-2xl font-black font-mono-numbers text-slate-900 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 bg-slate-50"
           />

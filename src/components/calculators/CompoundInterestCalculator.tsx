@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, downloadCsv, copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 import { TrendingUp, DollarSign, Calendar, Percent, Copy, Check, ShieldCheck, FileSpreadsheet, ArrowUpRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -37,7 +38,7 @@ export const CompoundInterestCalculator: React.FC<CompoundInterestProps> = ({
       const PMT = Math.max(0, numMonthlyContribution);
       const r = Math.max(0, numInterestRate) / 100;
       const n = Math.max(1, compoundFrequency);
-      const t = Math.max(1, numYears);
+      const t = Math.min(120, Math.max(1, Math.round(numYears)));
 
       // Effective monthly compounding rate matching compoundFrequency n
       const monthlyRate = r === 0 ? 0 : Math.pow(1 + r / n, n / 12) - 1;
@@ -186,13 +187,9 @@ export const CompoundInterestCalculator: React.FC<CompoundInterestProps> = ({
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 text-sm font-semibold">{currencySymbol}</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="10000000"
-                  step="500"
+                <DecimalInput
                   value={initialPrincipal}
-                  onChange={(e) => setInitialPrincipal(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setInitialPrincipal}
                   placeholder="10000"
                   className="w-36 pl-7 pr-3 py-1.5 text-right font-mono-numbers font-semibold text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-slate-50/50"
                 />
@@ -203,8 +200,8 @@ export const CompoundInterestCalculator: React.FC<CompoundInterestProps> = ({
               min="0"
               max="200000"
               step="1000"
-              value={numInitialPrincipal || 10000}
-              onChange={(e) => setInitialPrincipal(e.target.value === '' ? '' : Number(e.target.value))}
+              value={initialPrincipal === '' ? 0 : Math.min(200000, Math.max(0, numInitialPrincipal))}
+              onChange={(e) => setInitialPrincipal(Number(e.target.value))}
               className="w-full accent-orange-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
             />
           </div>
@@ -218,13 +215,9 @@ export const CompoundInterestCalculator: React.FC<CompoundInterestProps> = ({
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 text-sm font-semibold">{currencySymbol}</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="50000"
-                  step="50"
+                <DecimalInput
                   value={monthlyContribution}
-                  onChange={(e) => setMonthlyContribution(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setMonthlyContribution}
                   placeholder="500"
                   className="w-36 pl-7 pr-3 py-1.5 text-right font-mono-numbers font-semibold text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-slate-50/50"
                 />
@@ -235,8 +228,8 @@ export const CompoundInterestCalculator: React.FC<CompoundInterestProps> = ({
               min="0"
               max="5000"
               step="50"
-              value={numMonthlyContribution || 500}
-              onChange={(e) => setMonthlyContribution(e.target.value === '' ? '' : Number(e.target.value))}
+              value={monthlyContribution === '' ? 0 : Math.min(5000, Math.max(0, numMonthlyContribution))}
+              onChange={(e) => setMonthlyContribution(Number(e.target.value))}
               className="w-full accent-orange-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
             />
           </div>
@@ -249,13 +242,9 @@ export const CompoundInterestCalculator: React.FC<CompoundInterestProps> = ({
                 Estimated Annual Return Rate
               </label>
               <div className="relative">
-                <input
-                  type="number"
-                  min="0"
-                  max="30"
-                  step="0.1"
+                <DecimalInput
                   value={interestRate}
-                  onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setInterestRate}
                   placeholder="8.0"
                   className="w-full pl-3 pr-7 py-2 font-mono-numbers font-semibold text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-slate-50/50"
                 />
@@ -269,12 +258,10 @@ export const CompoundInterestCalculator: React.FC<CompoundInterestProps> = ({
                 Investment Horizon
               </label>
               <div className="relative">
-                <input
-                  type="number"
-                  min="1"
-                  max="60"
+                <DecimalInput
+                  allowDecimal={false}
                   value={years}
-                  onChange={(e) => setYears(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setYears}
                   placeholder="20"
                   className="w-full pl-3 pr-14 py-2 font-mono-numbers font-semibold text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-slate-50/50"
                 />

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, copyToClipboard } from '../../utils/formatters';
 import { Percent, DollarSign, HelpCircle, Copy, Check, Bookmark } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface AprCalculatorProps {
   currencySymbol?: string;
@@ -50,15 +51,16 @@ export const AprCalculator: React.FC<AprCalculatorProps> = ({
       const totalFinanceFees = numOriginationFee + pointsDollar + numOtherClosingCosts;
       const netProceeds = Math.max(0, P - totalFinanceFees);
 
-      // Solve for APR via Newton-Raphson
+      // Solve for APR via Newton-Raphson (supports 0% stated rate with prepaid fees)
       let apr = numInterestRate;
-      if (totalFinanceFees > 0 && netProceeds > 0 && r > 0) {
-        let rGuess = r;
-        for (let i = 0; i < 30; i++) {
-          const f = (monthlyPayment * (1 - Math.pow(1 + rGuess, -n))) / rGuess - netProceeds;
-          const fPrime = (monthlyPayment * (n * Math.pow(1 + rGuess, -n - 1) * rGuess - (1 - Math.pow(1 + rGuess, -n)))) / (rGuess * rGuess);
+      if (totalFinanceFees > 0 && netProceeds > 0 && monthlyPayment * n > netProceeds) {
+        let rGuess = r > 0 ? r : Math.max(0.0005, (2 * (monthlyPayment * n - netProceeds)) / (netProceeds * (n + 1)));
+        for (let i = 0; i < 40; i++) {
+          const factor = Math.pow(1 + rGuess, -n);
+          const f = (monthlyPayment * (1 - factor)) / rGuess - netProceeds;
+          const fPrime = (monthlyPayment * (n * Math.pow(1 + rGuess, -n - 1) * rGuess - (1 - factor))) / (rGuess * rGuess);
           if (Math.abs(fPrime) < 1e-12) break;
-          const rNext = rGuess - f / fPrime;
+          const rNext = Math.max(1e-7, rGuess - f / fPrime);
           if (Math.abs(rNext - rGuess) < 1e-8) {
             rGuess = rNext;
             break;
@@ -144,13 +146,9 @@ Monthly P&I Payment: ${formatCurrency(calculations.monthlyPayment, currencySymbo
               <span>Loan Amount</span>
               <span className="text-blue-600 font-mono">{formatCurrency(numLoanAmount, currencySymbol)}</span>
             </label>
-            <input
-              type="number"
-              min="1000"
-              max="5000000"
-              step="5000"
+            <DecimalInput
               value={loanAmount}
-              onChange={(e) => setLoanAmount(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setLoanAmount}
               placeholder="200000"
               className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
@@ -159,25 +157,18 @@ Monthly P&I Payment: ${formatCurrency(calculations.monthlyPayment, currencySymbo
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700">Stated Interest Rate (%)</label>
-              <input
-                type="number"
-                min="0.1"
-                max="30"
-                step="0.125"
+              <DecimalInput
                 value={interestRate}
-                onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setInterestRate}
                 placeholder="6.5"
                 className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700">Loan Term (Years)</label>
-              <input
-                type="number"
-                min="1"
-                max="40"
+              <DecimalInput
                 value={loanTermYears}
-                onChange={(e) => setLoanTermYears(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setLoanTermYears}
                 placeholder="30"
                 className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
@@ -189,31 +180,27 @@ Monthly P&I Payment: ${formatCurrency(calculations.monthlyPayment, currencySymbo
             <div className="grid grid-cols-3 gap-2">
               <div>
                 <label className="text-[10px] font-bold text-slate-500 block">Origination ({currencySymbol})</label>
-                <input
-                  type="number"
+                <DecimalInput
                   value={originationFee}
-                  onChange={(e) => setOriginationFee(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setOriginationFee}
                   placeholder="2000"
                   className="w-full p-1.5 text-xs font-semibold border border-slate-200 rounded-lg bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
               <div>
                 <label className="text-[10px] font-bold text-slate-500 block">Points (%)</label>
-                <input
-                  type="number"
-                  step="0.25"
+                <DecimalInput
                   value={discountPoints}
-                  onChange={(e) => setDiscountPoints(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setDiscountPoints}
                   placeholder="1.0"
                   className="w-full p-1.5 text-xs font-semibold border border-slate-200 rounded-lg bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
               <div>
                 <label className="text-[10px] font-bold text-slate-500 block">Other Fees ({currencySymbol})</label>
-                <input
-                  type="number"
+                <DecimalInput
                   value={otherClosingCosts}
-                  onChange={(e) => setOtherClosingCosts(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setOtherClosingCosts}
                   placeholder="1500"
                   className="w-full p-1.5 text-xs font-semibold border border-slate-200 rounded-lg bg-slate-50/50 focus:bg-white focus:outline-none"
                 />

@@ -10,8 +10,8 @@ import {
 import { Breadcrumbs } from '../shared/Breadcrumbs';
 import { useLanguage } from '../../i18n/LanguageContext';
 
-const FALLBACK_BLOG_IMAGE = 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=1200&h=675&q=80';
-const FALLBACK_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80';
+const FALLBACK_BLOG_IMAGE = '/og-image.png';
+const FALLBACK_AVATAR = '/favicon.svg';
 
 interface BlogListViewProps {
   onSelectPost: (slug: string) => void;

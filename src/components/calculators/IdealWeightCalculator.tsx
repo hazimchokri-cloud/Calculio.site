@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { formatNumber, copyToClipboard } from '../../utils/formatters';
 import { Scale, Copy, Check, Bookmark, Heart } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface IdealWeightCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -61,6 +62,8 @@ export const IdealWeightCalculator: React.FC<IdealWeightCalculatorProps> = ({ on
 
     const avgIdealKg = (devineKg + robinsonKg + millerKg + hamwiKg) / 4;
 
+    const isUnder5Ft = totalInches < 60;
+
     return {
       avgIdealKg,
       avgDisplay: toDisplay(avgIdealKg),
@@ -68,7 +71,8 @@ export const IdealWeightCalculator: React.FC<IdealWeightCalculatorProps> = ({ on
       robinson: toDisplay(robinsonKg),
       miller: toDisplay(millerKg),
       hamwi: toDisplay(hamwiKg),
-      bmiRange: `${toDisplay(bmiMinKg)} - ${toDisplay(bmiMaxKg)}`
+      bmiRange: `${toDisplay(bmiMinKg)} - ${toDisplay(bmiMaxKg)}`,
+      isUnder5Ft
     };
   }, [isInputEmpty, unitSystem, gender, numHeightCm, numHeightFt, numHeightIn]);
 
@@ -173,12 +177,9 @@ Hamwi Formula: ${calculations.hamwi}`;
                 <span>Height (cm)</span>
                 <span className="text-orange-600 font-mono">{heightCm} cm</span>
               </label>
-              <input
-                type="number"
-                min="100"
-                max="240"
+              <DecimalInput
                 value={heightCm}
-                onChange={(e) => setHeightCm(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setHeightCm}
                 className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
               />
             </div>
@@ -186,23 +187,17 @@ Hamwi Formula: ${calculations.hamwi}`;
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-700">Feet</label>
-                <input
-                  type="number"
-                  min="3"
-                  max="8"
+                <DecimalInput
                   value={heightFt}
-                  onChange={(e) => setHeightFt(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setHeightFt}
                   className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-700">Inches</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="11"
+                <DecimalInput
                   value={heightIn}
-                  onChange={(e) => setHeightIn(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setHeightIn}
                   className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -246,6 +241,11 @@ Hamwi Formula: ${calculations.hamwi}`;
                   <span className="font-bold font-mono text-white">{calculations ? calculations.hamwi : '—'}</span>
                 </div>
               </div>
+              {calculations?.isUnder5Ft && (
+                <p className="text-[11px] text-orange-200 bg-orange-500/10 border border-orange-400/20 rounded-lg px-2.5 py-1.5">
+                  Note: Devine, Robinson, Miller, and Hamwi equations define a 5 ft (60 in) baseline; use the WHO BMI range above for shorter heights.
+                </p>
+              )}
 
               <div className="flex items-center gap-2 pt-2">
                 <button

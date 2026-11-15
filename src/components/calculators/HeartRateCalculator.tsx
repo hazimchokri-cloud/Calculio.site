@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Heart, Activity, Flame, Zap, Copy, Check, Bookmark } from 'lucide-react';
 import { copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface HeartRateCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -19,17 +20,18 @@ export const HeartRateCalculator: React.FC<HeartRateCalculatorProps> = ({ onSave
   const isInputEmpty = age === '' || restingHr === '';
 
   const calculations = useMemo(() => {
-    if (isInputEmpty || numAge <= 0 || numRestingHr <= 0) return null;
-
-    const validAge = Math.max(10, numAge);
-    const validRhr = Math.max(35, numRestingHr);
+    if (isInputEmpty || numAge < 10 || numAge > 120 || numRestingHr < 25 || numRestingHr > 200) return null;
 
     // Max HR formulas
     // Tanaka: 208 - (0.7 * age)
     // Fox: 220 - age
-    const maxHrTanaka = Math.round(208 - 0.7 * validAge);
-    const maxHrFox = Math.round(220 - validAge);
+    const maxHrTanaka = Math.round(208 - 0.7 * numAge);
+    const maxHrFox = Math.round(220 - numAge);
     const baseMaxHr = formula === 'fox' ? maxHrFox : maxHrTanaka;
+
+    if (formula === 'karvonen' && numRestingHr >= baseMaxHr) {
+      return null;
+    }
 
     // Zones definition (5-zone standard)
     const ZONES_CONFIG = [
@@ -81,9 +83,9 @@ export const HeartRateCalculator: React.FC<HeartRateCalculatorProps> = ({ onSave
 
       if (formula === 'karvonen') {
         // Karvonen Heart Rate Reserve: Target HR = ((MaxHR - RHR) * %intensity) + RHR
-        const hrr = baseMaxHr - validRhr;
-        minBpm = Math.round(hrr * z.minPct + validRhr);
-        maxBpm = Math.round(hrr * z.maxPct + validRhr);
+        const hrr = baseMaxHr - numRestingHr;
+        minBpm = Math.round(hrr * z.minPct + numRestingHr);
+        maxBpm = Math.round(hrr * z.maxPct + numRestingHr);
       } else {
         // Standard % of Max HR
         minBpm = Math.round(baseMaxHr * z.minPct);
@@ -162,12 +164,9 @@ Zone 5 (VO2 Max 90-100%): ${calculations.zones[4].rangeBpm}`;
               <span>Age</span>
               <span className="text-rose-600 font-mono">{age} years</span>
             </label>
-            <input
-              type="number"
-              min="10"
-              max="100"
+            <DecimalInput
               value={age}
-              onChange={(e) => setAge(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setAge}
               className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
             />
           </div>
@@ -177,12 +176,9 @@ Zone 5 (VO2 Max 90-100%): ${calculations.zones[4].rangeBpm}`;
               <span>Resting Heart Rate (RHR)</span>
               <span className="text-rose-600 font-mono">{restingHr} BPM</span>
             </label>
-            <input
-              type="number"
-              min="35"
-              max="130"
+            <DecimalInput
               value={restingHr}
-              onChange={(e) => setRestingHr(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setRestingHr}
               className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
             />
           </div>
@@ -266,8 +262,8 @@ Zone 5 (VO2 Max 90-100%): ${calculations.zones[4].rangeBpm}`;
             </div>
           ) : (
             <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center justify-center text-center">
-              <p className="text-xs font-medium text-slate-400">
-                Enter your age and resting heart rate to calculate training zones.
+              <p className="text-xs font-medium text-slate-600">
+                Enter a valid age (10–120) and resting heart rate below your estimated maximum HR to calculate training zones.
               </p>
             </div>
           )}

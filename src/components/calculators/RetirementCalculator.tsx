@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 import { ShieldCheck, HeartHandshake, TrendingUp, DollarSign, Copy, Check, Bookmark, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 interface RetirementCalculatorProps {
@@ -31,11 +32,17 @@ export const RetirementCalculator: React.FC<RetirementCalculatorProps> = ({
   const numPostRetirementReturn = typeof postRetirementReturn === 'number' ? postRetirementReturn : 0;
   const numDesiredAnnualIncome = typeof desiredAnnualIncome === 'number' ? desiredAnnualIncome : 0;
 
-  const isInputEmpty = currentAge === '' || retirementAge === '' || lifeExpectancy === '' || desiredAnnualIncome === '';
+  const isInputEmpty =
+    currentAge === '' ||
+    retirementAge === '' ||
+    lifeExpectancy === '' ||
+    desiredAnnualIncome === '' ||
+    preRetirementReturn === '' ||
+    postRetirementReturn === '';
 
   const calculations = useMemo(() => {
-    if (isInputEmpty || numCurrentAge <= 0) return null;
-    const yearsToRetire = Math.max(1, numRetirementAge - numCurrentAge);
+    if (isInputEmpty || numCurrentAge <= 0 || numRetirementAge <= numCurrentAge) return null;
+    const yearsToRetire = numRetirementAge - numCurrentAge;
     const yearsInRetirement = Math.max(1, numLifeExpectancy - numRetirementAge);
     const rPre = Math.max(0, numPreRetirementReturn) / 100;
     const rPost = Math.max(0, numPostRetirementReturn) / 100;
@@ -137,34 +144,28 @@ Status: ${calculations.isOnTrack ? 'ON TRACK (Surplus: ' + formatCurrency(calcul
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-700">Current Age</label>
-              <input
-                type="number"
-                min="18"
-                max="80"
+              <DecimalInput
+                allowDecimal={false}
                 value={currentAge}
-                onChange={(e) => setCurrentAge(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setCurrentAge}
                 className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-700">Retire Age</label>
-              <input
-                type="number"
-                min="19"
-                max="90"
+              <DecimalInput
+                allowDecimal={false}
                 value={retirementAge}
-                onChange={(e) => setRetirementAge(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setRetirementAge}
                 className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-700">Life Expectancy</label>
-              <input
-                type="number"
-                min="20"
-                max="105"
+              <DecimalInput
+                allowDecimal={false}
                 value={lifeExpectancy}
-                onChange={(e) => setLifeExpectancy(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setLifeExpectancy}
                 className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
             </div>
@@ -178,13 +179,9 @@ Status: ${calculations.isOnTrack ? 'ON TRACK (Surplus: ' + formatCurrency(calcul
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-              <input
-                type="number"
-                min="0"
-                max="10000000"
-                step="5000"
+              <DecimalInput
                 value={currentSavings}
-                onChange={(e) => setCurrentSavings(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setCurrentSavings}
                 className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
             </div>
@@ -198,13 +195,9 @@ Status: ${calculations.isOnTrack ? 'ON TRACK (Surplus: ' + formatCurrency(calcul
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-              <input
-                type="number"
-                min="0"
-                max="100000"
-                step="1000"
+              <DecimalInput
                 value={annualSavings}
-                onChange={(e) => setAnnualSavings(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setAnnualSavings}
                 className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
             </div>
@@ -218,14 +211,30 @@ Status: ${calculations.isOnTrack ? 'ON TRACK (Surplus: ' + formatCurrency(calcul
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-              <input
-                type="number"
-                min="10000"
-                max="500000"
-                step="5000"
+              <DecimalInput
                 value={desiredAnnualIncome}
-                onChange={(e) => setDesiredAnnualIncome(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setDesiredAnnualIncome}
                 className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Return Rate Assumptions */}
+          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700">Pre-Retire Return (%)</label>
+              <DecimalInput
+                value={preRetirementReturn}
+                onValueChange={setPreRetirementReturn}
+                className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700">In-Retirement Return (%)</label>
+              <DecimalInput
+                value={postRetirementReturn}
+                onValueChange={setPostRetirementReturn}
+                className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
             </div>
           </div>

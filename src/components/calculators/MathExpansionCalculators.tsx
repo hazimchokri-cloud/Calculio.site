@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Calculator, RotateCcw, Copy, Check, Sparkles, Hash } from 'lucide-react';
-import { copyToClipboard } from '../../utils/formatters';
+import { RotateCcw } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface BaseCalcProps {
   currencySymbol?: string;
@@ -12,6 +12,12 @@ export const QuadraticSolver: React.FC<BaseCalcProps> = () => {
   const [a, setA] = useState<number | ''>(1);
   const [b, setB] = useState<number | ''>(-5);
   const [c, setC] = useState<number | ''>(6);
+
+  const handleReset = () => {
+    setA(1);
+    setB(-5);
+    setC(6);
+  };
 
   const results = useMemo(() => {
     if (a === '' || b === '' || c === '') return null;
@@ -62,7 +68,7 @@ export const QuadraticSolver: React.FC<BaseCalcProps> = () => {
       };
     } else {
       const real = (-numB / (2 * numA)).toFixed(4);
-      const imag = (Math.sqrt(-disc) / (2 * numA)).toFixed(4);
+      const imag = (Math.sqrt(-disc) / Math.abs(2 * numA)).toFixed(4);
       return {
         type: 'Complex Roots',
         x1: `${real} + ${imag}i`,
@@ -75,7 +81,6 @@ export const QuadraticSolver: React.FC<BaseCalcProps> = () => {
     }
   }, [a, b, c]);
 
-  const numA = typeof a === 'number' ? a : 0;
   const numB = typeof b === 'number' ? b : 0;
   const numC = typeof c === 'number' ? c : 0;
 
@@ -83,34 +88,44 @@ export const QuadraticSolver: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Quadratic Coefficients</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="p-3 bg-slate-50 rounded-xl border text-center font-mono text-sm font-bold text-slate-800">
             {a !== '' ? a : 'a'}x² {numB >= 0 ? `+ ${b !== '' ? b : 'b'}` : `- ${Math.abs(numB)}`}x {numC >= 0 ? `+ ${c !== '' ? c : 'c'}` : `- ${Math.abs(numC)}`} = 0
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Coefficient a</label>
-              <input
-                type="number"
+              <DecimalInput
+                allowNegative
                 value={a}
-                onChange={(e) => setA(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setA}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Coefficient b</label>
-              <input
-                type="number"
+              <DecimalInput
+                allowNegative
                 value={b}
-                onChange={(e) => setB(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setB}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Constant c</label>
-              <input
-                type="number"
+              <DecimalInput
+                allowNegative
                 value={c}
-                onChange={(e) => setC(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setC}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -165,89 +180,131 @@ export const PythagoreanCalculator: React.FC<BaseCalcProps> = () => {
   const [sideB, setSideB] = useState<number | ''>(4);
   const [sideC, setSideC] = useState<number | ''>('');
 
-  const results = useMemo(() => {
+  const handleReset = () => {
+    setSideA(3);
+    setSideB(4);
+    setSideC('');
+  };
+
+  const analysis = useMemo(() => {
+    const hasA = typeof sideA === 'number' && sideA > 0;
+    const hasB = typeof sideB === 'number' && sideB > 0;
+    const hasC = typeof sideC === 'number' && sideC > 0;
+    const count = [hasA, hasB, hasC].filter(Boolean).length;
+
+    if (count > 2) {
+      return { results: null, error: 'All 3 sides are filled. Leave 1 side blank to solve for it.' };
+    }
+    if (count < 2) {
+      return { results: null, error: null };
+    }
+
     const numA = typeof sideA === 'number' ? sideA : 0;
     const numB = typeof sideB === 'number' ? sideB : 0;
     const numC = typeof sideC === 'number' ? sideC : 0;
 
-    // If A and B given -> solve C
-    if (numA > 0 && numB > 0 && !numC) {
+    if (hasA && hasB && !hasC) {
       const cCalc = Math.sqrt(numA * numA + numB * numB);
       const area = 0.5 * numA * numB;
       const perimeter = numA + numB + cCalc;
       const alphaDeg = (Math.asin(numA / cCalc) * (180 / Math.PI)).toFixed(1);
       const betaDeg = (90 - Number(alphaDeg)).toFixed(1);
       return {
-        solvedSide: 'Hypotenuse (c)',
-        value: cCalc.toFixed(4),
-        area: area.toFixed(2),
-        perimeter: perimeter.toFixed(2),
-        angles: `α ≈ ${alphaDeg}°, β ≈ ${betaDeg}°, γ = 90°`
+        error: null,
+        results: {
+          solvedSide: 'Hypotenuse (c)',
+          value: cCalc.toFixed(4),
+          area: area.toFixed(2),
+          perimeter: perimeter.toFixed(2),
+          angles: `α ≈ ${alphaDeg}°, β ≈ ${betaDeg}°, γ = 90°`
+        }
       };
     }
 
-    // If C and A given -> solve B
-    if (numC > 0 && numA > 0 && numC > numA) {
+    if (hasC && hasA && !hasB) {
+      if (numC <= numA) {
+        return { results: null, error: 'Hypotenuse (c) must be strictly greater than Leg (a).' };
+      }
       const bCalc = Math.sqrt(numC * numC - numA * numA);
       const area = 0.5 * numA * bCalc;
       const perimeter = numA + bCalc + numC;
+      const alphaDeg = (Math.asin(numA / numC) * (180 / Math.PI)).toFixed(1);
+      const betaDeg = (90 - Number(alphaDeg)).toFixed(1);
       return {
-        solvedSide: 'Leg (b)',
-        value: bCalc.toFixed(4),
-        area: area.toFixed(2),
-        perimeter: perimeter.toFixed(2),
-        angles: `Right Triangle`
+        error: null,
+        results: {
+          solvedSide: 'Leg (b)',
+          value: bCalc.toFixed(4),
+          area: area.toFixed(2),
+          perimeter: perimeter.toFixed(2),
+          angles: `α ≈ ${alphaDeg}°, β ≈ ${betaDeg}°, γ = 90°`
+        }
       };
     }
 
-    // If C and B given -> solve A
-    if (numC > 0 && numB > 0 && numC > numB) {
+    if (hasC && hasB && !hasA) {
+      if (numC <= numB) {
+        return { results: null, error: 'Hypotenuse (c) must be strictly greater than Leg (b).' };
+      }
       const aCalc = Math.sqrt(numC * numC - numB * numB);
       const area = 0.5 * aCalc * numB;
       const perimeter = aCalc + numB + numC;
+      const alphaDeg = (Math.asin(aCalc / numC) * (180 / Math.PI)).toFixed(1);
+      const betaDeg = (90 - Number(alphaDeg)).toFixed(1);
       return {
-        solvedSide: 'Leg (a)',
-        value: aCalc.toFixed(4),
-        area: area.toFixed(2),
-        perimeter: perimeter.toFixed(2),
-        angles: `Right Triangle`
+        error: null,
+        results: {
+          solvedSide: 'Leg (a)',
+          value: aCalc.toFixed(4),
+          area: area.toFixed(2),
+          perimeter: perimeter.toFixed(2),
+          angles: `α ≈ ${alphaDeg}°, β ≈ ${betaDeg}°, γ = 90°`
+        }
       };
     }
 
-    return null;
+    return { results: null, error: null };
   }, [sideA, sideB, sideC]);
+
+  const results = analysis.results;
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Enter Any 2 Sides (Leave 1 Blank)</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Enter Any 2 Sides (Leave 1 Blank)</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">Leg a</label>
-            <input
-              type="number"
+            <DecimalInput
               value={sideA}
-              onChange={(e) => setSideA(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setSideA}
               placeholder="Leave blank to solve"
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">Leg b</label>
-            <input
-              type="number"
+            <DecimalInput
               value={sideB}
-              onChange={(e) => setSideB(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setSideB}
               placeholder="Leave blank to solve"
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">Hypotenuse c (Longest Side)</label>
-            <input
-              type="number"
+            <DecimalInput
               value={sideC}
-              onChange={(e) => setSideC(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setSideC}
               placeholder="Leave blank to solve"
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
@@ -261,6 +318,7 @@ export const PythagoreanCalculator: React.FC<BaseCalcProps> = () => {
               {results ? results.value : 'Enter 2 sides'}
             </div>
             {results && <span className="text-xs text-orange-800 font-semibold">{results.solvedSide}</span>}
+            {analysis.error && <p className="text-xs text-rose-700 font-semibold mt-2">{analysis.error}</p>}
           </div>
 
           {results && (
@@ -290,35 +348,53 @@ export const LcmGcdCalculator: React.FC<BaseCalcProps> = () => {
   const [num1, setNum1] = useState<number | ''>(24);
   const [num2, setNum2] = useState<number | ''>(36);
 
+  const handleReset = () => {
+    setNum1(24);
+    setNum2(36);
+  };
+
   const results = useMemo(() => {
     if (num1 === '' || num2 === '') return null;
     const a = Math.abs(Math.round(Number(num1)));
     const b = Math.abs(Math.round(Number(num2)));
-    if (a === 0 || b === 0) return null;
+    if (a <= 0 || b <= 0 || !Number.isSafeInteger(a) || !Number.isSafeInteger(b)) return null;
 
-    // Euclidean algorithm for GCD
-    const gcd = (x: number, y: number): number => (y === 0 ? x : gcd(y, x % y));
+    const gcd = (x: number, y: number): number => {
+      while (y !== 0) {
+        const t = x % y;
+        x = y;
+        y = t;
+      }
+      return x;
+    };
     const g = gcd(a, b);
-    const lcm = (a * b) / g;
+    const lcm = (a / g) * b;
 
-    // Prime factors helper
-    const getPrimeFactors = (n: number) => {
+    const getPrimeFactors = (n: number): string => {
+      if (n === 1) return '1';
+      if (n > 1e12) return 'Too large to factorize (> 10¹²)';
       const factors: number[] = [];
-      let d = 2;
-      while (n >= 2) {
-        if (n % d === 0) {
+      let rem = n;
+      while (rem % 2 === 0) {
+        factors.push(2);
+        rem /= 2;
+      }
+      let d = 3;
+      while (d * d <= rem) {
+        if (rem % d === 0) {
           factors.push(d);
-          n /= d;
+          rem /= d;
         } else {
-          d++;
+          d += 2;
         }
       }
+      if (rem > 1) factors.push(rem);
       return factors.join(' × ');
     };
 
     return {
       gcd: g,
-      lcm: lcm,
+      lcm: Number.isSafeInteger(lcm) ? lcm.toLocaleString() : lcm.toExponential(6),
       factorsA: getPrimeFactors(a),
       factorsB: getPrimeFactors(b)
     };
@@ -328,23 +404,32 @@ export const LcmGcdCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-4">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Two Positive Integers</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Two Positive Integers</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">First Integer</label>
-              <input
-                type="number"
+              <DecimalInput
+                allowDecimal={false}
                 value={num1}
-                onChange={(e) => setNum1(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))}
+                onValueChange={setNum1}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Second Integer</label>
-              <input
-                type="number"
+              <DecimalInput
+                allowDecimal={false}
                 value={num2}
-                onChange={(e) => setNum2(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))}
+                onValueChange={setNum2}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -357,7 +442,7 @@ export const LcmGcdCalculator: React.FC<BaseCalcProps> = () => {
               <div className="space-y-3">
                 <div>
                   <span className="text-xs font-bold text-purple-900 uppercase tracking-wider">Greatest Common Divisor (GCD / GCF)</span>
-                  <div className="text-2xl font-black text-purple-950 font-mono-numbers">{results.gcd}</div>
+                  <div className="text-2xl font-black text-purple-950 font-mono-numbers">{results.gcd.toLocaleString()}</div>
                 </div>
                 <div>
                   <span className="text-xs font-bold text-purple-900 uppercase tracking-wider">Least Common Multiple (LCM)</span>
@@ -386,6 +471,11 @@ export const LogarithmCalculator: React.FC<BaseCalcProps> = () => {
   const [valX, setValX] = useState<number | ''>(100);
   const [baseB, setBaseB] = useState<number | ''>(10);
 
+  const handleReset = () => {
+    setValX(100);
+    setBaseB(10);
+  };
+
   const results = useMemo(() => {
     if (valX === '' || baseB === '') return null;
     const numX = Number(valX);
@@ -408,25 +498,30 @@ export const LogarithmCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Logarithm Arguments</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Logarithm Arguments</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Argument x (x &gt; 0)</label>
-              <input
-                type="number"
-                step="any"
+              <DecimalInput
                 value={valX}
-                onChange={(e) => setValX(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setValX}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Base b (b &gt; 0, b ≠ 1)</label>
-              <input
-                type="number"
-                step="any"
+              <DecimalInput
                 value={baseB}
-                onChange={(e) => setBaseB(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setBaseB}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -474,44 +569,67 @@ export const FactorialCalculator: React.FC<BaseCalcProps> = () => {
   const [n, setN] = useState<number | ''>(7);
   const [r, setR] = useState<number | ''>(3);
 
+  const handleReset = () => {
+    setN(7);
+    setR(3);
+  };
+
   const results = useMemo(() => {
     if (n === '' || r === '') return null;
     const numN = Number(n);
     const numR = Number(r);
-    const fact = (num: number): number => (num <= 1 ? 1 : num * fact(num - 1));
-    if (numN < 0 || numR < 0 || numR > numN || numN > 20) return null;
+    if (!Number.isInteger(numN) || !Number.isInteger(numR) || numN < 0 || numR < 0 || numR > numN || numN > 20) return null;
 
-    const nFact = fact(numN);
-    const rFact = fact(numR);
-    const nMinusRFact = fact(numN - numR);
+    const factBig = (num: number): bigint => {
+      let acc = 1n;
+      for (let i = 2n; i <= BigInt(num); i++) acc *= i;
+      return acc;
+    };
+
+    const nFact = factBig(numN);
+    const rFact = factBig(numR);
+    const nMinusRFact = factBig(numN - numR);
 
     const nPr = nFact / nMinusRFact;
     const nCr = nFact / (rFact * nMinusRFact);
 
-    return { nFact, nPr, nCr };
+    return {
+      nFact: nFact.toLocaleString(),
+      nPr: nPr.toLocaleString(),
+      nCr: nCr.toLocaleString()
+    };
   }, [n, r]);
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Set Parameters</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Set Parameters</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Total Items (n ≤ 20)</label>
-              <input
-                type="number"
+              <DecimalInput
+                allowDecimal={false}
                 value={n}
-                onChange={(e) => setN(e.target.value === '' ? '' : Math.max(0, Math.min(20, Number(e.target.value))))}
+                onValueChange={(v) => setN(v === '' ? '' : Math.min(20, v))}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Subset Items (r ≤ n)</label>
-              <input
-                type="number"
+              <DecimalInput
+                allowDecimal={false}
                 value={r}
-                onChange={(e) => setR(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setR}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -523,20 +641,20 @@ export const FactorialCalculator: React.FC<BaseCalcProps> = () => {
             <div className="space-y-2">
               <div className="flex justify-between items-center bg-white p-2 rounded-lg border">
                 <span className="text-xs text-slate-600">Factorial ({n}!):</span>
-                <span className="font-black text-slate-900 font-mono-numbers">{results.nFact.toLocaleString()}</span>
+                <span className="font-black text-slate-900 font-mono-numbers">{results.nFact}</span>
               </div>
               <div className="flex justify-between items-center bg-white p-2 rounded-lg border">
                 <span className="text-xs text-slate-600">Permutations <sub>{n}</sub>P<sub>{r}</sub> (Order matters):</span>
-                <span className="font-black text-blue-700 font-mono-numbers">{results.nPr.toLocaleString()}</span>
+                <span className="font-black text-blue-700 font-mono-numbers">{results.nPr}</span>
               </div>
               <div className="flex justify-between items-center bg-white p-2 rounded-lg border">
                 <span className="text-xs text-slate-600">Combinations <sub>{n}</sub>C<sub>{r}</sub> (Order does not matter):</span>
-                <span className="font-black text-orange-700 font-mono-numbers">{results.nCr.toLocaleString()}</span>
+                <span className="font-black text-orange-700 font-mono-numbers">{results.nCr}</span>
               </div>
             </div>
           ) : (
             <div className="h-full flex items-center justify-center text-xs text-slate-500 py-6">
-              Enter n (0 ≤ n ≤ 20) and r (0 ≤ r ≤ n) to calculate.
+              Enter integers n (0 ≤ n ≤ 20) and r (0 ≤ r ≤ n) to calculate.
             </div>
           )}
         </div>
@@ -551,6 +669,13 @@ export const Matrix2x2Calculator: React.FC<BaseCalcProps> = () => {
   const [b, setB] = useState<number | ''>(7);
   const [c, setC] = useState<number | ''>(2);
   const [d, setD] = useState<number | ''>(6);
+
+  const handleReset = () => {
+    setA(4);
+    setB(7);
+    setC(2);
+    setD(6);
+  };
 
   const results = useMemo(() => {
     if (a === '' || b === '' || c === '' || d === '') return null;
@@ -578,41 +703,50 @@ export const Matrix2x2Calculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">2x2 Matrix Elements [A]</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">2x2 Matrix Elements [A]</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="grid grid-cols-2 gap-3 p-4 bg-slate-50 rounded-xl border border-slate-300">
             <div>
               <label className="text-[10px] text-slate-500 block">Row 1, Col 1 (a)</label>
-              <input
-                type="number"
+              <DecimalInput
+                allowNegative
                 value={a}
-                onChange={(e) => setA(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setA}
                 className="w-full p-2 border rounded-lg text-center font-bold bg-white"
               />
             </div>
             <div>
               <label className="text-[10px] text-slate-500 block">Row 1, Col 2 (b)</label>
-              <input
-                type="number"
+              <DecimalInput
+                allowNegative
                 value={b}
-                onChange={(e) => setB(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setB}
                 className="w-full p-2 border rounded-lg text-center font-bold bg-white"
               />
             </div>
             <div>
               <label className="text-[10px] text-slate-500 block">Row 2, Col 1 (c)</label>
-              <input
-                type="number"
+              <DecimalInput
+                allowNegative
                 value={c}
-                onChange={(e) => setC(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setC}
                 className="w-full p-2 border rounded-lg text-center font-bold bg-white"
               />
             </div>
             <div>
               <label className="text-[10px] text-slate-500 block">Row 2, Col 2 (d)</label>
-              <input
-                type="number"
+              <DecimalInput
+                allowNegative
                 value={d}
-                onChange={(e) => setD(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setD}
                 className="w-full p-2 border rounded-lg text-center font-bold bg-white"
               />
             </div>

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, copyToClipboard, downloadCsv } from '../../utils/formatters';
 import { Table, Calendar, Download, Copy, Check, Bookmark, DollarSign, TrendingDown } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface AmortizationCalculatorProps {
   currencySymbol?: string;
@@ -32,7 +33,7 @@ export const AmortizationCalculator: React.FC<AmortizationCalculatorProps> = ({
       const P = Math.max(0, numLoanAmount);
       const annualR = Math.max(0, numInterestRate) / 100;
       const r = annualR / 12;
-      const n = Math.max(1, numLoanTermYears * 12);
+      const n = Math.min(1200, Math.max(1, Math.round(numLoanTermYears * 12)));
 
       let monthlyPayment = 0;
       if (r === 0) {
@@ -199,38 +200,33 @@ Payoff Duration: ${calculations.actualMonths} Months (${(calculations.actualMont
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700">Loan Amount</label>
-            <input
-              type="number"
+            <DecimalInput
               value={loanAmount}
-              onChange={(e) => setLoanAmount(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setLoanAmount}
               className="w-full p-2 text-xs font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
             />
           </div>
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700">Interest Rate (%)</label>
-            <input
-              type="number"
-              step="0.1"
+            <DecimalInput
               value={interestRate}
-              onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setInterestRate}
               className="w-full p-2 text-xs font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
             />
           </div>
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700">Term (Years)</label>
-            <input
-              type="number"
+            <DecimalInput
               value={loanTermYears}
-              onChange={(e) => setLoanTermYears(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setLoanTermYears}
               className="w-full p-2 text-xs font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
             />
           </div>
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700">Extra Monthly</label>
-            <input
-              type="number"
+            <DecimalInput
               value={extraPaymentMonthly}
-              onChange={(e) => setExtraPaymentMonthly(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setExtraPaymentMonthly}
               className="w-full p-2 text-xs font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
             />
           </div>

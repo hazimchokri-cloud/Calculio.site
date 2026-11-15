@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { copyToClipboard, formatNumber } from '../../utils/formatters';
 import { Percent, ArrowRightLeft, Copy, Check, Bookmark, Split } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
+import { parseLocaleNumber } from '../../utils/numberInput';
 
 interface RatioCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -39,10 +41,10 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
 
   // Solve A/B = C/D
   const solveResults = useMemo(() => {
-    const a = valA === '' ? null : parseFloat(valA);
-    const b = valB === '' ? null : parseFloat(valB);
-    const c = valC === '' ? null : parseFloat(valC);
-    const d = valD === '' ? null : parseFloat(valD);
+    const a = valA === '' ? null : parseLocaleNumber(valA);
+    const b = valB === '' ? null : parseLocaleNumber(valB);
+    const c = valC === '' ? null : parseLocaleNumber(valC);
+    const d = valD === '' ? null : parseLocaleNumber(valD);
 
     let solvedVar = '';
     let solvedVal: number | null = null;
@@ -61,32 +63,44 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
       solvedVal = (b * c) / a;
     }
 
+    const filledCount = [a, b, c, d].filter(v => v !== null).length;
+
     return {
       solvedVar,
       solvedVal,
-      displayA: a !== null ? a : (solvedVar === 'A' ? solvedVal : '?'),
-      displayB: b !== null ? b : (solvedVar === 'B' ? solvedVal : '?'),
-      displayC: c !== null ? c : (solvedVar === 'C' ? solvedVal : '?'),
-      displayD: d !== null ? d : (solvedVar === 'D' ? solvedVal : '?')
+      filledCount,
+      displayA: a !== null ? a : (solvedVar === 'A' && solvedVal !== null ? Number(solvedVal.toFixed(4)) : '?'),
+      displayB: b !== null ? b : (solvedVar === 'B' && solvedVal !== null ? Number(solvedVal.toFixed(4)) : '?'),
+      displayC: c !== null ? c : (solvedVar === 'C' && solvedVal !== null ? Number(solvedVal.toFixed(4)) : '?'),
+      displayD: d !== null ? d : (solvedVar === 'D' && solvedVal !== null ? Number(solvedVal.toFixed(4)) : '?')
     };
   }, [valA, valB, valC, valD]);
 
-  // Simplify A:B
+  // Simplify A:B (supports decimal inputs by scaling power of 10 before GCD)
   const simplifyResults = useMemo(() => {
     if (simpA === '' || simpB === '') return null;
-    const a = Math.round(Number(simpA));
-    const b = Math.round(Number(simpB));
-    if (isNaN(a) || isNaN(b) || a <= 0 || b <= 0) return null;
+    const rawA = Number(simpA);
+    const rawB = Number(simpB);
+    if (!Number.isFinite(rawA) || !Number.isFinite(rawB) || rawA <= 0 || rawB <= 0) return null;
 
-    const divisor = gcd(a, b);
+    const decPlaces = (n: number) => {
+      const s = n.toString();
+      const idx = s.indexOf('.');
+      return idx === -1 ? 0 : Math.min(6, s.length - idx - 1);
+    };
+    const scale = Math.pow(10, Math.max(decPlaces(rawA), decPlaces(rawB)));
+    const a = Math.round(rawA * scale);
+    const b = Math.round(rawB * scale);
+
+    const divisor = gcd(a, b) || 1;
     const reducedA = a / divisor;
     const reducedB = b / divisor;
-    const decimalRatio = (a / b).toFixed(4);
+    const decimalRatio = (rawA / rawB).toFixed(4);
 
     return {
-      original: `${a} : ${b}`,
+      original: `${rawA} : ${rawB}`,
       reduced: `${reducedA} : ${reducedB}`,
-      divisor,
+      divisor: scale === 1 ? divisor : `${divisor} (scaled ×${scale})`,
       decimalRatio,
       percentage: `${((reducedA / (reducedA + reducedB)) * 100).toFixed(1)}% to ${((reducedB / (reducedA + reducedB)) * 100).toFixed(1)}%`
     };
@@ -276,21 +290,17 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
               <div className="grid grid-cols-2 gap-3 items-center">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700">First Term (A)</label>
-                  <input
-                    type="number"
-                    min="1"
+                  <DecimalInput
                     value={simpA}
-                    onChange={(e) => setSimpA(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={setSimpA}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700">Second Term (B)</label>
-                  <input
-                    type="number"
-                    min="1"
+                  <DecimalInput
                     value={simpB}
-                    onChange={(e) => setSimpB(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={setSimpB}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
@@ -308,11 +318,9 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Total Quantity / Amount</label>
-                <input
-                  type="number"
-                  min="1"
+                <DecimalInput
                   value={totalAmount}
-                  onChange={(e) => setTotalAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setTotalAmount}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -342,9 +350,15 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
                   <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1 font-mono">
                     {solveResults.displayA} : {solveResults.displayB} = {solveResults.displayC} : {solveResults.displayD}
                   </div>
-                  {solveResults.solvedVal !== null && (
+                  {solveResults.solvedVal !== null ? (
                     <div className="text-xs font-medium text-orange-300 mt-1">
                       Solved {solveResults.solvedVar} = {formatNumber(solveResults.solvedVal, 4)}
+                    </div>
+                  ) : (
+                    <div className="text-xs font-medium text-amber-300 mt-1">
+                      {solveResults.filledCount === 4
+                        ? 'Clear any one of the 4 fields to solve for it.'
+                        : 'Enter 3 valid numbers (with non-zero cross-denominator) to solve the missing term.'}
                     </div>
                   )}
                 </div>

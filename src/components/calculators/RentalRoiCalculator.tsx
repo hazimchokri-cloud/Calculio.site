@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Building, DollarSign, TrendingUp, Percent, RotateCcw, Copy, Check, Info, ArrowUpRight } from 'lucide-react';
+import { Building, RotateCcw, Copy, Check } from 'lucide-react';
 import { copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface RentalRoiCalculatorProps {
   currencySymbol?: string;
@@ -37,9 +38,10 @@ export const RentalRoiCalculator: React.FC<RentalRoiCalculatorProps> = ({
   const results = useMemo(() => {
     if (isInputEmpty) return null;
     const numPrice = typeof purchasePrice === 'number' ? purchasePrice : 0;
+    if (numPrice <= 0) return null;
     const numDownPct = typeof downPaymentPercent === 'number' ? downPaymentPercent : 0;
     const numRate = typeof interestRate === 'number' ? interestRate : 0;
-    const numTerm = typeof loanTermYears === 'number' ? loanTermYears : 30;
+    const numTerm = typeof loanTermYears === 'number' && loanTermYears > 0 ? loanTermYears : 30;
     const numClosing = typeof closingCosts === 'number' ? closingCosts : 0;
     const numRehab = typeof rehabCosts === 'number' ? rehabCosts : 0;
     const numRent = typeof monthlyRent === 'number' ? monthlyRent : 0;
@@ -170,58 +172,90 @@ Annual NOI: ${currencySymbol}${results.annualNOI.toLocaleString()} | GRM: ${resu
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Purchase Price</label>
               <div className="relative">
-                <span className="absolute left-3 top-2.5 text-xs font-bold text-slate-400">{currencySymbol}</span>
-                <input
-                  type="number"
-                  min="10000"
-                  step="5000"
+                <span className="absolute left-3 top-2 text-xs font-bold text-slate-400">{currencySymbol}</span>
+                <DecimalInput
                   value={purchasePrice}
-                  onChange={(e) => setPurchasePrice(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={(val) => setPurchasePrice(val)}
                   className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
                 />
               </div>
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Down Payment (%)</label>
-              <input
-                type="number"
-                min="0"
-                max="100"
+              <DecimalInput
                 value={downPaymentPercent}
-                onChange={(e) => setDownPaymentPercent(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={(val) => setDownPaymentPercent(val)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Loan Term (Years)</label>
+              <DecimalInput
+                allowDecimal={false}
+                value={loanTermYears}
+                onValueChange={(val) => setLoanTermYears(val)}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Mortgage Interest Rate (%)</label>
-              <input
-                type="number"
-                step="0.125"
-                min="1"
-                max="20"
+              <label className="block text-xs font-bold text-slate-700 mb-1">Interest Rate (%)</label>
+              <DecimalInput
                 value={interestRate}
-                onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={(val) => setInterestRate(val)}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
             <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Closing Costs</label>
+              <div className="relative">
+                <span className="absolute left-3 top-2 text-xs font-bold text-slate-400">{currencySymbol}</span>
+                <DecimalInput
+                  value={closingCosts}
+                  onValueChange={(val) => setClosingCosts(val)}
+                  className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Rehab / Repairs</label>
+              <div className="relative">
+                <span className="absolute left-3 top-2 text-xs font-bold text-slate-400">{currencySymbol}</span>
+                <DecimalInput
+                  value={rehabCosts}
+                  onValueChange={(val) => setRehabCosts(val)}
+                  className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+            <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Monthly Rental Income</label>
               <div className="relative">
-                <span className="absolute left-3 top-2.5 text-xs font-bold text-slate-400">{currencySymbol}</span>
-                <input
-                  type="number"
-                  min="100"
-                  step="50"
+                <span className="absolute left-3 top-2 text-xs font-bold text-slate-400">{currencySymbol}</span>
+                <DecimalInput
                   value={monthlyRent}
-                  onChange={(e) => setMonthlyRent(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={(val) => setMonthlyRent(val)}
                   className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold text-orange-800"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Other Monthly Income</label>
+              <div className="relative">
+                <span className="absolute left-3 top-2 text-xs font-bold text-slate-400">{currencySymbol}</span>
+                <DecimalInput
+                  value={otherMonthlyIncome}
+                  onValueChange={(val) => setOtherMonthlyIncome(val)}
+                  className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
                 />
               </div>
             </div>
@@ -230,31 +264,52 @@ Annual NOI: ${currencySymbol}${results.annualNOI.toLocaleString()} | GRM: ${resu
           {/* Operating Expenses */}
           <div className="pt-3 border-t border-slate-100">
             <span className="text-xs font-bold text-slate-900 block mb-2">Operating Expenses & Reserves</span>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div>
                 <label className="block text-[11px] font-semibold text-slate-600 mb-1">Yearly Property Tax</label>
-                <input
-                  type="number"
+                <DecimalInput
                   value={propertyTaxYearly}
-                  onChange={(e) => setPropertyTaxYearly(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={(val) => setPropertyTaxYearly(val)}
                   className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-bold"
                 />
               </div>
               <div>
                 <label className="block text-[11px] font-semibold text-slate-600 mb-1">Yearly Insurance</label>
-                <input
-                  type="number"
+                <DecimalInput
                   value={insuranceYearly}
-                  onChange={(e) => setInsuranceYearly(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={(val) => setInsuranceYearly(val)}
                   className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-bold"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">Vacancy Reserve (%)</label>
-                <input
-                  type="number"
+                <label className="block text-[11px] font-semibold text-slate-600 mb-1">Monthly HOA</label>
+                <DecimalInput
+                  value={hoaMonthly}
+                  onValueChange={(val) => setHoaMonthly(val)}
+                  className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-bold"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 mb-1">Maintenance (%)</label>
+                <DecimalInput
+                  value={maintenancePercent}
+                  onValueChange={(val) => setMaintenancePercent(val)}
+                  className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-bold"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 mb-1">Vacancy (%)</label>
+                <DecimalInput
                   value={vacancyPercent}
-                  onChange={(e) => setVacancyPercent(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={(val) => setVacancyPercent(val)}
+                  className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-bold"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 mb-1">Management (%)</label>
+                <DecimalInput
+                  value={managementPercent}
+                  onValueChange={(val) => setManagementPercent(val)}
                   className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-bold"
                 />
               </div>

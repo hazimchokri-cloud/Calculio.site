@@ -59,9 +59,9 @@ export const PrintReportHeader: React.FC<PrintReportHeaderProps> = ({
               {category}
             </span>
           )}
-          <h1 className="text-xl font-black text-[#0F172A] tracking-tight">
+          <h2 className="text-xl font-black text-[#0F172A] tracking-tight">
             {title}
-          </h1>
+          </h2>
           {description && (
             <p className="text-xs text-[#475569] leading-relaxed max-w-2xl">
               {description}

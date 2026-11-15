@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { copyToClipboard, formatNumber } from '../../utils/formatters';
-import { Radical, Copy, Check, Bookmark } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
+import { Copy, Check, Bookmark } from 'lucide-react';
 
 interface SquareRootCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -15,7 +16,7 @@ export const SquareRootCalculator: React.FC<SquareRootCalculatorProps> = ({ onSa
 
   // Simplify square root: √x = a√b
   const simplifySquareRoot = (n: number) => {
-    if (!Number.isInteger(n) || n <= 0) return null;
+    if (!Number.isInteger(n) || n <= 0 || n > 1e9) return null;
     let outside = 1;
     let inside = n;
     let d = 2;
@@ -24,7 +25,7 @@ export const SquareRootCalculator: React.FC<SquareRootCalculatorProps> = ({ onSa
         outside *= d;
         inside /= d * d;
       } else {
-        d++;
+        d = d === 2 ? 3 : d + 2;
       }
     }
     return {
@@ -48,7 +49,14 @@ export const SquareRootCalculator: React.FC<SquareRootCalculatorProps> = ({ onSa
       result = Math.pow(radicand, 1 / rootDegree);
     }
 
-    const isPerfect = result !== null && Number.isInteger(result);
+    let isPerfect = false;
+    if (result !== null && Number.isFinite(result) && Number.isInteger(radicand)) {
+      const rounded = Math.round(result);
+      if (Math.abs(result - rounded) < 1e-10 && Math.pow(rounded, rootDegree) === radicand) {
+        isPerfect = true;
+        result = rounded;
+      }
+    }
     const simplifiedRadical = rootDegree === 2 && radicand > 0 ? simplifySquareRoot(radicand) : null;
 
     return {
@@ -100,6 +108,7 @@ export const SquareRootCalculator: React.FC<SquareRootCalculatorProps> = ({ onSa
               <span>Radical Input</span>
             </h2>
             <button
+              type="button"
               onClick={handleReset}
               className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
             >
@@ -110,22 +119,19 @@ export const SquareRootCalculator: React.FC<SquareRootCalculatorProps> = ({ onSa
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700">Root Degree (n)</label>
-              <input
-                type="number"
-                min="1"
-                max="100"
+              <DecimalInput
+                allowDecimal={false}
                 value={rootDegree}
-                onChange={(e) => setRootDegree(e.target.value === '' ? '' : parseInt(e.target.value))}
+                onValueChange={(val) => setRootDegree(val)}
                 className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700">Radicand Number (x)</label>
-              <input
-                type="number"
-                step="any"
+              <DecimalInput
+                allowNegative
                 value={radicand}
-                onChange={(e) => setRadicand(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                onValueChange={(val) => setRadicand(val)}
                 className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
               />
             </div>
@@ -182,7 +188,13 @@ export const SquareRootCalculator: React.FC<SquareRootCalculatorProps> = ({ onSa
                   <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
                     <span className="text-[10px] text-slate-300 uppercase font-bold block">Perfect Root?</span>
                     <span className="text-lg font-bold text-orange-300 font-mono">
-                      {rootResults.isPerfect ? 'Yes (Integer)' : 'No (Irrational)'}
+                      {rootResults.isImaginary
+                        ? 'N/A (Complex)'
+                        : rootResults.isPerfect
+                        ? 'Yes (Integer)'
+                        : Number.isInteger(rootResults.radicand)
+                        ? 'No (Irrational)'
+                        : 'No (Non-Integer)'}
                     </span>
                   </div>
                 </div>
@@ -190,6 +202,7 @@ export const SquareRootCalculator: React.FC<SquareRootCalculatorProps> = ({ onSa
 
               <div className="flex items-center gap-2 pt-4 border-t border-cyan-900/60">
                 <button
+                  type="button"
                   onClick={handleCopy}
                   className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                 >
@@ -198,8 +211,10 @@ export const SquareRootCalculator: React.FC<SquareRootCalculatorProps> = ({ onSa
                 </button>
                 {onSaveCalculation && (
                   <button
+                    type="button"
+                    disabled={rootResults.isImaginary || rootResults.result === null}
                     onClick={handleSave}
-                    className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                    className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                   >
                     <Bookmark className="w-3.5 h-3.5" />
                     <span>{saved ? 'Saved' : 'Save'}</span>

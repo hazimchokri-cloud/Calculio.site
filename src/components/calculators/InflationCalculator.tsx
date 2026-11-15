@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Coins, Check, Copy, TrendingUp } from 'lucide-react';
 import { formatCurrency, formatNumber, copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface InflationProps {
   currencySymbol?: string;
@@ -20,12 +21,14 @@ export const InflationCalculator: React.FC<InflationProps> = ({ currencySymbol =
   const isInputEmpty = initialAmount === '' || avgInflationRate === '' || years === '';
 
   const stats = useMemo(() => {
-    if (isInputEmpty || numInitialAmount < 0 || numYears < 0) return null;
+    if (isInputEmpty || numInitialAmount < 0 || numYears < 0 || numInflationRate <= -100) return null;
     const rate = numInflationRate / 100;
+    const y = Math.min(200, numYears);
     // Future equivalent cost of goods
-    const futureCost = numInitialAmount * Math.pow(1 + rate, numYears);
+    const futureCost = numInitialAmount * Math.pow(1 + rate, y);
     // Purchasing power of the same nominal dollars in future
-    const futurePurchasingPower = rate === -1 ? 0 : numInitialAmount / Math.pow(1 + rate, numYears);
+    const futurePurchasingPower = numInitialAmount / Math.pow(1 + rate, y);
+    if (!Number.isFinite(futureCost) || !Number.isFinite(futurePurchasingPower)) return null;
     const cumulativeInflation = numInitialAmount > 0 ? ((futureCost - numInitialAmount) / numInitialAmount) * 100 : 0;
 
     return {
@@ -76,10 +79,9 @@ export const InflationCalculator: React.FC<InflationProps> = ({ currencySymbol =
               <label className="text-sm font-semibold text-slate-700 block">Starting Amount</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 text-sm font-semibold">{currencySymbol}</span>
-                <input
-                  type="number"
+                <DecimalInput
                   value={initialAmount}
-                  onChange={(e) => setInitialAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setInitialAmount}
                   className="w-full pl-7 pr-3 py-2 font-mono-numbers text-base font-bold border border-slate-200 rounded-lg bg-slate-50"
                 />
               </div>
@@ -88,23 +90,20 @@ export const InflationCalculator: React.FC<InflationProps> = ({ currencySymbol =
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold text-slate-700 block">Annual Inflation Rate (%)</label>
-                <input
-                  type="number"
-                  step="0.1"
+                <DecimalInput
+                  allowNegative
                   value={avgInflationRate}
-                  onChange={(e) => setAvgInflationRate(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setAvgInflationRate}
                   className="w-full px-3 py-2 font-mono-numbers text-sm font-semibold border border-slate-200 rounded-lg bg-slate-50"
                 />
               </div>
 
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold text-slate-700 block">Horizon (Years)</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="100"
+                <DecimalInput
+                  allowDecimal={false}
                   value={years}
-                  onChange={(e) => setYears(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setYears}
                   className="w-full px-3 py-2 font-mono-numbers text-sm font-semibold border border-slate-200 rounded-lg bg-slate-50"
                 />
               </div>

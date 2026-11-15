@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { formatNumber, copyToClipboard } from '../../utils/formatters';
 import { Flame, Activity, Copy, Check, Bookmark, Scale } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface BmrCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -25,7 +26,7 @@ export const BmrCalculator: React.FC<BmrCalculatorProps> = ({ onSaveCalculation 
   const numHeightIn = typeof heightIn === 'number' ? heightIn : 0;
   const numWeightKg = typeof weightKg === 'number' ? weightKg : 0;
   const numWeightLbs = typeof weightLbs === 'number' ? weightLbs : 0;
-  const numBodyFatPct = typeof bodyFatPct === 'number' ? bodyFatPct : 20;
+  const numBodyFatPct = typeof bodyFatPct === 'number' ? bodyFatPct : null;
 
   const isInputEmpty = unitSystem === 'metric'
     ? age === '' || heightCm === '' || weightKg === ''
@@ -35,26 +36,23 @@ export const BmrCalculator: React.FC<BmrCalculatorProps> = ({ onSaveCalculation 
     try {
       if (isInputEmpty) return null;
 
-      let weightInKg = unitSystem === 'metric' ? numWeightKg : numWeightLbs * 0.45359237;
-      let heightInCmVal = unitSystem === 'metric' ? numHeightCm : (numHeightFt * 12 + numHeightIn) * 2.54;
+      const weightInKg = unitSystem === 'metric' ? numWeightKg : numWeightLbs * 0.45359237;
+      const heightInCmVal = unitSystem === 'metric' ? numHeightCm : (numHeightFt * 12 + numHeightIn) * 2.54;
 
-      if (weightInKg <= 0 || heightInCmVal <= 0 || numAge <= 0) return null;
-
-      weightInKg = Math.max(20, weightInKg);
-      heightInCmVal = Math.max(50, heightInCmVal);
-      const validAge = Math.max(10, numAge);
+      if (weightInKg < 20 || heightInCmVal < 50 || numAge < 10 || numAge > 120) return null;
 
       // 1. Mifflin-St Jeor Equation (Most accurate standard)
-      let bmrMifflin = 10 * weightInKg + 6.25 * heightInCmVal - 5 * validAge + (gender === 'male' ? 5 : -161);
+      const bmrMifflin = 10 * weightInKg + 6.25 * heightInCmVal - 5 * numAge + (gender === 'male' ? 5 : -161);
 
       // 2. Revised Harris-Benedict Equation
-      let bmrHarris = gender === 'male'
-        ? 13.397 * weightInKg + 4.799 * heightInCmVal - 5.677 * validAge + 88.362
-        : 9.247 * weightInKg + 3.098 * heightInCmVal - 4.330 * validAge + 447.593;
+      const bmrHarris = gender === 'male'
+        ? 13.397 * weightInKg + 4.799 * heightInCmVal - 5.677 * numAge + 88.362
+        : 9.247 * weightInKg + 3.098 * heightInCmVal - 4.330 * numAge + 447.593;
 
       // 3. Katch-McArdle Equation (Based on Lean Body Mass)
-      const leanMassKg = weightInKg * (1 - numBodyFatPct / 100);
-      const bmrKatch = 370 + 21.6 * leanMassKg;
+      const validBodyFat = numBodyFatPct !== null && numBodyFatPct >= 2 && numBodyFatPct <= 70;
+      const leanMassKg = validBodyFat ? weightInKg * (1 - numBodyFatPct / 100) : null;
+      const bmrKatch = leanMassKg !== null ? 370 + 21.6 * leanMassKg : null;
 
       // Activity Multipliers based on Mifflin
       const activityLevels = [
@@ -71,7 +69,7 @@ export const BmrCalculator: React.FC<BmrCalculatorProps> = ({ onSaveCalculation 
       return {
         bmrMifflin: Math.round(bmrMifflin),
         bmrHarris: Math.round(bmrHarris),
-        bmrKatch: Math.round(bmrKatch),
+        bmrKatch: bmrKatch !== null ? Math.round(bmrKatch) : null,
         activityLevels
       };
     } catch {
@@ -84,7 +82,7 @@ export const BmrCalculator: React.FC<BmrCalculatorProps> = ({ onSaveCalculation 
     const text = `Basal Metabolic Rate (BMR) Summary:
 Mifflin-St Jeor (Standard): ${calculations.bmrMifflin} kcal/day
 Revised Harris-Benedict: ${calculations.bmrHarris} kcal/day
-Katch-McArdle (Lean Mass): ${calculations.bmrKatch} kcal/day
+Katch-McArdle (Lean Mass): ${calculations.bmrKatch !== null ? `${calculations.bmrKatch} kcal/day` : 'Requires Body Fat %'}
 Sedentary TDEE: ${calculations.activityLevels[0].calories} kcal/day
 Moderate Activity TDEE: ${calculations.activityLevels[2].calories} kcal/day`;
 
@@ -184,12 +182,9 @@ Moderate Activity TDEE: ${calculations.activityLevels[2].calories} kcal/day`;
               <span>Age</span>
               <span className="text-rose-600 font-mono">{age} years</span>
             </label>
-            <input
-              type="number"
-              min="10"
-              max="100"
+            <DecimalInput
               value={age}
-              onChange={(e) => setAge(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setAge}
               className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
             />
           </div>
@@ -201,12 +196,9 @@ Moderate Activity TDEE: ${calculations.activityLevels[2].calories} kcal/day`;
                 <span>Height (cm)</span>
                 <span className="text-rose-600 font-mono">{heightCm} cm</span>
               </label>
-              <input
-                type="number"
-                min="50"
-                max="250"
+              <DecimalInput
                 value={heightCm}
-                onChange={(e) => setHeightCm(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setHeightCm}
                 className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
               />
             </div>
@@ -214,23 +206,17 @@ Moderate Activity TDEE: ${calculations.activityLevels[2].calories} kcal/day`;
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-700">Feet</label>
-                <input
-                  type="number"
-                  min="3"
-                  max="8"
+                <DecimalInput
                   value={heightFt}
-                  onChange={(e) => setHeightFt(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setHeightFt}
                   className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-700">Inches</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="11"
+                <DecimalInput
                   value={heightIn}
-                  onChange={(e) => setHeightIn(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setHeightIn}
                   className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -243,13 +229,9 @@ Moderate Activity TDEE: ${calculations.activityLevels[2].calories} kcal/day`;
               <span>Weight ({unitSystem === 'metric' ? 'kg' : 'lbs'})</span>
               <span className="text-rose-600 font-mono">{unitSystem === 'metric' ? `${weightKg} kg` : `${weightLbs} lbs`}</span>
             </label>
-            <input
-              type="number"
-              min="20"
-              max="350"
+            <DecimalInput
               value={unitSystem === 'metric' ? weightKg : weightLbs}
-              onChange={(e) => {
-                const val = e.target.value === '' ? '' : Number(e.target.value);
+              onValueChange={(val) => {
                 if (unitSystem === 'metric') setWeightKg(val);
                 else setWeightLbs(val);
               }}
@@ -261,14 +243,12 @@ Moderate Activity TDEE: ${calculations.activityLevels[2].calories} kcal/day`;
           <div className="space-y-1 pt-2 border-t border-slate-100">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Body Fat % (Optional for Katch-McArdle)</span>
-              <span className="text-slate-500 font-mono">{bodyFatPct}%</span>
+              <span className="text-slate-500 font-mono">{bodyFatPct !== '' ? `${bodyFatPct}%` : '—'}</span>
             </label>
-            <input
-              type="number"
-              min="3"
-              max="60"
+            <DecimalInput
               value={bodyFatPct}
-              onChange={(e) => setBodyFatPct(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setBodyFatPct}
+              placeholder="e.g. 18"
               className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
             />
           </div>
@@ -295,7 +275,9 @@ Moderate Activity TDEE: ${calculations.activityLevels[2].calories} kcal/day`;
                 </div>
                 <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
                   <span className="text-[10px] text-slate-300 uppercase font-bold block">Katch-McArdle (LBM)</span>
-                  <span className="text-base font-bold text-white font-mono">{calculations ? `${formatNumber(calculations.bmrKatch)} kcal` : '—'}</span>
+                  <span className="text-base font-bold text-white font-mono">
+                    {calculations && calculations.bmrKatch !== null ? `${formatNumber(calculations.bmrKatch)} kcal` : 'Enter BF%'}
+                  </span>
                 </div>
               </div>
 

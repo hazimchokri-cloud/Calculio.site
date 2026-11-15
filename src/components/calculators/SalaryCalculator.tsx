@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, downloadCsv, copyToClipboard } from '../../utils/formatters';
 import { Briefcase, DollarSign, Clock, ShieldCheck, Check, Copy, Percent } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface SalaryCalcProps {
   currencySymbol?: string;
@@ -58,13 +59,13 @@ export const SalaryCalculator: React.FC<SalaryCalcProps> = ({
     const netAnnual = Math.max(0, grossAnnual - totalDeductions);
 
     const breakdown = [
-      { period: 'Annual', gross: grossAnnual, net: netAnnual, taxes: totalTaxes },
-      { period: 'Monthly (12x)', gross: grossAnnual / 12, net: netAnnual / 12, taxes: totalTaxes / 12 },
-      { period: 'Semi-Monthly (24x)', gross: grossAnnual / 24, net: netAnnual / 24, taxes: totalTaxes / 24 },
-      { period: 'Bi-Weekly (26x)', gross: grossAnnual / 26, net: netAnnual / 26, taxes: totalTaxes / 26 },
-      { period: 'Weekly (52x)', gross: grossAnnual / 52, net: netAnnual / 52, taxes: totalTaxes / 52 },
-      { period: 'Daily (260x)', gross: grossAnnual / 260, net: netAnnual / 260, taxes: totalTaxes / 260 },
-      { period: 'Hourly', gross: grossAnnual / totalHoursPerYear, net: netAnnual / totalHoursPerYear, taxes: totalTaxes / totalHoursPerYear }
+      { period: 'Annual', gross: grossAnnual, net: netAnnual, deductions: totalDeductions },
+      { period: 'Monthly (12x)', gross: grossAnnual / 12, net: netAnnual / 12, deductions: totalDeductions / 12 },
+      { period: 'Semi-Monthly (24x)', gross: grossAnnual / 24, net: netAnnual / 24, deductions: totalDeductions / 24 },
+      { period: 'Bi-Weekly (26x)', gross: grossAnnual / 26, net: netAnnual / 26, deductions: totalDeductions / 26 },
+      { period: 'Weekly (52x)', gross: grossAnnual / 52, net: netAnnual / 52, deductions: totalDeductions / 52 },
+      { period: 'Daily (260x)', gross: grossAnnual / 260, net: netAnnual / 260, deductions: totalDeductions / 260 },
+      { period: 'Hourly', gross: grossAnnual / totalHoursPerYear, net: netAnnual / totalHoursPerYear, deductions: totalDeductions / totalHoursPerYear }
     ];
 
     return {
@@ -143,10 +144,9 @@ export const SalaryCalculator: React.FC<SalaryCalcProps> = ({
               <label className="text-sm font-semibold text-slate-700 block">Earnings Amount</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 text-sm font-semibold">{currencySymbol}</span>
-                <input
-                  type="number"
+                <DecimalInput
                   value={payAmount}
-                  onChange={(e) => setPayAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setPayAmount}
                   className="w-full pl-7 pr-3 py-2 font-mono-numbers text-base font-bold border border-slate-200 rounded-lg bg-slate-50/50"
                 />
               </div>
@@ -174,10 +174,9 @@ export const SalaryCalculator: React.FC<SalaryCalcProps> = ({
 
           <div className="space-y-1.5">
             <label className="text-sm font-semibold text-slate-700 block">Work Hours per Week</label>
-            <input
-              type="number"
+            <DecimalInput
               value={hoursPerWeek}
-              onChange={(e) => setHoursPerWeek(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setHoursPerWeek}
               className="w-full px-3 py-2 text-sm font-mono-numbers border border-slate-200 rounded-lg bg-slate-50/50"
             />
           </div>
@@ -188,30 +187,27 @@ export const SalaryCalculator: React.FC<SalaryCalcProps> = ({
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div>
                 <label className="text-xs font-medium text-slate-700 mb-1 block">Est. Federal Tax (%)</label>
-                <input
-                  type="number"
+                <DecimalInput
                   value={federalTaxRate}
-                  onChange={(e) => setFederalTaxRate(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setFederalTaxRate}
                   className="w-full px-2.5 py-1.5 text-xs font-mono-numbers border border-slate-200 rounded-lg bg-slate-50/50"
                 />
               </div>
 
               <div>
                 <label className="text-xs font-medium text-slate-700 mb-1 block">Est. State Tax (%)</label>
-                <input
-                  type="number"
+                <DecimalInput
                   value={stateTaxRate}
-                  onChange={(e) => setStateTaxRate(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setStateTaxRate}
                   className="w-full px-2.5 py-1.5 text-xs font-mono-numbers border border-slate-200 rounded-lg bg-slate-50/50"
                 />
               </div>
 
               <div>
                 <label className="text-xs font-medium text-slate-700 mb-1 block">FICA / Medicare (%)</label>
-                <input
-                  type="number"
+                <DecimalInput
                   value={ficaMedicareRate}
-                  onChange={(e) => setFicaMedicareRate(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setFicaMedicareRate}
                   className="w-full px-2.5 py-1.5 text-xs font-mono-numbers border border-slate-200 rounded-lg bg-slate-50/50"
                 />
               </div>
@@ -221,10 +217,9 @@ export const SalaryCalculator: React.FC<SalaryCalcProps> = ({
               <label className="text-xs font-medium text-slate-700 mb-1 block">Annual Pre-tax Deductions (401k, HSA, Medical)</label>
               <div className="relative">
                 <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-700 text-xs font-semibold">{currencySymbol}</span>
-                <input
-                  type="number"
+                <DecimalInput
                   value={preTaxDeductionsAnnual}
-                  onChange={(e) => setPreTaxDeductionsAnnual(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setPreTaxDeductionsAnnual}
                   className="w-full pl-6 pr-2 py-1.5 text-xs font-mono-numbers border border-slate-200 rounded-lg bg-slate-50/50"
                 />
               </div>
@@ -270,6 +265,10 @@ export const SalaryCalculator: React.FC<SalaryCalcProps> = ({
                     <span>Total Annual Taxes:</span>
                     <strong className="text-rose-300 font-mono-numbers">{formatCurrency(stats.totalTaxes, currencySymbol)}</strong>
                   </div>
+                  <div className="flex justify-between text-slate-300">
+                    <span>Pre-Tax Deductions:</span>
+                    <strong className="text-slate-200 font-mono-numbers">{formatCurrency(numPreTaxDeductionsAnnual, currencySymbol)}</strong>
+                  </div>
                 </div>
               </div>
 
@@ -310,7 +309,7 @@ export const SalaryCalculator: React.FC<SalaryCalcProps> = ({
                 <tr>
                   <th className="py-2.5 px-3">Pay Period</th>
                   <th className="py-2.5 px-3">Gross Earnings</th>
-                  <th className="py-2.5 px-3">Taxes & Deductions</th>
+                  <th className="py-2.5 px-3">Total Taxes & Pre-Tax Deductions</th>
                   <th className="py-2.5 px-3 text-right">Net Take-Home Pay</th>
                 </tr>
               </thead>
@@ -319,7 +318,7 @@ export const SalaryCalculator: React.FC<SalaryCalcProps> = ({
                   <tr key={row.period} className="hover:bg-slate-50/80">
                     <td className="py-2 px-3 font-semibold text-slate-900 font-sans">{row.period}</td>
                     <td className="py-2 px-3 text-slate-700">{formatCurrency(row.gross, currencySymbol)}</td>
-                    <td className="py-2 px-3 text-rose-600">-{formatCurrency(row.taxes, currencySymbol)}</td>
+                    <td className="py-2 px-3 text-rose-600">-{formatCurrency(row.deductions, currencySymbol)}</td>
                     <td className="py-2 px-3 text-right font-bold text-orange-700">{formatCurrency(row.net, currencySymbol)}</td>
                   </tr>
                 ))}

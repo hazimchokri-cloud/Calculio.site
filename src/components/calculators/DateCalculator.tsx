@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Calendar as CalendarIcon, Clock, Check, Copy, RefreshCw, Bookmark, Sparkles, Plus, Minus, ArrowRight, Briefcase } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, Copy, RefreshCw, Bookmark, Sparkles, Plus, Minus, Briefcase } from 'lucide-react';
 import { formatNumber, copyToClipboard } from '../../utils/formatters';
+import { parseLocalDate, formatLocalIsoDate, addLocalDays, diffLocalCalendarDays, countWeekdaysBetween } from '../../utils/dateUtils';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface DateCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -9,8 +11,8 @@ interface DateCalculatorProps {
 type DateMode = 'difference' | 'add-subtract';
 
 export const DateCalculator: React.FC<DateCalculatorProps> = ({ onSaveCalculation }) => {
-  const todayStr = new Date().toISOString().split('T')[0];
-  const nextMonthStr = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const todayStr = formatLocalIsoDate(new Date());
+  const nextMonthStr = formatLocalIsoDate(addLocalDays(new Date(), 30));
 
   const [mode, setMode] = useState<DateMode>('difference');
   const [startDate, setStartDate] = useState<string>(todayStr);
@@ -48,36 +50,20 @@ export const DateCalculator: React.FC<DateCalculatorProps> = ({ onSaveCalculatio
     try {
       if (mode !== 'difference') return null;
 
-      const d1 = new Date(startDate);
-      const d2 = new Date(endDate);
+      const d1 = parseLocalDate(startDate);
+      const d2 = parseLocalDate(endDate);
 
-      if (isNaN(d1.getTime()) || isNaN(d2.getTime())) {
+      if (!d1 || !d2) {
         return null;
       }
 
-      const start = d1 < d2 ? d1 : d2;
-      const end = d1 < d2 ? d2 : d1;
+      const start = d1 <= d2 ? d1 : d2;
+      const end = d1 <= d2 ? d2 : d1;
       const isReversed = d1 > d2;
 
-      const diffTime = Math.abs(end.getTime() - start.getTime());
-      let totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      if (includeEndDay) totalDays += 1;
-
-      // Calculate business days (Monday-Friday)
-      let businessDays = 0;
-      let weekendDays = 0;
-      const cur = new Date(start);
-      const stopTime = end.getTime() + (includeEndDay ? 24 * 60 * 60 * 1000 : 0);
-
-      while (cur.getTime() < stopTime) {
-        const dayOfWeek = cur.getDay(); // 0 is Sunday, 6 is Saturday
-        if (dayOfWeek === 0 || dayOfWeek === 6) {
-          weekendDays++;
-        } else {
-          businessDays++;
-        }
-        cur.setDate(cur.getDate() + 1);
-      }
+      const totalDays = diffLocalCalendarDays(start, end) + (includeEndDay ? 1 : 0);
+      const businessDays = countWeekdaysBetween(start, end, includeEndDay);
+      const weekendDays = Math.max(0, totalDays - businessDays);
 
       const weeks = Math.floor(totalDays / 7);
       const remainingDays = totalDays % 7;
@@ -104,15 +90,15 @@ export const DateCalculator: React.FC<DateCalculatorProps> = ({ onSaveCalculatio
     try {
       if (mode !== 'add-subtract') return null;
 
-      const b = new Date(baseDate);
-      if (isNaN(b.getTime())) return null;
+      const b = parseLocalDate(baseDate);
+      if (!b) return null;
 
-      const numDaysSafe = typeof numDays === 'number' ? numDays : 0;
-      const numWeeksSafe = typeof numWeeks === 'number' ? numWeeks : 0;
-      const numMonthsSafe = typeof numMonths === 'number' ? numMonths : 0;
+      const numDaysSafe = typeof numDays === 'number' ? Math.max(0, Math.round(numDays)) : 0;
+      const numWeeksSafe = typeof numWeeks === 'number' ? Math.max(0, Math.round(numWeeks)) : 0;
+      const numMonthsSafe = typeof numMonths === 'number' ? Math.max(0, Math.round(numMonths)) : 0;
 
       const totalDaysToAdd = numDaysSafe + (numWeeksSafe * 7);
-      const targetDate = new Date(b);
+      const targetDate = new Date(b.getFullYear(), b.getMonth(), b.getDate());
 
       if (addOp === 'add') {
         targetDate.setMonth(targetDate.getMonth() + numMonthsSafe);
@@ -131,7 +117,7 @@ export const DateCalculator: React.FC<DateCalculatorProps> = ({ onSaveCalculatio
 
       return {
         formatted: targetDate.toLocaleDateString('en-US', options),
-        iso: targetDate.toISOString().split('T')[0],
+        iso: formatLocalIsoDate(targetDate),
         dayOfWeek: targetDate.toLocaleDateString('en-US', { weekday: 'long' }),
         totalDaysOffset: totalDaysToAdd + (numMonthsSafe * 30.4)
       };
@@ -261,9 +247,10 @@ export const DateCalculator: React.FC<DateCalculatorProps> = ({ onSaveCalculatio
                     key={p.label}
                     type="button"
                     onClick={() => {
-                      const st = new Date(startDate);
-                      st.setDate(st.getDate() + p.d);
-                      setEndDate(st.toISOString().split('T')[0]);
+                      const st = parseLocalDate(startDate);
+                      if (st) {
+                        setEndDate(formatLocalIsoDate(addLocalDays(st, p.d)));
+                      }
                     }}
                     className="text-xs font-bold px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 transition-colors"
                   >
@@ -313,31 +300,28 @@ export const DateCalculator: React.FC<DateCalculatorProps> = ({ onSaveCalculatio
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-700">Days</label>
-                  <input
-                    type="number"
-                    min="0"
+                  <DecimalInput
+                    allowDecimal={false}
                     value={numDays}
-                    onChange={(e) => setNumDays(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={(val) => setNumDays(val)}
                     className="w-full px-3 py-2 text-sm font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-700">Weeks</label>
-                  <input
-                    type="number"
-                    min="0"
+                  <DecimalInput
+                    allowDecimal={false}
                     value={numWeeks}
-                    onChange={(e) => setNumWeeks(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={(val) => setNumWeeks(val)}
                     className="w-full px-3 py-2 text-sm font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-700">Months</label>
-                  <input
-                    type="number"
-                    min="0"
+                  <DecimalInput
+                    allowDecimal={false}
                     value={numMonths}
-                    onChange={(e) => setNumMonths(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={(val) => setNumMonths(val)}
                     className="w-full px-3 py-2 text-sm font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
@@ -443,7 +427,7 @@ export const DateCalculator: React.FC<DateCalculatorProps> = ({ onSaveCalculatio
 
                   <div className="p-3.5 bg-white/10 rounded-xl text-xs text-slate-200 border border-white/10 space-y-1">
                     <span className="text-[10px] text-indigo-300 uppercase font-bold block">Offset Summary</span>
-                    <div>{addOp === 'add' ? 'Added' : 'Subtracted'} {numDays} days, {numWeeks} weeks, {numMonths} months from {baseDate}.</div>
+                    <div>{addOp === 'add' ? 'Added' : 'Subtracted'} {numDays || 0} days, {numWeeks || 0} weeks, {numMonths || 0} months from {baseDate}.</div>
                   </div>
                 </div>
               )}

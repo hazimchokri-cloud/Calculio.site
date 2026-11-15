@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Clock, Zap, Activity, Coins, Utensils, Dog, Globe, RotateCcw, Copy, Check, TrendingUp, DollarSign } from 'lucide-react';
-import { copyToClipboard } from '../../utils/formatters';
+import { RotateCcw } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
+import { getDaysInMonth } from '../../utils/dateUtils';
 
 interface BaseCalcProps {
   currencySymbol?: string;
@@ -10,21 +11,31 @@ interface BaseCalcProps {
 // 1. Density, Mass & Volume Calculator (ρ = m / V)
 export const DensityCalculator: React.FC<BaseCalcProps> = () => {
   const [solveFor, setSolveFor] = useState<'density' | 'mass' | 'volume'>('density');
-  const [mass, setMass] = useState<number | ''>(500); // grams
-  const [volume, setVolume] = useState<number | ''>(250); // cm³ or mL
-  const [density, setDensity] = useState<number | ''>(2.0); // g/cm³
+  const [mass, setMass] = useState<number | ''>(500);
+  const [volume, setVolume] = useState<number | ''>(250);
+  const [density, setDensity] = useState<number | ''>(2.0);
+
+  const handleReset = () => {
+    setSolveFor('density');
+    setMass(500);
+    setVolume(250);
+    setDensity(2.0);
+  };
 
   const results = useMemo(() => {
     if (solveFor === 'density') {
-      if (mass === '' || volume === '' || volume <= 0) return null;
+      if (mass === '' || volume === '') return null;
+      if (mass < 0 || volume <= 0) return { error: 'Mass must be non-negative and volume must be greater than zero.' } as const;
       const calcD = mass / volume;
       return { output: calcD.toFixed(3), unit: 'g/cm³ (or kg/L)', label: 'Calculated Density' };
     } else if (solveFor === 'mass') {
       if (density === '' || volume === '') return null;
+      if (density < 0 || volume < 0) return { error: 'Density and volume must be non-negative.' } as const;
       const calcM = density * volume;
       return { output: calcM.toFixed(2), unit: 'grams', label: 'Calculated Mass' };
     } else {
-      if (mass === '' || density === '' || density <= 0) return null;
+      if (mass === '' || density === '') return null;
+      if (mass < 0 || density <= 0) return { error: 'Mass must be non-negative and density must be greater than zero.' } as const;
       const calcV = mass / density;
       return { output: calcV.toFixed(2), unit: 'cm³ (mL)', label: 'Calculated Volume' };
     }
@@ -34,7 +45,16 @@ export const DensityCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Target Variable to Solve</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Target Variable to Solve</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="grid grid-cols-3 gap-2">
             {(['density', 'mass', 'volume'] as const).map((mode) => (
               <button
@@ -52,10 +72,9 @@ export const DensityCalculator: React.FC<BaseCalcProps> = () => {
             {solveFor !== 'mass' && (
               <div>
                 <label className="block text-xs font-semibold text-slate-600 mb-1">Mass (grams)</label>
-                <input
-                  type="number"
+                <DecimalInput
                   value={mass}
-                  onChange={(e) => setMass(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                  onValueChange={setMass}
                   className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
                 />
               </div>
@@ -63,10 +82,9 @@ export const DensityCalculator: React.FC<BaseCalcProps> = () => {
             {solveFor !== 'volume' && (
               <div>
                 <label className="block text-xs font-semibold text-slate-600 mb-1">Volume (cm³ or mL)</label>
-                <input
-                  type="number"
+                <DecimalInput
                   value={volume}
-                  onChange={(e) => setVolume(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                  onValueChange={setVolume}
                   className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
                 />
               </div>
@@ -74,10 +92,9 @@ export const DensityCalculator: React.FC<BaseCalcProps> = () => {
             {solveFor !== 'density' && (
               <div>
                 <label className="block text-xs font-semibold text-slate-600 mb-1">Density (g/cm³)</label>
-                <input
-                  type="number"
+                <DecimalInput
                   value={density}
-                  onChange={(e) => setDensity(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                  onValueChange={setDensity}
                   className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
                 />
               </div>
@@ -85,7 +102,7 @@ export const DensityCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">{results.label}</span>
@@ -96,7 +113,7 @@ export const DensityCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter valid numbers for the required fields to calculate.
+            {results && 'error' in results ? results.error : 'Enter valid numbers for the required fields to calculate.'}
           </div>
         )}
       </div>
@@ -110,8 +127,15 @@ export const EnergyCalculator: React.FC<BaseCalcProps> = () => {
   const [velocityMs, setVelocityMs] = useState<number | ''>(15);
   const [heightM, setHeightM] = useState<number | ''>(20);
 
+  const handleReset = () => {
+    setMassKg(10);
+    setVelocityMs(15);
+    setHeightM(20);
+  };
+
   const results = useMemo(() => {
     if (massKg === '' || velocityMs === '' || heightM === '') return null;
+    if (massKg < 0) return { error: 'Mass must be non-negative.' } as const;
     const m = massKg;
     const v = velocityMs;
     const h = heightM;
@@ -127,39 +151,47 @@ export const EnergyCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Physical Parameters</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Physical Parameters</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Mass (kg)</label>
-            <input
-              type="number"
+            <DecimalInput
               value={massKg}
-              onChange={(e) => setMassKg(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setMassKg}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Velocity (m/s)</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={velocityMs}
-                onChange={(e) => setVelocityMs(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setVelocityMs}
+                allowNegative
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Height (meters)</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={heightM}
-                onChange={(e) => setHeightM(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setHeightM}
+                allowNegative
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-orange-50 to-orange-100/60 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
             <div className="space-y-3">
               <div>
@@ -181,7 +213,7 @@ export const EnergyCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter mass, velocity, and height to calculate energy values.
+            {results && 'error' in results ? results.error : 'Enter mass, velocity, and height to calculate energy values.'}
           </div>
         )}
       </div>
@@ -191,16 +223,24 @@ export const EnergyCalculator: React.FC<BaseCalcProps> = () => {
 
 // 3. Pressure & Force Calculator (P = F / A)
 export const PressureCalculator: React.FC<BaseCalcProps> = () => {
-  const [forceN, setForceN] = useState<number | ''>(500); // Newtons
-  const [areaM2, setAreaM2] = useState<number | ''>(0.05); // m²
+  const [forceN, setForceN] = useState<number | ''>(500);
+  const [areaM2, setAreaM2] = useState<number | ''>(0.05);
+
+  const handleReset = () => {
+    setForceN(500);
+    setAreaM2(0.05);
+  };
 
   const results = useMemo(() => {
-    if (forceN === '' || areaM2 === '' || areaM2 <= 0) return null;
+    if (forceN === '' || areaM2 === '') return null;
+    if (forceN < 0 || areaM2 <= 0) {
+      return { error: 'Force must be non-negative and surface area must be greater than zero.' } as const;
+    }
     const f = forceN;
     const a = areaM2;
 
     const pressurePascals = f / a;
-    const pressurePsi = pressurePascals * 0.000145038;
+    const pressurePsi = pressurePascals * 0.0001450377;
     const pressureBar = pressurePascals / 100000;
     const pressureAtm = pressurePascals / 101325;
 
@@ -211,29 +251,35 @@ export const PressureCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Applied Force & Area</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Applied Force &amp; Area</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Perpendicular Force (Newtons)</label>
-            <input
-              type="number"
+            <DecimalInput
               value={forceN}
-              onChange={(e) => setForceN(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setForceN}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Surface Area (m²)</label>
-            <input
-              type="number"
-              step="0.001"
+            <DecimalInput
               value={areaM2}
-              onChange={(e) => setAreaM2(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setAreaM2}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Calculated Pressure</span>
@@ -250,7 +296,7 @@ export const PressureCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter perpendicular force and surface area to calculate pressure.
+            {results && 'error' in results ? results.error : 'Enter perpendicular force and surface area to calculate pressure.'}
           </div>
         )}
       </div>
@@ -263,12 +309,23 @@ export const SpeedOfSoundCalculator: React.FC<BaseCalcProps> = () => {
   const [temperatureC, setTemperatureC] = useState<number | ''>(20);
   const [objectSpeedKmh, setObjectSpeedKmh] = useState<number | ''>(1235);
 
+  const handleReset = () => {
+    setTemperatureC(20);
+    setObjectSpeedKmh(1235);
+  };
+
   const results = useMemo(() => {
     if (temperatureC === '' || objectSpeedKmh === '') return null;
     const tc = temperatureC;
     const osk = objectSpeedKmh;
+    if (tc < -273.15) {
+      return { error: 'Temperature cannot be below absolute zero (−273.15 °C).' } as const;
+    }
+    if (osk < 0) {
+      return { error: 'Object speed must be non-negative.' } as const;
+    }
 
-    const speedOfSoundMs = 331.3 * Math.sqrt(Math.max(0, 1 + tc / 273.15));
+    const speedOfSoundMs = 331.3 * Math.sqrt(1 + tc / 273.15);
     const speedOfSoundKmh = speedOfSoundMs * 3.6;
     const speedOfSoundMph = speedOfSoundKmh * 0.621371;
     const machNumber = speedOfSoundKmh > 0 ? osk / speedOfSoundKmh : 0;
@@ -280,28 +337,36 @@ export const SpeedOfSoundCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Air Conditions & Vehicle Speed</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Air Conditions &amp; Vehicle Speed</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Air Temperature (°C)</label>
-            <input
-              type="number"
+            <DecimalInput
               value={temperatureC}
-              onChange={(e) => setTemperatureC(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setTemperatureC}
+              allowNegative
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Object Speed (km/h)</label>
-            <input
-              type="number"
+            <DecimalInput
               value={objectSpeedKmh}
-              onChange={(e) => setObjectSpeedKmh(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setObjectSpeedKmh}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-sky-50 to-indigo-50 p-5 rounded-xl border border-sky-200 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-sky-900 uppercase tracking-wider">Speed of Sound at {results.tc}°C</span>
@@ -320,7 +385,7 @@ export const SpeedOfSoundCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter air temperature and object speed to calculate speed of sound and Mach number.
+            {results && 'error' in results ? results.error : 'Enter air temperature and object speed to calculate speed of sound and Mach number.'}
           </div>
         )}
       </div>
@@ -336,6 +401,15 @@ export const TimeCardCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
   const [hoursWed, setHoursWed] = useState<number | ''>(8);
   const [hoursThu, setHoursThu] = useState<number | ''>(8.5);
   const [hoursFri, setHoursFri] = useState<number | ''>(9);
+
+  const handleReset = () => {
+    setHourlyWage(25);
+    setHoursMon(8);
+    setHoursTue(8);
+    setHoursWed(8);
+    setHoursThu(8.5);
+    setHoursFri(9);
+  };
 
   const results = useMemo(() => {
     if (
@@ -356,6 +430,10 @@ export const TimeCardCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
     const hTh = hoursThu;
     const hF = hoursFri;
 
+    if (hw < 0 || hM < 0 || hTu < 0 || hW < 0 || hTh < 0 || hF < 0) {
+      return { error: 'Daily hours and hourly wage must be non-negative.' } as const;
+    }
+
     const totalHours = hM + hTu + hW + hTh + hF;
     const regularHours = Math.min(40, totalHours);
     const overtimeHours = Math.max(0, totalHours - 40);
@@ -366,26 +444,35 @@ export const TimeCardCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
     return { totalHours, regularHours, overtimeHours, regularPay, overtimePay, totalGrossPay, hw };
   }, [hourlyWage, hoursMon, hoursTue, hoursWed, hoursThu, hoursFri]);
 
+  const dayRows: { label: string; val: number | ''; setter: React.Dispatch<React.SetStateAction<number | ''>> }[] = [
+    { label: 'Mon', val: hoursMon, setter: setHoursMon },
+    { label: 'Tue', val: hoursTue, setter: setHoursTue },
+    { label: 'Wed', val: hoursWed, setter: setHoursWed },
+    { label: 'Thu', val: hoursThu, setter: setHoursThu },
+    { label: 'Fri', val: hoursFri, setter: setHoursFri }
+  ];
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Daily Clocked Hours</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Daily Clocked Hours</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="grid grid-cols-5 gap-1.5">
-            {[
-              ['Mon', hoursMon, setHoursMon],
-              ['Tue', hoursTue, setHoursTue],
-              ['Wed', hoursWed, setHoursWed],
-              ['Thu', hoursThu, setHoursThu],
-              ['Fri', hoursFri, setHoursFri]
-            ].map(([day, val, setter]: any) => (
-              <div key={day}>
-                <label className="block text-[10px] text-slate-500 text-center">{day}</label>
-                <input
-                  type="number"
-                  step="0.5"
-                  value={val}
-                  onChange={(e) => setter(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+            {dayRows.map((d) => (
+              <div key={d.label}>
+                <label className="block text-[10px] text-slate-500 text-center mb-0.5">{d.label}</label>
+                <DecimalInput
+                  value={d.val}
+                  onValueChange={d.setter}
                   className="w-full p-1 border rounded text-center text-xs font-bold"
                 />
               </div>
@@ -393,23 +480,22 @@ export const TimeCardCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Hourly Base Wage ({currencySymbol})</label>
-            <input
-              type="number"
+            <DecimalInput
               value={hourlyWage}
-              onChange={(e) => setHourlyWage(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setHourlyWage}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Total Weekly Gross Pay</span>
               <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
                 {currencySymbol}{results.totalGrossPay.toFixed(2)}
               </div>
-              <span className="text-xs text-orange-700 font-semibold">{results.totalHours} Total Clocked Hours</span>
+              <span className="text-xs text-orange-700 font-semibold">{results.totalHours.toFixed(2).replace(/\.00$/, '')} Total Clocked Hours</span>
             </div>
 
             <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700 space-y-1">
@@ -419,7 +505,7 @@ export const TimeCardCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter clocked hours for each day and hourly base wage to calculate pay.
+            {results && 'error' in results ? results.error : 'Enter clocked hours for each day and hourly base wage to calculate pay.'}
           </div>
         )}
       </div>
@@ -433,20 +519,38 @@ export const ExactAgeCalculator: React.FC<BaseCalcProps> = () => {
   const [birthMonth, setBirthMonth] = useState<number>(6);
   const [birthDay, setBirthDay] = useState<number | ''>(15);
 
+  const handleReset = () => {
+    setBirthYear(1995);
+    setBirthMonth(6);
+    setBirthDay(15);
+  };
+
   const results = useMemo(() => {
     if (birthYear === '' || birthDay === '') return null;
-    const by = birthYear;
-    const bd = birthDay;
-    const birth = new Date(by, birthMonth - 1, bd);
+    const by = Math.trunc(birthYear);
+    const bd = Math.trunc(birthDay);
+    const maxDay = getDaysInMonth(by, birthMonth);
     const now = new Date();
-    const diffMs = Math.max(0, now.getTime() - birth.getTime());
 
+    if (by < 1900 || by > now.getFullYear()) {
+      return { error: `Enter a valid birth year between 1900 and ${now.getFullYear()}.` } as const;
+    }
+    if (bd < 1 || bd > maxDay) {
+      return { error: `Month ${birthMonth} of ${by} has ${maxDay} days. Enter a day between 1 and ${maxDay}.` } as const;
+    }
+
+    const birth = new Date(by, birthMonth - 1, bd);
+    if (birth.getTime() > now.getTime()) {
+      return { error: 'Birth date cannot be in the future.' } as const;
+    }
+
+    const diffMs = now.getTime() - birth.getTime();
     const totalSeconds = Math.floor(diffMs / 1000);
     const totalMinutes = Math.floor(totalSeconds / 60);
     const totalHours = Math.floor(totalMinutes / 60);
     const totalDays = Math.floor(totalHours / 24);
     const years = (totalDays / 365.2425).toFixed(2);
-    const heartbeats = Math.floor(totalMinutes * 75); // approx 75 bpm
+    const heartbeats = Math.floor(totalMinutes * 75);
 
     return { totalSeconds, totalHours, totalDays, years, heartbeats };
   }, [birthYear, birthMonth, birthDay]);
@@ -455,14 +559,23 @@ export const ExactAgeCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Date of Birth</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Date of Birth</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="grid grid-cols-3 gap-2">
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-1">Month</label>
               <select
                 value={birthMonth}
                 onChange={(e) => setBirthMonth(Number(e.target.value))}
-                className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
+                className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold bg-white"
               >
                 {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m, i) => (
                   <option key={m} value={i + 1}>{m}</option>
@@ -471,26 +584,26 @@ export const ExactAgeCalculator: React.FC<BaseCalcProps> = () => {
             </div>
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-1">Day</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={birthDay}
-                onChange={(e) => setBirthDay(e.target.value === '' ? '' : Math.max(1, Math.min(31, Number(e.target.value))))}
+                onValueChange={setBirthDay}
+                allowDecimal={false}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-1">Year</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={birthYear}
-                onChange={(e) => setBirthYear(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setBirthYear}
+                allowDecimal={false}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">Exact Elapsed Lifespan</span>
@@ -508,7 +621,7 @@ export const ExactAgeCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter your date of birth to calculate exact elapsed lifespan.
+            {results && 'error' in results ? results.error : 'Enter your date of birth to calculate exact elapsed lifespan.'}
           </div>
         )}
       </div>
@@ -518,8 +631,15 @@ export const ExactAgeCalculator: React.FC<BaseCalcProps> = () => {
 
 // 7. Time Zone Difference & Meeting Planner
 export const TimeZoneCalculator: React.FC<BaseCalcProps> = () => {
-  const [baseTimeHour, setBaseTimeHour] = useState<number | ''>(14); // 2 PM
-  const [originZoneOffset, setOriginZoneOffset] = useState<number>(-5); // UTC-5 EST
+  const [baseTimeHour, setBaseTimeHour] = useState<number | ''>(14);
+  const [baseTimeMinute, setBaseTimeMinute] = useState<number | ''>(0);
+  const [originZoneOffset, setOriginZoneOffset] = useState<number>(-5);
+
+  const handleReset = () => {
+    setBaseTimeHour(14);
+    setBaseTimeMinute(0);
+    setOriginZoneOffset(-5);
+  };
 
   const zones = [
     { name: 'US Pacific (PST/PDT)', offset: -8 },
@@ -533,31 +653,56 @@ export const TimeZoneCalculator: React.FC<BaseCalcProps> = () => {
   ];
 
   const results = useMemo(() => {
-    if (baseTimeHour === '') return null;
-    const bHour = baseTimeHour;
-    return { bHour };
-  }, [baseTimeHour]);
+    if (baseTimeHour === '' || baseTimeMinute === '') return null;
+    const h = Math.trunc(baseTimeHour);
+    const m = Math.trunc(baseTimeMinute);
+    if (h < 0 || h > 23 || m < 0 || m > 59) {
+      return { error: 'Enter an hour between 0 and 23 and minutes between 0 and 59.' } as const;
+    }
+    const baseMinutes = h * 60 + m;
+    return { baseMinutes };
+  }, [baseTimeHour, baseTimeMinute]);
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Origin Meeting Time</h4>
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Origin Hour (0 - 23 24h clock)</label>
-            <input
-              type="number"
-              value={baseTimeHour}
-              onChange={(e) => setBaseTimeHour(e.target.value === '' ? '' : Math.max(0, Math.min(23, Number(e.target.value))))}
-              className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
-            />
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Origin Meeting Time</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Hour (0–23)</label>
+              <DecimalInput
+                value={baseTimeHour}
+                onValueChange={setBaseTimeHour}
+                allowDecimal={false}
+                className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Minute (0–59)</label>
+              <DecimalInput
+                value={baseTimeMinute}
+                onValueChange={setBaseTimeMinute}
+                allowDecimal={false}
+                className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
+              />
+            </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Your Base Zone</label>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">Your Base Zone (Standard Offset)</label>
             <select
               value={originZoneOffset}
               onChange={(e) => setOriginZoneOffset(Number(e.target.value))}
-              className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
+              className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold bg-white"
             >
               {zones.map((z) => (
                 <option key={z.name} value={z.offset}>{z.name} (UTC{z.offset >= 0 ? `+${z.offset}` : z.offset})</option>
@@ -566,19 +711,22 @@ export const TimeZoneCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-slate-900 to-indigo-950 text-white p-5 rounded-xl flex flex-col justify-between space-y-3">
             <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider">World Converted Times</span>
             <div className="space-y-1.5 text-xs">
               {zones.map((z) => {
-                const diff = z.offset - originZoneOffset;
-                let targetHour = (results.bHour + diff) % 24;
-                if (targetHour < 0) targetHour += 24;
-                const formatted = `${Math.floor(targetHour)}:${(targetHour % 1 === 0.5 ? '30' : '00')}`;
+                const diffMinutes = Math.round((z.offset - originZoneOffset) * 60);
+                const rawMinutes = results.baseMinutes + diffMinutes;
+                const dayShift = Math.floor(rawMinutes / 1440);
+                const modMinutes = ((rawMinutes % 1440) + 1440) % 1440;
+                const hh = String(Math.floor(modMinutes / 60)).padStart(2, '0');
+                const mm = String(modMinutes % 60).padStart(2, '0');
+                const dayLabel = dayShift > 0 ? ' (+1d)' : dayShift < 0 ? ' (-1d)' : '';
                 return (
                   <div key={z.name} className="flex justify-between border-b border-white/10 pb-1">
                     <span className="text-slate-300">{z.name}:</span>
-                    <span className="font-mono font-bold text-white">{formatted}</span>
+                    <span className="font-mono font-bold text-white">{hh}:{mm}{dayLabel}</span>
                   </div>
                 );
               })}
@@ -586,7 +734,7 @@ export const TimeZoneCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter origin hour (0-23) to convert across world time zones.
+            {results && 'error' in results ? results.error : 'Enter origin hour (0-23) and minutes (0-59) to convert across world time zones.'}
           </div>
         )}
       </div>
@@ -606,6 +754,17 @@ export const NetWorthCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
   const [carLoans, setCarLoans] = useState<number | ''>(8000);
   const [creditCardDebt, setCreditCardDebt] = useState<number | ''>(2000);
 
+  const handleReset = () => {
+    setCashChecking(25000);
+    setInvestments(85000);
+    setRealEstateVal(350000);
+    setVehiclesOther(20000);
+    setMortgageDebt(260000);
+    setStudentDebt(15000);
+    setCarLoans(8000);
+    setCreditCardDebt(2000);
+  };
+
   const results = useMemo(() => {
     if (
       cashChecking === '' ||
@@ -620,18 +779,8 @@ export const NetWorthCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
       return null;
     }
 
-    const cc = cashChecking;
-    const inv = investments;
-    const re = realEstateVal;
-    const vo = vehiclesOther;
-
-    const md = mortgageDebt;
-    const sd = studentDebt;
-    const cl = carLoans;
-    const ccd = creditCardDebt;
-
-    const totalAssets = cc + inv + re + vo;
-    const totalLiabilities = md + sd + cl + ccd;
+    const totalAssets = cashChecking + investments + realEstateVal + vehiclesOther;
+    const totalLiabilities = mortgageDebt + studentDebt + carLoans + creditCardDebt;
     const netWorth = totalAssets - totalLiabilities;
 
     return { totalAssets, totalLiabilities, netWorth };
@@ -641,24 +790,34 @@ export const NetWorthCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Balance Sheet Inputs</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="space-y-2 p-3 bg-orange-50/50 rounded-xl border border-orange-100">
             <span className="text-xs font-bold text-orange-800 uppercase tracking-wider block">Assets ({currencySymbol})</span>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div>
                 <label className="block text-[10px] text-slate-500 mb-0.5">Cash / Checking</label>
-                <input type="number" value={cashChecking} onChange={(e) => setCashChecking(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Cash" className="w-full p-1.5 border rounded bg-white font-bold" />
+                <DecimalInput value={cashChecking} onValueChange={setCashChecking} className="w-full p-1.5 border rounded bg-white font-bold" />
               </div>
               <div>
                 <label className="block text-[10px] text-slate-500 mb-0.5">Investments / Stocks</label>
-                <input type="number" value={investments} onChange={(e) => setInvestments(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Investments" className="w-full p-1.5 border rounded bg-white font-bold" />
+                <DecimalInput value={investments} onValueChange={setInvestments} className="w-full p-1.5 border rounded bg-white font-bold" />
               </div>
               <div>
                 <label className="block text-[10px] text-slate-500 mb-0.5">Real Estate</label>
-                <input type="number" value={realEstateVal} onChange={(e) => setRealEstateVal(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Real Estate" className="w-full p-1.5 border rounded bg-white font-bold" />
+                <DecimalInput value={realEstateVal} onValueChange={setRealEstateVal} className="w-full p-1.5 border rounded bg-white font-bold" />
               </div>
               <div>
                 <label className="block text-[10px] text-slate-500 mb-0.5">Vehicles / Other</label>
-                <input type="number" value={vehiclesOther} onChange={(e) => setVehiclesOther(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Vehicles" className="w-full p-1.5 border rounded bg-white font-bold" />
+                <DecimalInput value={vehiclesOther} onValueChange={setVehiclesOther} className="w-full p-1.5 border rounded bg-white font-bold" />
               </div>
             </div>
           </div>
@@ -668,19 +827,19 @@ export const NetWorthCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div>
                 <label className="block text-[10px] text-slate-500 mb-0.5">Mortgage</label>
-                <input type="number" value={mortgageDebt} onChange={(e) => setMortgageDebt(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Mortgage" className="w-full p-1.5 border rounded bg-white font-bold" />
+                <DecimalInput value={mortgageDebt} onValueChange={setMortgageDebt} className="w-full p-1.5 border rounded bg-white font-bold" />
               </div>
               <div>
                 <label className="block text-[10px] text-slate-500 mb-0.5">Student Loans</label>
-                <input type="number" value={studentDebt} onChange={(e) => setStudentDebt(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Student Loans" className="w-full p-1.5 border rounded bg-white font-bold" />
+                <DecimalInput value={studentDebt} onValueChange={setStudentDebt} className="w-full p-1.5 border rounded bg-white font-bold" />
               </div>
               <div>
                 <label className="block text-[10px] text-slate-500 mb-0.5">Auto Loans</label>
-                <input type="number" value={carLoans} onChange={(e) => setCarLoans(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Auto Loan" className="w-full p-1.5 border rounded bg-white font-bold" />
+                <DecimalInput value={carLoans} onValueChange={setCarLoans} className="w-full p-1.5 border rounded bg-white font-bold" />
               </div>
               <div>
                 <label className="block text-[10px] text-slate-500 mb-0.5">Credit Cards</label>
-                <input type="number" value={creditCardDebt} onChange={(e) => setCreditCardDebt(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))} placeholder="Credit Cards" className="w-full p-1.5 border rounded bg-white font-bold" />
+                <DecimalInput value={creditCardDebt} onValueChange={setCreditCardDebt} className="w-full p-1.5 border rounded bg-white font-bold" />
               </div>
             </div>
           </div>
@@ -691,7 +850,7 @@ export const NetWorthCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '
             <div>
               <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Total Net Worth</span>
               <div className="text-3xl font-black text-blue-950 font-mono-numbers mt-1">
-                {currencySymbol}{results.netWorth.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                {results.netWorth < 0 ? '-' : ''}{currencySymbol}{Math.abs(results.netWorth).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
 
@@ -715,12 +874,18 @@ export const DogAgeCalculator: React.FC<BaseCalcProps> = () => {
   const [dogAge, setDogAge] = useState<number | ''>(4);
   const [dogSize, setDogSize] = useState<'small' | 'medium' | 'large' | 'giant'>('medium');
 
+  const handleReset = () => {
+    setDogAge(4);
+    setDogSize('medium');
+  };
+
   const humanAge = useMemo(() => {
     if (dogAge === '') return null;
     const da = dogAge;
-    if (da <= 0) return 0;
-    if (da === 1) return 15;
-    if (da === 2) return 24;
+    if (da < 0) return null;
+    if (da === 0) return 0;
+    if (da <= 1) return da * 15;
+    if (da <= 2) return 15 + (da - 1) * 9;
 
     const remainingYears = da - 2;
     let multiplier = 4;
@@ -736,14 +901,21 @@ export const DogAgeCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Dog Age & Breed Size</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Dog Age &amp; Breed Size</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Dog Age (Calendar Years)</label>
-            <input
-              type="number"
-              step="0.5"
+            <DecimalInput
               value={dogAge}
-              onChange={(e) => setDogAge(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setDogAge}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -751,8 +923,8 @@ export const DogAgeCalculator: React.FC<BaseCalcProps> = () => {
             <label className="block text-xs font-semibold text-slate-600 mb-1">Breed Size Category</label>
             <select
               value={dogSize}
-              onChange={(e) => setDogSize(e.target.value as any)}
-              className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
+              onChange={(e) => setDogSize(e.target.value as 'small' | 'medium' | 'large' | 'giant')}
+              className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold bg-white"
             >
               <option value="small">Small (&lt; 20 lbs / 9 kg)</option>
               <option value="medium">Medium (21 - 50 lbs / 10 - 23 kg)</option>
@@ -767,16 +939,16 @@ export const DogAgeCalculator: React.FC<BaseCalcProps> = () => {
             <div>
               <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Equivalent Human Age</span>
               <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
-                ~{humanAge} Human Years
+                ~{Number(humanAge.toFixed(1))} Human Years
               </div>
             </div>
             <div className="bg-white p-3 rounded-lg border border-orange-100 text-xs text-slate-700">
-              <p>Calculated using American Veterinary Medical Association (AVMA) size-adjusted developmental curves.</p>
+              <p>Calculated using American Veterinary Medical Association (AVMA) piecewise size-adjusted developmental curves (15 yr Year 1, +9 yr Year 2, +4–7 yr/yr thereafter).</p>
             </div>
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter your dog's age to calculate human age equivalent.
+            Enter your dog&apos;s age to calculate human age equivalent.
           </div>
         )}
       </div>
@@ -789,19 +961,23 @@ export const CookingConverterCalculator: React.FC<BaseCalcProps> = () => {
   const [cups, setCups] = useState<number | ''>(1);
   const [ingredient, setIngredient] = useState<'flour' | 'sugar' | 'butter' | 'liquid'>('flour');
 
+  const handleReset = () => {
+    setCups(1);
+    setIngredient('flour');
+  };
+
   const conversions = useMemo(() => {
-    if (cups === '') return null;
+    if (cups === '' || cups < 0) return null;
     const c = cups;
-    const tablespoons = c * 16;
-    const teaspoons = c * 48;
-    const fluidOunces = c * 8;
+    const tablespoons = Number((c * 16).toFixed(2));
+    const teaspoons = Number((c * 48).toFixed(2));
+    const fluidOunces = Number((c * 8).toFixed(2));
     const milliliters = c * 236.588;
 
-    // Weight in grams depends on ingredient density
-    let gramsPerCup = 120; // all-purpose flour
-    if (ingredient === 'sugar') gramsPerCup = 200; // granulated sugar
-    else if (ingredient === 'butter') gramsPerCup = 227; // 2 sticks
-    else if (ingredient === 'liquid') gramsPerCup = 240; // water/milk
+    let gramsPerCup = 120;
+    if (ingredient === 'sugar') gramsPerCup = 200;
+    else if (ingredient === 'butter') gramsPerCup = 227;
+    else if (ingredient === 'liquid') gramsPerCup = 240;
 
     const grams = c * gramsPerCup;
 
@@ -812,14 +988,21 @@ export const CookingConverterCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Volume & Ingredient</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Volume &amp; Ingredient</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Measuring Cups</label>
-            <input
-              type="number"
-              step="0.25"
+            <DecimalInput
               value={cups}
-              onChange={(e) => setCups(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setCups}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -827,8 +1010,8 @@ export const CookingConverterCalculator: React.FC<BaseCalcProps> = () => {
             <label className="block text-xs font-semibold text-slate-600 mb-1">Ingredient for Gram Weight</label>
             <select
               value={ingredient}
-              onChange={(e) => setIngredient(e.target.value as any)}
-              className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
+              onChange={(e) => setIngredient(e.target.value as 'flour' | 'sugar' | 'butter' | 'liquid')}
+              className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold bg-white"
             >
               <option value="flour">All-Purpose Flour (~120g/cup)</option>
               <option value="sugar">Granulated Sugar (~200g/cup)</option>
@@ -841,7 +1024,7 @@ export const CookingConverterCalculator: React.FC<BaseCalcProps> = () => {
         {conversions ? (
           <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
             <div>
-              <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Weight & Volume Equivalents</span>
+              <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Weight &amp; Volume Equivalents</span>
               <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
                 {conversions.grams} grams
               </div>
@@ -870,18 +1053,27 @@ export const CryptoDcaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
   const [months, setMonths] = useState<number | ''>(24);
   const [expectedAnnualGrowth, setExpectedAnnualGrowth] = useState<number | ''>(25);
 
+  const handleReset = () => {
+    setMonthlyDeposit(250);
+    setMonths(24);
+    setExpectedAnnualGrowth(25);
+  };
+
   const results = useMemo(() => {
     if (monthlyDeposit === '' || months === '' || expectedAnnualGrowth === '') return null;
     const md = monthlyDeposit;
-    const mo = months;
+    const mo = Math.trunc(months);
     const eag = expectedAnnualGrowth;
+    if (md < 0 || mo < 1 || mo > 600) {
+      return { error: 'Enter a non-negative deposit and a duration between 1 and 600 months.' } as const;
+    }
 
     const totalInvested = md * mo;
     const monthlyRate = eag / 100 / 12;
     let portfolioValue = 0;
 
     for (let m = 0; m < mo; m++) {
-      portfolioValue = (portfolioValue + md) * (1 + monthlyRate);
+      portfolioValue = Math.max(0, (portfolioValue + md) * (1 + monthlyRate));
     }
 
     const profit = portfolioValue - totalInvested;
@@ -894,46 +1086,56 @@ export const CryptoDcaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Recurring Purchase Plan</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Recurring Purchase Plan</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Monthly Deposit ({currencySymbol})</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={monthlyDeposit}
-                onChange={(e) => setMonthlyDeposit(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setMonthlyDeposit}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Duration (Months)</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={months}
-                onChange={(e) => setMonths(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))}
+                onValueChange={setMonths}
+                allowDecimal={false}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Expected Annual Asset Appreciation (%)</label>
-            <input
-              type="number"
+            <DecimalInput
               value={expectedAnnualGrowth}
-              onChange={(e) => setExpectedAnnualGrowth(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setExpectedAnnualGrowth}
+              allowNegative
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">Projected Portfolio Value</span>
               <div className="text-3xl font-black text-indigo-950 font-mono-numbers mt-1">
                 {currencySymbol}{results.portfolioValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
               </div>
-              <span className="text-xs text-indigo-700 font-semibold">Total Profit: +{currencySymbol}{results.profit.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({results.roiPct.toFixed(1)}% ROI)</span>
+              <span className={`text-xs font-semibold ${results.profit < 0 ? 'text-red-700' : 'text-indigo-700'}`}>
+                Total {results.profit < 0 ? 'Loss' : 'Profit'}: {results.profit < 0 ? '-' : '+'}{currencySymbol}{Math.abs(results.profit).toLocaleString(undefined, { maximumFractionDigits: 2 })} ({results.roiPct.toFixed(1)}% ROI)
+              </span>
             </div>
 
             <div className="bg-white p-3 rounded-lg border border-indigo-100 text-xs text-slate-700">
@@ -942,7 +1144,7 @@ export const CryptoDcaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter deposit amount, duration, and expected growth rate to calculate DCA projection.
+            {results && 'error' in results ? results.error : 'Enter deposit amount, duration, and expected growth rate to calculate DCA projection.'}
           </div>
         )}
       </div>
@@ -951,16 +1153,25 @@ export const CryptoDcaCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
 };
 
 // 12. Crypto Staking APY & Rewards Calculator
-export const StakingRewardsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
+export const StakingRewardsCalculator: React.FC<BaseCalcProps> = () => {
   const [stakedAmount, setStakedAmount] = useState<number | ''>(5000);
   const [apyPercent, setApyPercent] = useState<number | ''>(6.5);
   const [stakingDays, setStakingDays] = useState<number | ''>(365);
+
+  const handleReset = () => {
+    setStakedAmount(5000);
+    setApyPercent(6.5);
+    setStakingDays(365);
+  };
 
   const results = useMemo(() => {
     if (stakedAmount === '' || apyPercent === '' || stakingDays === '') return null;
     const sa = stakedAmount;
     const apy = apyPercent;
-    const sd = stakingDays;
+    const sd = Math.trunc(stakingDays);
+    if (sa < 0 || apy < 0 || sd < 1) {
+      return { error: 'Enter non-negative staked amount & APY, and at least 1 staking day.' } as const;
+    }
 
     const dailyRate = apy / 100 / 365;
     const endingAmount = sa * Math.pow(1 + dailyRate, sd);
@@ -973,40 +1184,46 @@ export const StakingRewardsCalculator: React.FC<BaseCalcProps> = ({ currencySymb
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Staking Pool Parameters</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Staking Pool Parameters</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Staked Crypto Tokens / Value</label>
-            <input
-              type="number"
+            <DecimalInput
               value={stakedAmount}
-              onChange={(e) => setStakedAmount(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setStakedAmount}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Staking APY (%)</label>
-              <input
-                type="number"
-                step="0.1"
+              <DecimalInput
                 value={apyPercent}
-                onChange={(e) => setApyPercent(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setApyPercent}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Staking Duration (Days)</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={stakingDays}
-                onChange={(e) => setStakingDays(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))}
+                onValueChange={setStakingDays}
+                allowDecimal={false}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Compounded Staking Yield</span>
@@ -1018,7 +1235,7 @@ export const StakingRewardsCalculator: React.FC<BaseCalcProps> = ({ currencySymb
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter staked amount, APY, and staking days to calculate yield.
+            {results && 'error' in results ? results.error : 'Enter staked amount, APY, and staking days to calculate yield.'}
           </div>
         )}
       </div>
@@ -1028,21 +1245,27 @@ export const StakingRewardsCalculator: React.FC<BaseCalcProps> = ({ currencySymb
 
 // 13. Impermanent Loss Calculator
 export const ImpermanentLossCalculator: React.FC<BaseCalcProps> = () => {
-  const [priceChangeA, setPriceChangeA] = useState<number | ''>(100); // 100% up (2x)
-  const [priceChangeB, setPriceChangeB] = useState<number | ''>(0); // 0% stable
+  const [priceChangeA, setPriceChangeA] = useState<number | ''>(100);
+  const [priceChangeB, setPriceChangeB] = useState<number | ''>(0);
+
+  const handleReset = () => {
+    setPriceChangeA(100);
+    setPriceChangeB(0);
+  };
 
   const results = useMemo(() => {
     if (priceChangeA === '' || priceChangeB === '') return null;
     const pca = priceChangeA;
     const pcb = priceChangeB;
 
-    // Relative price ratio change k
+    if (pca <= -100 || pcb <= -100) {
+      return { error: 'Asset price change must be greater than -100%.' } as const;
+    }
+
     const ratioA = 1 + pca / 100;
     const ratioB = 1 + pcb / 100;
-    const k = ratioB !== 0 ? ratioA / ratioB : 1;
+    const k = ratioA / ratioB;
 
-    if (k <= 0) return { ilPct: '0.00' };
-    // Standard AMM Impermanent Loss formula: IL = (2 * sqrt(k)) / (1 + k) - 1
     const ilFactor = (2 * Math.sqrt(k)) / (1 + k) - 1;
     const ilPct = Math.abs(ilFactor * 100);
 
@@ -1053,28 +1276,37 @@ export const ImpermanentLossCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Liquidity Pool Asset Price Changes</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Liquidity Pool Asset Price Changes</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Asset A Price Change (%)</label>
-            <input
-              type="number"
+            <DecimalInput
               value={priceChangeA}
-              onChange={(e) => setPriceChangeA(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setPriceChangeA}
+              allowNegative
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Asset B Price Change (%)</label>
-            <input
-              type="number"
+            <DecimalInput
               value={priceChangeB}
-              onChange={(e) => setPriceChangeB(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setPriceChangeB}
+              allowNegative
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-red-50 to-orange-50 p-5 rounded-xl border border-red-200 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-red-900 uppercase tracking-wider">Impermanent Loss (IL)</span>
@@ -1086,7 +1318,7 @@ export const ImpermanentLossCalculator: React.FC<BaseCalcProps> = () => {
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter asset price change percentages to calculate impermanent loss.
+            {results && 'error' in results ? results.error : 'Enter asset price change percentages to calculate impermanent loss.'}
           </div>
         )}
       </div>

@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Calendar, Baby, Heart, Copy, Check, Bookmark, Sparkles } from 'lucide-react';
 import { copyToClipboard } from '../../utils/formatters';
+import { parseLocalDate, formatLocalIsoDate, addLocalDays, diffLocalCalendarDays } from '../../utils/dateUtils';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface DueDateCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -9,7 +11,7 @@ interface DueDateCalculatorProps {
 export const DueDateCalculator: React.FC<DueDateCalculatorProps> = ({ onSaveCalculation }) => {
   const [calcMethod, setCalcMethod] = useState<'lmp' | 'conception' | 'ultrasound' | 'ivf'>('lmp');
   
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = formatLocalIsoDate(new Date());
   const [inputDate, setInputDate] = useState<string>(todayStr);
   const [cycleLength, setCycleLength] = useState<number | ''>(28);
   const [ultrasoundWeeks, setUltrasoundWeeks] = useState<number | ''>(8);
@@ -20,34 +22,35 @@ export const DueDateCalculator: React.FC<DueDateCalculatorProps> = ({ onSaveCalc
 
   const calculations = useMemo(() => {
     try {
-      const baseDate = new Date(inputDate);
-      if (isNaN(baseDate.getTime())) return null;
+      const baseDate = parseLocalDate(inputDate);
+      if (!baseDate) return null;
 
       const numCycleLength = typeof cycleLength === 'number' ? cycleLength : 28;
       const numUltrasoundWeeks = typeof ultrasoundWeeks === 'number' ? ultrasoundWeeks : 0;
       const numUltrasoundDays = typeof ultrasoundDays === 'number' ? ultrasoundDays : 0;
 
-      let dueDate = new Date(baseDate);
+      let dueDate = baseDate;
 
       if (calcMethod === 'lmp') {
         // Due = LMP + 280 days + (cycle - 28)
-        dueDate.setDate(dueDate.getDate() + 280 + (numCycleLength - 28));
+        dueDate = addLocalDays(baseDate, 280 + (numCycleLength - 28));
       } else if (calcMethod === 'conception') {
         // Due = Conception + 266 days
-        dueDate.setDate(dueDate.getDate() + 266);
+        dueDate = addLocalDays(baseDate, 266);
       } else if (calcMethod === 'ultrasound') {
         // Due = Scan Date + (280 - (scanWeeks*7 + scanDays))
         const daysAtScan = numUltrasoundWeeks * 7 + numUltrasoundDays;
         const daysRemainingFromScan = 280 - daysAtScan;
-        dueDate.setDate(dueDate.getDate() + daysRemainingFromScan);
+        dueDate = addLocalDays(baseDate, daysRemainingFromScan);
       } else if (calcMethod === 'ivf') {
         // IVF 3-day transfer: + 263 days; 5-day transfer: + 261 days
         const daysToAdd = ivfType === 'day5' ? 261 : 263;
-        dueDate.setDate(dueDate.getDate() + daysToAdd);
+        dueDate = addLocalDays(baseDate, daysToAdd);
       }
 
-      const today = new Date();
-      const daysUntilDue = Math.floor((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const daysUntilDue = diffLocalCalendarDays(today, dueDate);
       const currentGestationalDays = 280 - daysUntilDue;
       const currentWeeks = Math.max(0, Math.floor(currentGestationalDays / 7));
       const currentDays = Math.max(0, currentGestationalDays % 7);
@@ -171,23 +174,19 @@ Current Gestation: ${calculations.currentWeeks} weeks, ${calculations.currentDay
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="text-xs font-bold text-slate-700">Weeks at Scan</label>
-                <input
-                  type="number"
-                  min="4"
-                  max="40"
+                <DecimalInput
                   value={ultrasoundWeeks}
-                  onChange={(e) => setUltrasoundWeeks(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setUltrasoundWeeks}
+                  allowDecimal={false}
                   className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
               <div>
                 <label className="text-xs font-bold text-slate-700">Days at Scan</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="6"
+                <DecimalInput
                   value={ultrasoundDays}
-                  onChange={(e) => setUltrasoundDays(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setUltrasoundDays}
+                  allowDecimal={false}
                   className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>

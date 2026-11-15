@@ -61,7 +61,7 @@ export const LegalView: React.FC<LegalViewProps> = ({
   ];
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#F8FAFC] py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8 sm:space-y-10">
         
         {/* Breadcrumb Navigation */}
@@ -992,7 +992,7 @@ export const LegalView: React.FC<LegalViewProps> = ({
           </div>
         </article>
       </div>
-    </main>
+    </div>
   );
 };
 

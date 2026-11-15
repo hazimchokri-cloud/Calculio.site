@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { copyToClipboard, formatNumber } from '../../utils/formatters';
+import { parseNumberList } from '../../utils/numberInput';
+import { DecimalInput } from '../shared/DecimalInput';
 import { BarChart3, Plus, Trash2, Copy, Check, Bookmark, Layers } from 'lucide-react';
 
 interface AverageCalculatorProps {
@@ -31,10 +33,7 @@ export const AverageCalculator: React.FC<AverageCalculatorProps> = ({ onSaveCalc
   // Standard calculations
   const standardStats = useMemo(() => {
     try {
-      const rawNumbers = dataInput
-        .split(/[\s,;\n]+/)
-        .map(v => parseFloat(v))
-        .filter(v => !isNaN(v));
+      const rawNumbers = parseNumberList(dataInput);
 
       if (rawNumbers.length === 0) return null;
 
@@ -118,7 +117,7 @@ export const AverageCalculator: React.FC<AverageCalculatorProps> = ({ onSaveCalc
         }
       }
 
-      if (hasIncomplete || totalWeight === 0) return null;
+      if (hasIncomplete || totalWeight <= 0) return null;
 
       const weightedAverage = weightedSum / totalWeight;
 
@@ -150,7 +149,10 @@ export const AverageCalculator: React.FC<AverageCalculatorProps> = ({ onSaveCalc
     );
   };
 
+  const activeHasResult = tab === 'standard' ? Boolean(standardStats) : Boolean(weightedStats);
+
   const handleCopy = async () => {
+    if (!activeHasResult) return;
     let text = '';
     if (tab === 'standard' && standardStats) {
       text = `Average / Mean: ${formatNumber(standardStats.mean, 4)}
@@ -170,7 +172,7 @@ Count: ${standardStats.count}, Sum: ${formatNumber(standardStats.sum, 4)}`;
   };
 
   const handleSave = () => {
-    if (!onSaveCalculation) return;
+    if (!onSaveCalculation || !activeHasResult) return;
     if (tab === 'standard' && standardStats) {
       onSaveCalculation(
         `Mean: ${formatNumber(standardStats.mean, 2)} | Median: ${formatNumber(standardStats.median, 2)}`,
@@ -203,6 +205,7 @@ Count: ${standardStats.count}, Sum: ${formatNumber(standardStats.sum, 4)}`;
       <div className="flex items-center justify-between gap-4">
         <div className="flex gap-2 p-1.5 bg-slate-200/60 rounded-2xl max-w-md">
           <button
+            type="button"
             onClick={() => setTab('standard')}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
               tab === 'standard' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
@@ -211,6 +214,7 @@ Count: ${standardStats.count}, Sum: ${formatNumber(standardStats.sum, 4)}`;
             Arithmetic & Geometric Mean
           </button>
           <button
+            type="button"
             onClick={() => setTab('weighted')}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
               tab === 'weighted' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
@@ -220,6 +224,7 @@ Count: ${standardStats.count}, Sum: ${formatNumber(standardStats.sum, 4)}`;
           </button>
         </div>
         <button
+          type="button"
           onClick={handleReset}
           className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors"
         >
@@ -289,18 +294,17 @@ Count: ${standardStats.count}, Sum: ${formatNumber(standardStats.sum, 4)}`;
                 {weightedItems.map((item) => (
                   <div key={item.id} className="grid grid-cols-12 gap-2 items-center">
                     <div className="col-span-6">
-                      <input
-                        type="number"
+                      <DecimalInput
+                        allowNegative
                         value={item.value}
-                        onChange={(e) => updateWeightedItem(item.id, 'value', e.target.value === '' ? '' : (parseFloat(e.target.value) || 0))}
+                        onValueChange={(val) => updateWeightedItem(item.id, 'value', val)}
                         className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:outline-none"
                       />
                     </div>
                     <div className="col-span-5">
-                      <input
-                        type="number"
+                      <DecimalInput
                         value={item.weight}
-                        onChange={(e) => updateWeightedItem(item.id, 'weight', e.target.value === '' ? '' : (parseFloat(e.target.value) || 0))}
+                        onValueChange={(val) => updateWeightedItem(item.id, 'weight', val)}
                         className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:outline-none"
                       />
                     </div>
@@ -331,7 +335,7 @@ Count: ${standardStats.count}, Sum: ${formatNumber(standardStats.sum, 4)}`;
             )}
             {tab === 'weighted' && !weightedStats && (
               <div className="py-8 text-center text-slate-400 text-xs">
-                Enter valid values and non-zero weights to calculate weighted average.
+                Enter valid values and a positive total weight to calculate weighted average.
               </div>
             )}
             {tab === 'standard' && standardStats && (
@@ -413,16 +417,20 @@ Count: ${standardStats.count}, Sum: ${formatNumber(standardStats.sum, 4)}`;
 
             <div className="flex items-center gap-2 pt-4 border-t border-orange-900/60">
               <button
+                type="button"
+                disabled={!activeHasResult}
                 onClick={handleCopy}
-                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? 'Copied' : 'Copy Stats'}</span>
               </button>
               {onSaveCalculation && (
                 <button
+                  type="button"
+                  disabled={!activeHasResult}
                   onClick={handleSave}
-                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                 >
                   <Bookmark className="w-3.5 h-3.5" />
                   <span>{saved ? 'Saved' : 'Save'}</span>

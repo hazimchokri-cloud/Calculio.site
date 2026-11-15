@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Percent, Check, Copy, RefreshCw, Bookmark, Sparkles, TrendingUp, TrendingDown, ArrowRight, BarChart2 } from 'lucide-react';
 import { formatNumber, copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface PercentageCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -106,6 +107,22 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ onSa
         const numStart = Number(p3Start);
         const numEnd = Number(p3End);
         const diff = numEnd - numStart;
+        if (numStart === 0 && numEnd !== 0) {
+          return {
+            title: `Change from ${p3Start} to ${p3End}`,
+            mainResult: 'Undefined (0 start)',
+            mainLabel: 'Percentage Change',
+            isPositive: numEnd > 0,
+            formula: `(${p3End} - 0) / |0| × 100 is undefined (division by zero)`,
+            breakdown: [
+              { label: 'Initial Value', value: '0' },
+              { label: 'Final Value', value: `${p3End}` },
+              { label: 'Absolute Difference', value: `${diff > 0 ? '+' : ''}${formatNumber(diff, 2)}` },
+              { label: 'Multiplier Factor', value: 'Undefined' }
+            ],
+            percentRatio: 100
+          };
+        }
         const changePct = numStart !== 0 ? (diff / Math.abs(numStart)) * 100 : 0;
         const isIncrease = changePct >= 0;
         const formula = `((${p3End} - ${p3Start}) / |${p3Start}|) × 100 = ${isIncrease ? '+' : ''}${formatNumber(changePct, 2)}%`;
@@ -244,11 +261,10 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ onSa
                   <span className="text-blue-600 font-mono">{p1Percent !== '' ? `${p1Percent}%` : ''}</span>
                 </label>
                 <div className="relative">
-                  <input
-                    type="number"
-                    step="any"
+                  <DecimalInput
                     value={p1Percent}
-                    onChange={(e) => setP1Percent(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                    onValueChange={setP1Percent}
+                    allowNegative
                     placeholder="15"
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
@@ -259,18 +275,17 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ onSa
                   min="1"
                   max="100"
                   value={p1Percent !== '' ? Math.min(100, Math.max(1, Number(p1Percent))) : 15}
-                  onChange={(e) => setP1Percent(e.target.value === '' ? '' : Number(e.target.value))}
+                  onChange={(e) => setP1Percent(Number(e.target.value))}
                   className="w-full accent-blue-600 cursor-pointer"
                 />
               </div>
 
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Total Value (Y)</label>
-                <input
-                  type="number"
-                  step="any"
+                <DecimalInput
                   value={p1Value}
-                  onChange={(e) => setP1Value(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={setP1Value}
+                  allowNegative
                   placeholder="250"
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
@@ -297,11 +312,10 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ onSa
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Part (X)</label>
-                <input
-                  type="number"
-                  step="any"
+                <DecimalInput
                   value={p2Part}
-                  onChange={(e) => setP2Part(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={setP2Part}
+                  allowNegative
                   placeholder="45"
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
@@ -309,11 +323,10 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ onSa
 
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Total / Whole (Y)</label>
-                <input
-                  type="number"
-                  step="any"
+                <DecimalInput
                   value={p2Total}
-                  onChange={(e) => setP2Total(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={setP2Total}
+                  allowNegative
                   placeholder="180"
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
@@ -326,11 +339,10 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ onSa
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Initial Starting Value</label>
-                <input
-                  type="number"
-                  step="any"
+                <DecimalInput
                   value={p3Start}
-                  onChange={(e) => setP3Start(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={setP3Start}
+                  allowNegative
                   placeholder="50"
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
@@ -338,11 +350,10 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ onSa
 
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Final Ending Value</label>
-                <input
-                  type="number"
-                  step="any"
+                <DecimalInput
                   value={p3End}
-                  onChange={(e) => setP3End(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={setP3End}
+                  allowNegative
                   placeholder="75"
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
@@ -355,11 +366,10 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ onSa
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">First Value (A)</label>
-                <input
-                  type="number"
-                  step="any"
+                <DecimalInput
                   value={p4A}
-                  onChange={(e) => setP4A(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={setP4A}
+                  allowNegative
                   placeholder="100"
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
@@ -367,11 +377,10 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ onSa
 
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Second Value (B)</label>
-                <input
-                  type="number"
-                  step="any"
+                <DecimalInput
                   value={p4B}
-                  onChange={(e) => setP4B(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={setP4B}
+                  allowNegative
                   placeholder="130"
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
@@ -384,11 +393,9 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ onSa
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Original Item Price ($)</label>
-                <input
-                  type="number"
-                  step="any"
+                <DecimalInput
                   value={p5Price}
-                  onChange={(e) => setP5Price(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={setP5Price}
                   placeholder="120"
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
@@ -399,11 +406,9 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ onSa
                   <span>Discount Percentage (%)</span>
                   <span className="text-blue-600 font-mono">{p5Discount !== '' ? `${p5Discount}%` : ''}</span>
                 </label>
-                <input
-                  type="number"
-                  step="any"
+                <DecimalInput
                   value={p5Discount}
-                  onChange={(e) => setP5Discount(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={setP5Discount}
                   placeholder="20"
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
@@ -486,16 +491,20 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ onSa
             {/* Action Bar */}
             <div className="flex items-center gap-2 pt-4 border-t border-blue-900/60">
               <button
+                type="button"
+                disabled={!results}
                 onClick={handleCopy}
-                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? 'Copied' : 'Copy Result'}</span>
               </button>
               {onSaveCalculation && (
                 <button
+                  type="button"
+                  disabled={!results}
                   onClick={handleSave}
-                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                 >
                   <Bookmark className="w-3.5 h-3.5" />
                   <span>{saved ? 'Saved' : 'Save'}</span>

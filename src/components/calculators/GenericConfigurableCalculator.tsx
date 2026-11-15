@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { CalculatorMeta } from '../../types';
 import { Calculator, Sparkles, Copy, Check, RotateCcw, Info, ArrowRight } from 'lucide-react';
 import { copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface GenericConfigurableCalculatorProps {
   calculator: CalculatorMeta;
@@ -84,30 +85,30 @@ Inputs: A=${numA}, B=${numB}, C=${numC}`;
           <div className="space-y-3 pt-2">
             <div>
               <label className="block text-xs font-bold text-[#0F172A] mb-1">Primary Value / Quantity</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={valA}
-                onChange={(e) => setValA(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setValA}
+                allowNegative
                 placeholder="100"
                 className="w-full px-3 py-2 border border-[#E2E8F0] rounded-xl text-xs font-bold text-[#0F172A] bg-[#F8FAFC] focus:bg-[#FFFFFF] focus:border-[#F97316] focus:outline-none"
               />
             </div>
             <div>
               <label className="block text-xs font-bold text-[#0F172A] mb-1">Rate / Factor / Multiplier</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={valB}
-                onChange={(e) => setValB(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setValB}
+                allowNegative
                 placeholder="20"
                 className="w-full px-3 py-2 border border-[#E2E8F0] rounded-xl text-xs font-bold text-[#0F172A] bg-[#F8FAFC] focus:bg-[#FFFFFF] focus:border-[#F97316] focus:outline-none"
               />
             </div>
             <div>
               <label className="block text-xs font-bold text-[#0F172A] mb-1">Adjustment / Period (Optional)</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={valC}
-                onChange={(e) => setValC(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setValC}
+                allowNegative
                 placeholder="5"
                 className="w-full px-3 py-2 border border-[#E2E8F0] rounded-xl text-xs font-bold text-[#0F172A] bg-[#F8FAFC] focus:bg-[#FFFFFF] focus:border-[#F97316] focus:outline-none"
               />

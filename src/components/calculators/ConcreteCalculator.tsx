@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { HardHat, Ruler, Package, DollarSign, RotateCcw, Copy, Check, Info, Sparkles } from 'lucide-react';
+import { HardHat, Package, RotateCcw, Copy, Check } from 'lucide-react';
 import { copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface ConcreteCalculatorProps {
   currencySymbol?: string;
@@ -8,8 +9,7 @@ interface ConcreteCalculatorProps {
 }
 
 export const ConcreteCalculator: React.FC<ConcreteCalculatorProps> = ({
-  currencySymbol = '$',
-  onSave
+  currencySymbol = '$'
 }) => {
   const [shape, setShape] = useState<'slab' | 'footing' | 'column'>('slab');
   const [unit, setUnit] = useState<'imperial' | 'metric'>('imperial');
@@ -45,7 +45,12 @@ export const ConcreteCalculator: React.FC<ConcreteCalculatorProps> = ({
 
   const results = useMemo(() => {
     try {
-      if (isInputEmpty) return null;
+      if (isInputEmpty || numQuantity < 1) return null;
+      if (shape === 'column') {
+        if (numDiameter <= 0 || numHeight <= 0) return null;
+      } else {
+        if (numLength <= 0 || numWidth <= 0 || numDepth <= 0) return null;
+      }
 
       let volumeCubicYards = 0;
       let volumeCubicMeters = 0;
@@ -76,7 +81,7 @@ export const ConcreteCalculator: React.FC<ConcreteCalculatorProps> = ({
         }
       }
 
-      const wasteMultiplier = 1 + (numWasteMargin / 100);
+      const wasteMultiplier = 1 + (Math.max(0, numWasteMargin) / 100);
       const totalVolumeYards = volumeCubicYards * wasteMultiplier;
       const totalVolumeMeters = volumeCubicMeters * wasteMultiplier;
 
@@ -84,7 +89,7 @@ export const ConcreteCalculator: React.FC<ConcreteCalculatorProps> = ({
       const bags60lb = Math.ceil(totalVolumeYards * 60);
       const bags80lb = Math.ceil(totalVolumeYards * 45);
 
-      const estimatedTotalCost = (unit === 'imperial' ? totalVolumeYards : totalVolumeMeters) * numPricePerUnit;
+      const estimatedTotalCost = (unit === 'imperial' ? totalVolumeYards : totalVolumeMeters) * Math.max(0, numPricePerUnit);
 
       return {
         volumeCubicYards: Math.round(totalVolumeYards * 100) / 100,
@@ -137,14 +142,14 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
               <button
                 type="button"
                 onClick={() => setUnit('imperial')}
-                className={`px-2.5 py-1 rounded-md transition-all ${unit === 'imperial' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-600'}`}
+                className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${unit === 'imperial' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-600'}`}
               >
                 Feet / Inches
               </button>
               <button
                 type="button"
                 onClick={() => setUnit('metric')}
-                className={`px-2.5 py-1 rounded-md transition-all ${unit === 'metric' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-600'}`}
+                className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${unit === 'metric' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-600'}`}
               >
                 Meters / CM
               </button>
@@ -156,21 +161,21 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
             <button
               type="button"
               onClick={() => setShape('slab')}
-              className={`p-2.5 rounded-xl border text-xs font-bold text-center transition-all ${shape === 'slab' ? 'border-orange-500 bg-orange-50 text-orange-900 shadow-2xs' : 'border-slate-200 hover:bg-slate-50 text-slate-700'}`}
+              className={`p-2.5 rounded-xl border text-xs font-bold text-center transition-all cursor-pointer ${shape === 'slab' ? 'border-orange-500 bg-orange-50 text-orange-900 shadow-2xs' : 'border-slate-200 hover:bg-slate-50 text-slate-700'}`}
             >
               Slab / Patio
             </button>
             <button
               type="button"
               onClick={() => setShape('footing')}
-              className={`p-2.5 rounded-xl border text-xs font-bold text-center transition-all ${shape === 'footing' ? 'border-orange-500 bg-orange-50 text-orange-900 shadow-2xs' : 'border-slate-200 hover:bg-slate-50 text-slate-700'}`}
+              className={`p-2.5 rounded-xl border text-xs font-bold text-center transition-all cursor-pointer ${shape === 'footing' ? 'border-orange-500 bg-orange-50 text-orange-900 shadow-2xs' : 'border-slate-200 hover:bg-slate-50 text-slate-700'}`}
             >
               Footing / Wall
             </button>
             <button
               type="button"
               onClick={() => setShape('column')}
-              className={`p-2.5 rounded-xl border text-xs font-bold text-center transition-all ${shape === 'column' ? 'border-orange-500 bg-orange-50 text-orange-900 shadow-2xs' : 'border-slate-200 hover:bg-slate-50 text-slate-700'}`}
+              className={`p-2.5 rounded-xl border text-xs font-bold text-center transition-all cursor-pointer ${shape === 'column' ? 'border-orange-500 bg-orange-50 text-orange-900 shadow-2xs' : 'border-slate-200 hover:bg-slate-50 text-slate-700'}`}
             >
               Round Column
             </button>
@@ -183,12 +188,9 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   Length ({unit === 'imperial' ? 'ft' : 'm'})
                 </label>
-                <input
-                  type="number"
-                  min="0.1"
-                  step="0.5"
+                <DecimalInput
                   value={length}
-                  onChange={(e) => setLength(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                  onValueChange={setLength}
                   className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-orange-500"
                 />
               </div>
@@ -196,12 +198,9 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   Width ({unit === 'imperial' ? 'ft' : 'm'})
                 </label>
-                <input
-                  type="number"
-                  min="0.1"
-                  step="0.5"
+                <DecimalInput
                   value={width}
-                  onChange={(e) => setWidth(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                  onValueChange={setWidth}
                   className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-orange-500"
                 />
               </div>
@@ -209,12 +208,9 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   Thickness ({unit === 'imperial' ? 'in' : 'cm'})
                 </label>
-                <input
-                  type="number"
-                  min="1"
-                  step="0.5"
+                <DecimalInput
                   value={depth}
-                  onChange={(e) => setDepth(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                  onValueChange={setDepth}
                   className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-orange-500"
                 />
               </div>
@@ -225,11 +221,9 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   Diameter ({unit === 'imperial' ? 'in' : 'cm'})
                 </label>
-                <input
-                  type="number"
-                  min="1"
+                <DecimalInput
                   value={diameter}
-                  onChange={(e) => setDiameter(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                  onValueChange={setDiameter}
                   className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-orange-500"
                 />
               </div>
@@ -237,11 +231,9 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   Height ({unit === 'imperial' ? 'ft' : 'm'})
                 </label>
-                <input
-                  type="number"
-                  min="0.1"
+                <DecimalInput
                   value={height}
-                  onChange={(e) => setHeight(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                  onValueChange={setHeight}
                   className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-orange-500"
                 />
               </div>
@@ -251,32 +243,26 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Quantity</label>
-              <input
-                type="number"
-                min="1"
+              <DecimalInput
+                allowDecimal={false}
                 value={quantity}
-                onChange={(e) => setQuantity(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setQuantity}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Waste Factor (%)</label>
-              <input
-                type="number"
-                min="0"
-                max="50"
+              <DecimalInput
                 value={wasteMargin}
-                onChange={(e) => setWasteMargin(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setWasteMargin}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Price / {unit === 'imperial' ? 'yd³' : 'm³'}</label>
-              <input
-                type="number"
-                min="0"
+              <DecimalInput
                 value={pricePerUnit}
-                onChange={(e) => setPricePerUnit(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setPricePerUnit}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
@@ -290,7 +276,7 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
               <div className="flex items-center justify-between pb-3 border-b border-orange-200/70">
                 <span className="text-xs font-bold uppercase tracking-wider text-orange-900">Total Concrete Needed</span>
                 <span className="text-[10px] font-bold bg-orange-200/80 text-orange-900 px-2 py-0.5 rounded-full">
-                  Includes +{wasteMargin}% Waste
+                  Includes +{Math.max(0, numWasteMargin)}% Waste
                 </span>
               </div>
 
@@ -336,7 +322,7 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
               <button
                 type="button"
                 onClick={handleCopy}
-                className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs"
+                className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-orange-600" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -344,7 +330,7 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
               <button
                 type="button"
                 onClick={handleReset}
-                className="py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1 transition-all"
+                className="py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1 transition-all cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset</span>
@@ -353,8 +339,8 @@ Est. Cost: ${currencySymbol}${results.estimatedTotalCost.toLocaleString()}`;
           </div>
         ) : (
           <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center justify-center text-center">
-            <p className="text-xs font-medium text-slate-400">
-              Enter dimensions to calculate concrete volume and pre-mix bags.
+            <p className="text-xs font-medium text-slate-500">
+              Enter positive dimensions and quantity (≥ 1) to calculate concrete volume and pre-mix bags.
             </p>
           </div>
         )}

@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { GraduationCap, Plus, Trash2, Check, Copy, RefreshCw, Bookmark, Sparkles, Award } from 'lucide-react';
-import { formatNumber, copyToClipboard } from '../../utils/formatters';
+import { GraduationCap, Plus, Trash2, Check, Copy, RefreshCw, Bookmark, Sparkles } from 'lucide-react';
+import { copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 import confetti from 'canvas-confetti';
 
 interface Course {
   id: string;
   name: string;
   grade: string;
-  credits: number;
+  credits: number | '';
 }
 
 interface GpaCalculatorProps {
@@ -59,6 +60,10 @@ export const GpaCalculator: React.FC<GpaCalculatorProps> = ({ onSaveCalculation 
 
     const numPriorGpa = typeof priorGpa === 'number' ? priorGpa : 0;
     const numPriorCredits = typeof priorCredits === 'number' ? priorCredits : 0;
+
+    if (includePrior && (priorGpa === '' || priorCredits === '' || numPriorGpa < 0 || numPriorGpa > 4.0 || numPriorCredits < 0)) {
+      return null;
+    }
 
     if (semesterCredits <= 0 && (!includePrior || numPriorCredits <= 0)) {
       return null;
@@ -229,13 +234,9 @@ ${includePrior ? `• Cumulative GPA: ${stats.cumulativeGpa} (${stats.cumulative
                   ))}
                 </select>
 
-                <input
-                  type="number"
-                  min="0.5"
-                  max="12"
-                  step="0.5"
+                <DecimalInput
                   value={c.credits}
-                  onChange={(e) => updateCourse(c.id, 'credits', e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={(val) => updateCourse(c.id, 'credits', val)}
                   className="col-span-2 px-2 py-2 text-xs text-center font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   title="Credit Hours"
                 />
@@ -268,25 +269,18 @@ ${includePrior ? `• Cumulative GPA: ${stats.cumulativeGpa} (${stats.cumulative
             {includePrior && (
               <div className="grid grid-cols-2 gap-4 p-3.5 bg-slate-50 rounded-xl border border-slate-200/60">
                 <div>
-                  <label className="text-xs text-slate-700 font-bold mb-1 block">Prior Cumulative GPA</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="4.0"
-                    step="0.01"
+                  <label className="text-xs text-slate-700 font-bold mb-1 block">Prior Cumulative GPA (0–4.0)</label>
+                  <DecimalInput
                     value={priorGpa}
-                    onChange={(e) => setPriorGpa(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={(val) => setPriorGpa(val)}
                     className="w-full px-3 py-1.5 text-xs font-mono border border-slate-200 rounded-lg bg-white"
                   />
                 </div>
                 <div>
                   <label className="text-xs text-slate-700 font-bold mb-1 block">Prior Total Credits</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="200"
+                  <DecimalInput
                     value={priorCredits}
-                    onChange={(e) => setPriorCredits(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={(val) => setPriorCredits(val)}
                     className="w-full px-3 py-1.5 text-xs font-mono border border-slate-200 rounded-lg bg-white"
                   />
                 </div>
@@ -387,7 +381,7 @@ ${includePrior ? `• Cumulative GPA: ${stats.cumulativeGpa} (${stats.cumulative
             </div>
           ) : (
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-slate-500 text-sm">
-              Enter your course credits and grades to compute your Grade Point Average.
+              Enter valid course credits and prior GPA (0.00–4.00) to compute your Grade Point Average.
             </div>
           )}
         </div>

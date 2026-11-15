@@ -16,7 +16,7 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
   const [homePrice, setHomePrice] = useState<number | ''>(400000);
   const [downPaymentPercent, setDownPaymentPercent] = useState<number | ''>(20);
   const [loanTermYears, setLoanTermYears] = useState<number | ''>(30);
-  const [interestRate, setInterestRate] = useState<number | ''>(6.5);
+  const [interestRateInput, setInterestRateInput] = useState<string>('6.5');
   const [propertyTaxAnnual, setPropertyTaxAnnual] = useState<number | ''>(4200);
   const [homeInsuranceAnnual, setHomeInsuranceAnnual] = useState<number | ''>(1400);
   const [hoaMonthly, setHoaMonthly] = useState<number | ''>(50);
@@ -26,18 +26,38 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
   const [copied, setCopied] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
+  const parseDecimalInput = (raw: string): number | null => {
+    const normalized = raw.trim().replace(/,/g, '.');
+    if (normalized === '' || normalized === '.') return null;
+    if (!/^\d*\.?\d*$/.test(normalized)) return null;
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+  };
+
+  const handleInterestRateChange = (raw: string) => {
+    const cleaned = raw.replace(/\s+/g, '').replace(/,/g, '.');
+    if (cleaned === '') {
+      setInterestRateInput('');
+      return;
+    }
+    const parts = cleaned.replace(/[^\d.]/g, '').split('.');
+    const sanitized = parts.length > 1 ? `${parts[0]}.${parts.slice(1).join('')}` : parts[0];
+    setInterestRateInput(sanitized);
+  };
+
   // Computed Loan
   const numHomePrice = typeof homePrice === 'number' ? homePrice : 0;
   const numDownPaymentPercent = typeof downPaymentPercent === 'number' ? downPaymentPercent : 0;
   const numLoanTermYears = typeof loanTermYears === 'number' ? loanTermYears : 30;
-  const numInterestRate = typeof interestRate === 'number' ? interestRate : 0;
+  const parsedInterestRate = parseDecimalInput(interestRateInput);
+  const numInterestRate = parsedInterestRate ?? 0;
   const numPropertyTax = typeof propertyTaxAnnual === 'number' ? propertyTaxAnnual : 0;
   const numHomeInsurance = typeof homeInsuranceAnnual === 'number' ? homeInsuranceAnnual : 0;
   const numHoa = typeof hoaMonthly === 'number' ? hoaMonthly : 0;
   const numPmi = typeof pmiAnnualPercent === 'number' ? pmiAnnualPercent : 0.5;
   const numExtra = typeof extraMonthlyPayment === 'number' ? extraMonthlyPayment : 0;
 
-  const isInputEmpty = homePrice === '' || downPaymentPercent === '' || loanTermYears === '' || interestRate === '';
+  const isInputEmpty = homePrice === '' || downPaymentPercent === '' || loanTermYears === '' || parsedInterestRate === null;
 
   const downPaymentAmount = useMemo(() => (numHomePrice * numDownPaymentPercent) / 100, [numHomePrice, numDownPaymentPercent]);
   const loanAmount = useMemo(() => Math.max(0, numHomePrice - downPaymentAmount), [numHomePrice, downPaymentAmount]);
@@ -175,10 +195,7 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
   ]);
 
   const handleCopySummary = async () => {
-    if (!calculation) {
-      alert("Please enter a value.");
-      return;
-    }
+    if (!calculation) return;
     const summary = `Mortgage Summary:
 • Home Price: ${formatCurrency(numHomePrice, currencySymbol)}
 • Down Payment: ${formatCurrency(downPaymentAmount, currencySymbol)} (${numDownPaymentPercent}%)
@@ -219,7 +236,7 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
     if (onSaveCalculation) {
       onSaveCalculation(
         `Mortgage for ${formatCurrency(numHomePrice, currencySymbol)}: ${formatCurrency(calculation.totalMonthlyPayment, currencySymbol)}/mo`,
-        { homePrice, downPaymentPercent, loanTermYears, interestRate },
+        { homePrice, downPaymentPercent, loanTermYears, interestRate: numInterestRate },
         { monthlyPayment: calculation.totalMonthlyPayment, totalInterest: calculation.totalInterestPaid }
       );
       setSavedSuccess(true);
@@ -252,7 +269,7 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
                 setHomePrice(400000);
                 setDownPaymentPercent(20);
                 setLoanTermYears(30);
-                setInterestRate(6.5);
+                setInterestRateInput('6.5');
                 setPropertyTaxAnnual(4200);
                 setHomeInsuranceAnnual(1400);
                 setHoaMonthly(50);
@@ -371,11 +388,13 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
               <div className="relative">
                 <input
                   id="interest-rate-input"
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  value={interestRate}
-                  onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+                  type="text"
+                  inputMode="decimal"
+                  lang="en"
+                  dir="ltr"
+                  autoComplete="off"
+                  value={interestRateInput}
+                  onChange={(e) => handleInterestRateChange(e.target.value)}
                   placeholder="6.5"
                   className="w-full pl-3 pr-8 py-2 font-mono-numbers font-semibold text-base border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-slate-50/50"
                 />
@@ -526,7 +545,7 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
                     <span className="text-base font-bold text-[#F97316] font-mono-numbers">{formatCurrency(calculation.totalInterestPaid, currencySymbol)}</span>
                   </div>
                   <div>
-                    <span className="text-[#64748B] text-xs block mb-0.5 font-medium">Overall Total Cost</span>
+                    <span className="text-[#64748B] text-xs block mb-0.5 font-medium">Total Paid Over the Loan Term (excl. down payment)</span>
                     <span className="text-base font-bold text-[#0F172A] font-mono-numbers">{formatCurrency(calculation.totalPaymentsWithEscrow, currencySymbol)}</span>
                   </div>
                   <div>
@@ -546,24 +565,30 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
           {/* Action Toolbar */}
           <div className="flex flex-wrap items-center gap-2">
             <button
+              type="button"
+              disabled={!calculation}
               onClick={handleCopySummary}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] text-[#0F172A] text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] disabled:opacity-50 disabled:cursor-not-allowed text-[#0F172A] text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer"
             >
               {copied ? <Check className="w-4 h-4 text-[#F97316]" /> : <Copy className="w-4 h-4 text-[#64748B]" />}
               <span>{copied ? 'Summary Copied!' : 'Copy Summary'}</span>
             </button>
 
             <button
+              type="button"
+              disabled={!calculation}
               onClick={handleExportCsv}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] text-[#0F172A] text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] disabled:opacity-50 disabled:cursor-not-allowed text-[#0F172A] text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer"
             >
               <FileSpreadsheet className="w-4 h-4 text-[#F97316]" />
               <span>Export CSV</span>
             </button>
 
             <button
+              type="button"
+              disabled={!calculation}
               onClick={handleSave}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#F97316] hover:bg-[#EA580C] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4" />
               <span>{savedSuccess ? 'Saved!' : 'Save Result'}</span>

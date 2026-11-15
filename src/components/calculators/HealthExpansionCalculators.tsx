@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Activity, Flame, Moon, RotateCcw, Copy, Check, Heart, Trophy } from 'lucide-react';
-import { copyToClipboard } from '../../utils/formatters';
+import { Moon, RotateCcw } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface BaseCalcProps {
   currencySymbol?: string;
@@ -15,30 +15,37 @@ export const PaceCalculator: React.FC<BaseCalcProps> = () => {
   const [minutes, setMinutes] = useState<number | ''>(28);
   const [seconds, setSeconds] = useState<number | ''>(30);
 
+  const handleReset = () => {
+    setDistance(5);
+    setDistanceUnit('km');
+    setHours(0);
+    setMinutes(28);
+    setSeconds(30);
+  };
+
   const results = useMemo(() => {
     const d = typeof distance === 'number' ? distance : 0;
-    const h = typeof hours === 'number' ? hours : 0;
-    const m = typeof minutes === 'number' ? minutes : 0;
-    const s = typeof seconds === 'number' ? seconds : 0;
+    const h = typeof hours === 'number' ? Math.max(0, hours) : 0;
+    const m = typeof minutes === 'number' ? Math.max(0, minutes) : 0;
+    const s = typeof seconds === 'number' ? Math.max(0, seconds) : 0;
 
     const totalSeconds = h * 3600 + m * 60 + s;
     if (totalSeconds <= 0 || d <= 0) return null;
 
-    const pacePerUnitSec = totalSeconds / d;
-    const paceMin = Math.floor(pacePerUnitSec / 60);
-    const paceSec = Math.round(pacePerUnitSec % 60);
+    const roundedPaceSec = Math.round(totalSeconds / d);
+    const paceMin = Math.floor(roundedPaceSec / 60);
+    const paceSec = roundedPaceSec % 60;
 
-    // Speed in units/hr
     const speed = (d / (totalSeconds / 3600)).toFixed(2);
 
-    // Common race predictions based on this pace
     const distKm = distanceUnit === 'km' ? d : d * 1.60934;
     const paceSecPerKm = totalSeconds / distKm;
 
     const formatTime = (sec: number) => {
-      const hh = Math.floor(sec / 3600);
-      const mm = Math.floor((sec % 3600) / 60);
-      const ss = Math.round(sec % 60);
+      const totalRounded = Math.round(sec);
+      const hh = Math.floor(totalRounded / 3600);
+      const mm = Math.floor((totalRounded % 3600) / 60);
+      const ss = totalRounded % 60;
       return `${hh > 0 ? hh + 'h ' : ''}${mm}m ${ss < 10 ? '0' : ''}${ss}s`;
     };
 
@@ -56,15 +63,22 @@ export const PaceCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-4">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Run / Walk Details</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Run / Walk Details</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Distance</label>
-              <input
-                type="number"
-                step="0.1"
+              <DecimalInput
                 value={distance}
-                onChange={(e) => setDistance(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setDistance}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -72,8 +86,8 @@ export const PaceCalculator: React.FC<BaseCalcProps> = () => {
               <label className="block text-xs font-semibold text-slate-700 mb-1">Unit</label>
               <select
                 value={distanceUnit}
-                onChange={(e) => setDistanceUnit(e.target.value as any)}
-                className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
+                onChange={(e) => setDistanceUnit(e.target.value as 'km' | 'miles')}
+                className="w-full px-3 py-2 border rounded-lg text-sm font-bold bg-white"
               >
                 <option value="km">Kilometers (km)</option>
                 <option value="miles">Miles (mi)</option>
@@ -86,28 +100,28 @@ export const PaceCalculator: React.FC<BaseCalcProps> = () => {
             <div className="grid grid-cols-3 gap-2">
               <div>
                 <span className="text-[10px] text-slate-400">Hours</span>
-                <input
-                  type="number"
+                <DecimalInput
+                  allowDecimal={false}
                   value={hours}
-                  onChange={(e) => setHours(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                  onValueChange={setHours}
                   className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
                 />
               </div>
               <div>
                 <span className="text-[10px] text-slate-400">Minutes</span>
-                <input
-                  type="number"
+                <DecimalInput
+                  allowDecimal={false}
                   value={minutes}
-                  onChange={(e) => setMinutes(e.target.value === '' ? '' : Math.max(0, Math.min(59, Number(e.target.value))))}
+                  onValueChange={(v) => setMinutes(v === '' ? '' : Math.min(59, v))}
                   className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
                 />
               </div>
               <div>
                 <span className="text-[10px] text-slate-400">Seconds</span>
-                <input
-                  type="number"
+                <DecimalInput
+                  allowDecimal={false}
                   value={seconds}
-                  onChange={(e) => setSeconds(e.target.value === '' ? '' : Math.max(0, Math.min(59, Number(e.target.value))))}
+                  onValueChange={(v) => setSeconds(v === '' ? '' : Math.min(59, v))}
                   className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
                 />
               </div>
@@ -147,13 +161,19 @@ export const OneRepMaxCalculator: React.FC<BaseCalcProps> = () => {
   const [reps, setReps] = useState(6);
   const [unit, setUnit] = useState<'lbs' | 'kg'>('lbs');
 
+  const handleReset = () => {
+    setWeightLifted(185);
+    setReps(6);
+    setUnit('lbs');
+  };
+
   const results = useMemo(() => {
     const w = typeof weightLifted === 'number' ? weightLifted : 0;
     if (w <= 0 || reps <= 0) return null;
     // Brzycki formula: 1RM = Weight / (1.0278 - (0.0278 * Reps))
-    const brzycki = w / (1.0278 - (0.0278 * Math.min(reps, 15)));
+    const brzycki = reps === 1 ? w : w / (1.0278 - (0.0278 * Math.min(reps, 15)));
     // Epley formula: 1RM = Weight * (1 + 0.0333 * Reps)
-    const epley = w * (1 + 0.0333 * reps);
+    const epley = reps === 1 ? w : w * (1 + 0.0333 * reps);
     // Consensus avg
     const oneRm = Math.round((brzycki + epley) / 2);
 
@@ -173,14 +193,22 @@ export const OneRepMaxCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-4">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Lift Performance</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Lift Performance</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Weight Lifted</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={weightLifted}
-                onChange={(e) => setWeightLifted(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setWeightLifted}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -188,8 +216,8 @@ export const OneRepMaxCalculator: React.FC<BaseCalcProps> = () => {
               <label className="block text-xs font-semibold text-slate-700 mb-1">Unit</label>
               <select
                 value={unit}
-                onChange={(e) => setUnit(e.target.value as any)}
-                className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
+                onChange={(e) => setUnit(e.target.value as 'lbs' | 'kg')}
+                className="w-full px-3 py-2 border rounded-lg text-sm font-bold bg-white"
               >
                 <option value="lbs">Pounds (lbs)</option>
                 <option value="kg">Kilograms (kg)</option>
@@ -250,60 +278,75 @@ export const WaistToHipCalculator: React.FC<BaseCalcProps> = () => {
   const [hip, setHip] = useState<number | ''>(40);
   const [gender, setGender] = useState<'female' | 'male'>('female');
 
-  const w = typeof waist === 'number' ? waist : 0;
-  const h = typeof hip === 'number' ? hip : 0;
+  const handleReset = () => {
+    setWaist(32);
+    setHip(40);
+    setGender('female');
+  };
 
-  const whr = h > 0 ? (w / h) : 0;
-  
-  let risk = 'Low Risk';
-  let badgeColor = 'bg-orange-100 text-orange-800';
-  let bodyShape = 'Pear / Balanced';
+  const results = useMemo(() => {
+    const w = typeof waist === 'number' ? waist : 0;
+    const h = typeof hip === 'number' ? hip : 0;
+    if (waist === '' || hip === '' || w <= 0 || h <= 0) return null;
 
-  if (gender === 'female') {
-    if (whr > 0.85) {
-      risk = 'High Risk';
-      badgeColor = 'bg-red-100 text-red-800';
-      bodyShape = 'Apple (Abdominal Weight)';
-    } else if (whr >= 0.80) {
-      risk = 'Moderate Risk';
-      badgeColor = 'bg-amber-100 text-amber-800';
-      bodyShape = 'Balanced';
+    const whr = w / h;
+    let risk = 'Low Risk';
+    let badgeColor = 'bg-orange-100 text-orange-800';
+    let bodyShape = 'Pear / Balanced';
+
+    if (gender === 'female') {
+      if (whr > 0.85) {
+        risk = 'High Risk';
+        badgeColor = 'bg-red-100 text-red-800';
+        bodyShape = 'Apple (Abdominal Weight)';
+      } else if (whr >= 0.80) {
+        risk = 'Moderate Risk';
+        badgeColor = 'bg-amber-100 text-amber-800';
+        bodyShape = 'Balanced';
+      }
+    } else {
+      if (whr > 0.95) {
+        risk = 'High Risk';
+        badgeColor = 'bg-red-100 text-red-800';
+        bodyShape = 'Apple (Abdominal Weight)';
+      } else if (whr >= 0.90) {
+        risk = 'Moderate Risk';
+        badgeColor = 'bg-amber-100 text-amber-800';
+        bodyShape = 'Balanced';
+      }
     }
-  } else {
-    if (whr > 0.95) {
-      risk = 'High Risk';
-      badgeColor = 'bg-red-100 text-red-800';
-      bodyShape = 'Apple (Abdominal Weight)';
-    } else if (whr >= 0.90) {
-      risk = 'Moderate Risk';
-      badgeColor = 'bg-amber-100 text-amber-800';
-      bodyShape = 'Balanced';
-    }
-  }
+
+    return { whr, risk, badgeColor, bodyShape };
+  }, [waist, hip, gender]);
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-4">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Body Measurements (Inches or cm)</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Body Measurements (Inches or cm)</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Waist Circumference</label>
-              <input
-                type="number"
-                step="0.5"
+              <DecimalInput
                 value={waist}
-                onChange={(e) => setWaist(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setWaist}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Hip Circumference</label>
-              <input
-                type="number"
-                step="0.5"
+              <DecimalInput
                 value={hip}
-                onChange={(e) => setHip(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setHip}
                 className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
               />
             </div>
@@ -314,14 +357,14 @@ export const WaistToHipCalculator: React.FC<BaseCalcProps> = () => {
               <button
                 type="button"
                 onClick={() => setGender('female')}
-                className={`py-2 text-xs font-bold rounded-lg border transition-colors ${gender === 'female' ? 'bg-pink-50 border-pink-300 text-pink-700' : 'bg-white border-slate-200 text-slate-600'}`}
+                className={`py-2 text-xs font-bold rounded-lg border transition-colors cursor-pointer ${gender === 'female' ? 'bg-pink-50 border-pink-300 text-pink-700' : 'bg-white border-slate-200 text-slate-600'}`}
               >
                 Female
               </button>
               <button
                 type="button"
                 onClick={() => setGender('male')}
-                className={`py-2 text-xs font-bold rounded-lg border transition-colors ${gender === 'male' ? 'bg-blue-50 border-blue-300 text-blue-700' : 'bg-white border-slate-200 text-slate-600'}`}
+                className={`py-2 text-xs font-bold rounded-lg border transition-colors cursor-pointer ${gender === 'male' ? 'bg-blue-50 border-blue-300 text-blue-700' : 'bg-white border-slate-200 text-slate-600'}`}
               >
                 Male
               </button>
@@ -330,23 +373,31 @@ export const WaistToHipCalculator: React.FC<BaseCalcProps> = () => {
         </div>
 
         <div className="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Waist-to-Hip Ratio (WHR)</span>
-            <div className="text-3xl font-black text-slate-900 font-mono-numbers mt-1">
-              {whr.toFixed(2)}
-            </div>
-            <div className="mt-2 inline-flex items-center gap-2">
-              <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}`}>
-                {risk}
-              </span>
-              <span className="text-xs text-slate-600 font-medium">Shape: {bodyShape}</span>
-            </div>
-          </div>
+          {results ? (
+            <>
+              <div>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Waist-to-Hip Ratio (WHR)</span>
+                <div className="text-3xl font-black text-slate-900 font-mono-numbers mt-1">
+                  {results.whr.toFixed(2)}
+                </div>
+                <div className="mt-2 inline-flex items-center gap-2">
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${results.badgeColor}`}>
+                    {results.risk}
+                  </span>
+                  <span className="text-xs text-slate-600 font-medium">Shape: {results.bodyShape}</span>
+                </div>
+              </div>
 
-          <div className="bg-white p-3 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-1">
-            <span className="font-bold text-slate-800">WHO Guidelines:</span>
-            <p>Women with WHR ≤ 0.80 and Men with WHR ≤ 0.90 have lowest cardiovascular risk.</p>
-          </div>
+              <div className="bg-white p-3 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-1">
+                <span className="font-bold text-slate-800">WHO Guidelines:</span>
+                <p>Women with WHR &lt; 0.80 and Men with WHR &lt; 0.90 have lowest cardiovascular risk.</p>
+              </div>
+            </>
+          ) : (
+            <div className="h-full flex items-center justify-center text-center text-xs text-slate-500 py-8">
+              Enter positive waist and hip circumferences in the same unit (inches or cm) to calculate WHR.
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -358,6 +409,12 @@ export const SleepCycleCalculator: React.FC<BaseCalcProps> = () => {
   const [wakeHour, setWakeHour] = useState(7);
   const [wakeMinute, setWakeMinute] = useState(0);
   const [wakeAmPm, setWakeAmPm] = useState<'AM' | 'PM'>('AM');
+
+  const handleReset = () => {
+    setWakeHour(7);
+    setWakeMinute(0);
+    setWakeAmPm('AM');
+  };
 
   const bedtimes = useMemo(() => {
     let hour24 = wakeHour % 12;
@@ -393,9 +450,18 @@ export const SleepCycleCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Moon className="w-5 h-5 text-indigo-600" />
-            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">I Need to Wake Up At</h4>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Moon className="w-5 h-5 text-indigo-600" />
+              <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">I Need to Wake Up At</h4>
+            </div>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
           </div>
           <div className="grid grid-cols-3 gap-2">
             <div>
@@ -403,7 +469,7 @@ export const SleepCycleCalculator: React.FC<BaseCalcProps> = () => {
               <select
                 value={wakeHour}
                 onChange={(e) => setWakeHour(Number(e.target.value))}
-                className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
+                className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold bg-white"
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(h => (
                   <option key={h} value={h}>{h}</option>
@@ -415,7 +481,7 @@ export const SleepCycleCalculator: React.FC<BaseCalcProps> = () => {
               <select
                 value={wakeMinute}
                 onChange={(e) => setWakeMinute(Number(e.target.value))}
-                className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
+                className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold bg-white"
               >
                 {[0, 15, 30, 45].map(m => (
                   <option key={m} value={m}>{m < 10 ? '0' : ''}{m}</option>
@@ -426,8 +492,8 @@ export const SleepCycleCalculator: React.FC<BaseCalcProps> = () => {
               <label className="block text-xs font-semibold text-slate-600 mb-1">AM/PM</label>
               <select
                 value={wakeAmPm}
-                onChange={(e) => setWakeAmPm(e.target.value as any)}
-                className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
+                onChange={(e) => setWakeAmPm(e.target.value as 'AM' | 'PM')}
+                className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold bg-white"
               >
                 <option value="AM">AM</option>
                 <option value="PM">PM</option>
@@ -464,22 +530,20 @@ export const AlcoholCaloriesCalculator: React.FC<BaseCalcProps> = () => {
   const [wineGlasses, setWineGlasses] = useState<number | ''>(1); // 5oz wine
   const [cocktails, setCocktails] = useState<number | ''>(0); // mixed drink
 
+  const handleReset = () => {
+    setBeers(2);
+    setWineGlasses(1);
+    setCocktails(0);
+  };
+
   const results = useMemo(() => {
-    const b = typeof beers === 'number' ? beers : 0;
-    const w = typeof wineGlasses === 'number' ? wineGlasses : 0;
-    const c = typeof cocktails === 'number' ? cocktails : 0;
+    const b = typeof beers === 'number' ? Math.max(0, beers) : 0;
+    const w = typeof wineGlasses === 'number' ? Math.max(0, wineGlasses) : 0;
+    const c = typeof cocktails === 'number' ? Math.max(0, cocktails) : 0;
 
-    const beerCal = b * 150;
-    const wineCal = w * 125;
-    const cocktailCal = c * 220;
-    const totalCal = beerCal + wineCal + cocktailCal;
+    const totalCal = Math.round(b * 150 + w * 125 + c * 220);
+    const totalUnits = b * 1.5 + w * 2.1 + c * 2.0;
 
-    const beerUnits = b * 1.5;
-    const wineUnits = w * 2.1;
-    const cocktailUnits = c * 2.0;
-    const totalUnits = beerUnits + wineUnits + cocktailUnits;
-
-    // Running at 100 cal/mile -> miles
     const milesToRun = (totalCal / 100).toFixed(1);
     const briskWalkingMin = Math.round(totalCal / 5);
 
@@ -490,31 +554,37 @@ export const AlcoholCaloriesCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Drinks Consumed</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Drinks Consumed</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Standard Beers / Cider (12 oz, 5% ABV)</label>
-            <input
-              type="number"
+            <DecimalInput
               value={beers}
-              onChange={(e) => setBeers(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setBeers}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Glasses of Wine (5 oz, 12% ABV)</label>
-            <input
-              type="number"
+            <DecimalInput
               value={wineGlasses}
-              onChange={(e) => setWineGlasses(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setWineGlasses}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Cocktails / Mixed Spirits (1.5 oz spirit + mixer)</label>
-            <input
-              type="number"
+            <DecimalInput
               value={cocktails}
-              onChange={(e) => setCocktails(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setCocktails}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
@@ -522,11 +592,11 @@ export const AlcoholCaloriesCalculator: React.FC<BaseCalcProps> = () => {
 
         <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-5 rounded-xl border border-amber-200 flex flex-col justify-between space-y-4">
           <div>
-            <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">Total Empty Calories</span>
+            <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">Total Beverage Calories</span>
             <div className="text-3xl font-black text-amber-950 font-mono-numbers mt-1">
               {results.totalCal} kcal
             </div>
-            <span className="text-xs text-amber-800 font-semibold">{results.totalUnits} Standard Alcohol Units</span>
+            <span className="text-xs text-amber-800 font-semibold">{results.totalUnits} UK-style Alcohol Units</span>
           </div>
 
           <div className="bg-white p-3 rounded-lg border border-amber-100 text-xs text-slate-700 space-y-1.5">
@@ -552,6 +622,12 @@ export const LeanBodyMassCalculator: React.FC<BaseCalcProps> = () => {
   const [heightCm, setHeightCm] = useState<number | ''>(178);
   const [gender, setGender] = useState<'male' | 'female'>('male');
 
+  const handleReset = () => {
+    setWeightKg(75);
+    setHeightCm(178);
+    setGender('male');
+  };
+
   const results = useMemo(() => {
     const w = typeof weightKg === 'number' ? weightKg : 0;
     const h = typeof heightCm === 'number' ? heightCm : 0;
@@ -568,7 +644,9 @@ export const LeanBodyMassCalculator: React.FC<BaseCalcProps> = () => {
       jamesLbm = (1.07 * w) - 148 * Math.pow(w / h, 2);
     }
 
-    const avgLbm = Math.max(1, (boerLbm + jamesLbm) / 2);
+    const rawAvg = (boerLbm + jamesLbm) / 2;
+    const outOfRange = rawAvg <= 0 || rawAvg > w;
+    const avgLbm = Math.min(w, Math.max(1, rawAvg));
     const fatMass = Math.max(0, w - avgLbm);
     const fatPercentage = (fatMass / w) * 100;
 
@@ -576,7 +654,8 @@ export const LeanBodyMassCalculator: React.FC<BaseCalcProps> = () => {
       lbmKg: avgLbm.toFixed(1),
       lbmLbs: (avgLbm * 2.20462).toFixed(1),
       fatMassKg: fatMass.toFixed(1),
-      fatPercentage: fatPercentage.toFixed(1)
+      fatPercentage: fatPercentage.toFixed(1),
+      outOfRange
     };
   }, [weightKg, heightCm, gender]);
 
@@ -584,23 +663,30 @@ export const LeanBodyMassCalculator: React.FC<BaseCalcProps> = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Body Metrics</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Body Metrics</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Total Body Weight (kg)</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={weightKg}
-                onChange={(e) => setWeightKg(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setWeightKg}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Height (cm)</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={heightCm}
-                onChange={(e) => setHeightCm(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setHeightCm}
                 className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -611,14 +697,14 @@ export const LeanBodyMassCalculator: React.FC<BaseCalcProps> = () => {
               <button
                 type="button"
                 onClick={() => setGender('male')}
-                className={`py-2 text-xs font-bold rounded-lg border transition-colors ${gender === 'male' ? 'bg-blue-50 border-blue-300 text-blue-700' : 'bg-white border-slate-200 text-slate-600'}`}
+                className={`py-2 text-xs font-bold rounded-lg border transition-colors cursor-pointer ${gender === 'male' ? 'bg-blue-50 border-blue-300 text-blue-700' : 'bg-white border-slate-200 text-slate-600'}`}
               >
                 Male
               </button>
               <button
                 type="button"
                 onClick={() => setGender('female')}
-                className={`py-2 text-xs font-bold rounded-lg border transition-colors ${gender === 'female' ? 'bg-pink-50 border-pink-300 text-pink-700' : 'bg-white border-slate-200 text-slate-600'}`}
+                className={`py-2 text-xs font-bold rounded-lg border transition-colors cursor-pointer ${gender === 'female' ? 'bg-pink-50 border-pink-300 text-pink-700' : 'bg-white border-slate-200 text-slate-600'}`}
               >
                 Female
               </button>
@@ -633,6 +719,7 @@ export const LeanBodyMassCalculator: React.FC<BaseCalcProps> = () => {
               {results ? results.lbmKg : '--'} kg
               <span className="text-sm font-normal text-teal-700 ml-2">({results ? results.lbmLbs : '--'} lbs)</span>
             </div>
+            <p className="text-[11px] text-teal-700 mt-1">Average of Boer &amp; James clinical LBM formulas.</p>
           </div>
 
           <div className="bg-white p-3 rounded-lg border border-teal-100 text-xs text-slate-700 space-y-1">
@@ -644,6 +731,9 @@ export const LeanBodyMassCalculator: React.FC<BaseCalcProps> = () => {
               <span>Implied Body Fat:</span>
               <span className="font-bold text-teal-800">{results ? results.fatPercentage : '--'}%</span>
             </div>
+            {results?.outOfRange && (
+              <p className="text-[11px] text-amber-700 font-medium pt-1">Note: Extreme height/weight proportions exceed standard empirical bounds; clamped to body weight.</p>
+            )}
           </div>
         </div>
       </div>

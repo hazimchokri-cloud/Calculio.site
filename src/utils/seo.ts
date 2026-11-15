@@ -110,14 +110,17 @@ export function updateDocumentSeo(config: SeoConfig) {
     descEl.content = config.description;
 
     // Meta keywords
+    const existingKwEl = document.querySelector('meta[name="keywords"]') as HTMLMetaElement | null;
     if (config.keywords && config.keywords.length > 0) {
-      let kwEl = document.querySelector('meta[name="keywords"]') as HTMLMetaElement | null;
+      let kwEl = existingKwEl;
       if (!kwEl) {
         kwEl = document.createElement('meta');
         kwEl.name = 'keywords';
         document.head.appendChild(kwEl);
       }
       kwEl.content = config.keywords.join(', ');
+    } else if (existingKwEl) {
+      existingKwEl.remove();
     }
 
     // Robots tag
@@ -132,10 +135,16 @@ export function updateDocumentSeo(config: SeoConfig) {
 
     // Canonical link
     const CANONICAL_ORIGIN = 'https://calculio.site';
+    const resolveAssetUrl = (path?: string) => {
+      if (!path) return `${CANONICAL_ORIGIN}/og-image.png`;
+      if (path.startsWith('http://') || path.startsWith('https://')) return path;
+      return `${CANONICAL_ORIGIN}${path.startsWith('/') ? path : `/${path}`}`;
+    };
 
     const fullCanonical = config.canonicalUrl 
       ? (config.canonicalUrl.startsWith('http') ? config.canonicalUrl : `${CANONICAL_ORIGIN}${config.canonicalUrl.startsWith('/') ? config.canonicalUrl : `/${config.canonicalUrl}`}`)
       : CANONICAL_ORIGIN;
+    const resolvedOgImage = resolveAssetUrl(config.ogImage);
 
     let canonEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonEl) {
@@ -155,22 +164,32 @@ export function updateDocumentSeo(config: SeoConfig) {
       }
       tag.content = content;
     };
+    const removeMetaProperty = (property: string) => {
+      const existing = document.querySelector(`meta[property="${property}"]`);
+      if (existing) existing.remove();
+    };
 
     setOgTag('og:title', config.title);
     setOgTag('og:description', config.description);
     setOgTag('og:url', fullCanonical);
     setOgTag('og:type', config.ogType || 'website');
     setOgTag('og:site_name', 'Calculio - Free Online Calculators');
-    setOgTag('og:image', config.ogImage || 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1200&q=80');
+    setOgTag('og:image', resolvedOgImage);
 
     if (config.author) {
       setOgTag('article:author', config.author);
+    } else {
+      removeMetaProperty('article:author');
     }
     if (config.publishedTime) {
       setOgTag('article:published_time', config.publishedTime);
+    } else {
+      removeMetaProperty('article:published_time');
     }
     if (config.modifiedTime) {
       setOgTag('article:modified_time', config.modifiedTime);
+    } else {
+      removeMetaProperty('article:modified_time');
     }
 
     // Twitter Cards
@@ -187,7 +206,7 @@ export function updateDocumentSeo(config: SeoConfig) {
     setTwitterTag('twitter:card', 'summary_large_image');
     setTwitterTag('twitter:title', config.title);
     setTwitterTag('twitter:description', config.description);
-    setTwitterTag('twitter:image', config.ogImage || 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1200&q=80');
+    setTwitterTag('twitter:image', resolvedOgImage);
 
     // JSON-LD Structured Data Injection
     let schemaScript = document.getElementById('calculio-jsonld-schema') as HTMLScriptElement | null;
@@ -268,6 +287,11 @@ export function buildCalculatorSchema(calc: CalculatorMeta, origin: string = 'ht
  */
 export function buildArticleSchema(post: BlogPost, origin: string = 'https://calculio.site') {
   const url = `${origin}${getBlogPostUrl(post.slug)}`;
+  const resolvedImage = post.coverImage
+    ? (post.coverImage.startsWith('http://') || post.coverImage.startsWith('https://')
+        ? post.coverImage
+        : `${origin}${post.coverImage.startsWith('/') ? post.coverImage : `/${post.coverImage}`}`)
+    : `${origin}/og-image.png`;
 
   return {
     '@context': 'https://schema.org',
@@ -278,7 +302,7 @@ export function buildArticleSchema(post: BlogPost, origin: string = 'https://cal
     },
     headline: post.title,
     description: post.excerpt,
-    image: post.coverImage,
+    image: resolvedImage,
     author: post.author?.name
       ? {
           '@type': 'Person',

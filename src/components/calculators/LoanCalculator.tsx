@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, copyToClipboard, downloadCsv } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 import { 
   DollarSign, 
   Percent, 
@@ -203,13 +204,9 @@ ${numExtraPayment > 0 ? `Extra Monthly: ${formatCurrency(numExtraPayment, curren
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-              <input
-                type="number"
-                min="0"
-                max="5000000"
-                step="500"
+              <DecimalInput
                 value={loanAmount}
-                onChange={(e) => setLoanAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setLoanAmount}
                 placeholder="25000"
                 className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
@@ -219,8 +216,8 @@ ${numExtraPayment > 0 ? `Extra Monthly: ${formatCurrency(numExtraPayment, curren
               min="1000"
               max="200000"
               step="1000"
-              value={numLoanAmount || 25000}
-              onChange={(e) => setLoanAmount(e.target.value === '' ? '' : Number(e.target.value))}
+              value={loanAmount === '' ? 0 : Math.min(200000, Math.max(1000, numLoanAmount))}
+              onChange={(e) => setLoanAmount(Number(e.target.value))}
               className="w-full accent-orange-600 cursor-pointer"
             />
           </div>
@@ -232,13 +229,9 @@ ${numExtraPayment > 0 ? `Extra Monthly: ${formatCurrency(numExtraPayment, curren
               <span className="text-orange-600 font-mono">{interestRate !== '' ? `${interestRate}%` : ''}</span>
             </label>
             <div className="relative">
-              <input
-                type="number"
-                min="0"
-                max="35"
-                step="0.1"
+              <DecimalInput
                 value={interestRate}
-                onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setInterestRate}
                 placeholder="6.5"
                 className="w-full pl-3 pr-8 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
@@ -246,11 +239,11 @@ ${numExtraPayment > 0 ? `Extra Monthly: ${formatCurrency(numExtraPayment, curren
             </div>
             <input
               type="range"
-              min="0.1"
+              min="0"
               max="25"
               step="0.25"
-              value={numInterestRate || 6.5}
-              onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+              value={interestRate === '' ? 0 : Math.min(25, Math.max(0, numInterestRate))}
+              onChange={(e) => setInterestRate(Number(e.target.value))}
               className="w-full accent-orange-600 cursor-pointer"
             />
           </div>
@@ -283,8 +276,8 @@ ${numExtraPayment > 0 ? `Extra Monthly: ${formatCurrency(numExtraPayment, curren
                 min="1"
                 max="30"
                 step="1"
-                value={numLoanTermYears || 5}
-                onChange={(e) => setLoanTermYears(e.target.value === '' ? '' : Number(e.target.value))}
+                value={loanTermYears === '' ? 1 : Math.min(30, Math.max(1, numLoanTermYears))}
+                onChange={(e) => setLoanTermYears(Number(e.target.value))}
                 className="w-full accent-orange-600 cursor-pointer"
               />
             </div>
@@ -301,13 +294,9 @@ ${numExtraPayment > 0 ? `Extra Monthly: ${formatCurrency(numExtraPayment, curren
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-              <input
-                type="number"
-                min="0"
-                max="10000"
-                step="25"
+              <DecimalInput
                 value={extraPayment}
-                onChange={(e) => setExtraPayment(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setExtraPayment}
                 placeholder="0"
                 className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Briefcase, DollarSign, TrendingUp, RotateCcw, Copy, Check, Info } from 'lucide-react';
+import { Briefcase, Copy, Check } from 'lucide-react';
 import { copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface BreakEvenCalculatorProps {
   currencySymbol?: string;
@@ -9,7 +10,6 @@ interface BreakEvenCalculatorProps {
 
 export const BreakEvenCalculator: React.FC<BreakEvenCalculatorProps> = ({
   currencySymbol = '$',
-  onSave
 }) => {
   const [fixedCosts, setFixedCosts] = useState<number | ''>(15000); // Rent, salaries, software
   const [unitPrice, setUnitPrice] = useState<number | ''>(50); // Sale price per unit
@@ -31,10 +31,11 @@ export const BreakEvenCalculator: React.FC<BreakEvenCalculatorProps> = ({
       // Contribution margin per unit = Price - Variable Cost
       const contributionMargin = numUnitPrice - numVariableCostPerUnit;
       const contributionMarginRatio = numUnitPrice > 0 ? (contributionMargin / numUnitPrice) * 100 : 0;
+      const hasBreakEven = contributionMargin > 0;
 
       // Break-even units = Fixed Costs / Contribution Margin
-      const breakEvenUnits = contributionMargin > 0 ? Math.ceil(numFixedCosts / contributionMargin) : 0;
-      const breakEvenRevenue = breakEvenUnits * numUnitPrice;
+      const breakEvenUnits = hasBreakEven ? Math.ceil(numFixedCosts / contributionMargin) : null;
+      const breakEvenRevenue = breakEvenUnits !== null ? breakEvenUnits * numUnitPrice : null;
 
       // Expected profit/loss based on expected units
       const totalRevenue = numExpectedUnitsSold * numUnitPrice;
@@ -44,10 +45,11 @@ export const BreakEvenCalculator: React.FC<BreakEvenCalculatorProps> = ({
       const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
       return {
+        hasBreakEven,
         contributionMargin: Math.round(contributionMargin * 100) / 100,
         contributionMarginRatio: Math.round(contributionMarginRatio * 10) / 10,
         breakEvenUnits,
-        breakEvenRevenue: Math.round(breakEvenRevenue),
+        breakEvenRevenue: breakEvenRevenue !== null ? Math.round(breakEvenRevenue) : null,
         totalRevenue: Math.round(totalRevenue),
         totalCosts: Math.round(totalCosts),
         netProfit: Math.round(netProfit),
@@ -60,9 +62,12 @@ export const BreakEvenCalculator: React.FC<BreakEvenCalculatorProps> = ({
 
   const handleCopy = () => {
     if (!results) return;
+    const breakEvenLine =
+      results.hasBreakEven && results.breakEvenUnits !== null && results.breakEvenRevenue !== null
+        ? `Break-Even Volume: ${results.breakEvenUnits.toLocaleString()} units\nBreak-Even Revenue: ${currencySymbol}${results.breakEvenRevenue.toLocaleString()}`
+        : `Break-Even Volume: No Break-Even (Selling price must exceed variable cost per unit)`;
     const text = `Business Break-Even Analysis:
-Break-Even Volume: ${results.breakEvenUnits.toLocaleString()} units
-Break-Even Revenue: ${currencySymbol}${results.breakEvenRevenue.toLocaleString()}
+${breakEvenLine}
 Contribution Margin: ${currencySymbol}${results.contributionMargin}/unit (${results.contributionMarginRatio}%)
 Expected Net Profit (${numExpectedUnitsSold} units): ${currencySymbol}${results.netProfit.toLocaleString()}`;
     copyToClipboard(text);
@@ -88,6 +93,7 @@ Expected Net Profit (${numExpectedUnitsSold} units): ${currencySymbol}${results.
               <span>Cost & Price Inputs</span>
             </h4>
             <button
+              type="button"
               onClick={handleReset}
               className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
             >
@@ -99,12 +105,9 @@ Expected Net Profit (${numExpectedUnitsSold} units): ${currencySymbol}${results.
             <label className="block text-xs font-bold text-slate-700 mb-1">Total Fixed Costs (Monthly or Annual)</label>
             <div className="relative">
               <span className="absolute left-3 top-2.5 text-xs font-bold text-slate-400">{currencySymbol}</span>
-              <input
-                type="number"
-                min="0"
-                step="500"
+              <DecimalInput
                 value={fixedCosts}
-                onChange={(e) => setFixedCosts(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={(val) => setFixedCosts(val)}
                 className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
@@ -116,12 +119,9 @@ Expected Net Profit (${numExpectedUnitsSold} units): ${currencySymbol}${results.
               <label className="block text-xs font-bold text-slate-700 mb-1">Selling Price / Unit</label>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-xs font-bold text-slate-400">{currencySymbol}</span>
-                <input
-                  type="number"
-                  min="0.01"
-                  step="1"
+                <DecimalInput
                   value={unitPrice}
-                  onChange={(e) => setUnitPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={(val) => setUnitPrice(val)}
                   className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
                 />
               </div>
@@ -130,12 +130,9 @@ Expected Net Profit (${numExpectedUnitsSold} units): ${currencySymbol}${results.
               <label className="block text-xs font-bold text-slate-700 mb-1">Variable Cost / Unit</label>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-xs font-bold text-slate-400">{currencySymbol}</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
+                <DecimalInput
                   value={variableCostPerUnit}
-                  onChange={(e) => setVariableCostPerUnit(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={(val) => setVariableCostPerUnit(val)}
                   className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
                 />
               </div>
@@ -144,12 +141,10 @@ Expected Net Profit (${numExpectedUnitsSold} units): ${currencySymbol}${results.
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">Estimated Unit Sales Target</label>
-            <input
-              type="number"
-              min="0"
-              step="50"
+            <DecimalInput
+              allowDecimal={false}
               value={expectedUnitsSold}
-              onChange={(e) => setExpectedUnitsSold(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={(val) => setExpectedUnitsSold(val)}
               className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
             />
           </div>
@@ -161,27 +156,36 @@ Expected Net Profit (${numExpectedUnitsSold} units): ${currencySymbol}${results.
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-sky-200">
                 <span className="text-xs font-bold uppercase tracking-wider text-sky-900">Break-Even Results</span>
-                <span className="text-xs font-extrabold text-sky-800">
+                <span className={`text-xs font-extrabold ${results.hasBreakEven ? 'text-sky-800' : 'text-rose-700'}`}>
                   Margin: {currencySymbol}{results.contributionMargin}/unit
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-3.5 bg-white rounded-xl border border-sky-200 shadow-2xs">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">Break-Even Units</span>
-                  <span className="text-2xl font-black text-slate-900 block mt-0.5">
-                    {results.breakEvenUnits.toLocaleString()}
-                  </span>
-                  <span className="text-[10px] text-slate-500">Units required to cover costs</span>
+              {!results.hasBreakEven ? (
+                <div className="p-4 bg-rose-50 rounded-xl border border-rose-200 text-xs text-rose-900 space-y-1">
+                  <div className="font-bold text-sm">No Break-Even (Price ≤ Variable Cost)</div>
+                  <p>
+                    Each unit loses {currencySymbol}{Math.abs(results.contributionMargin).toFixed(2)} before fixed costs. Increase selling price above {currencySymbol}{numVariableCostPerUnit} to reach break-even.
+                  </p>
                 </div>
-                <div className="p-3.5 bg-white rounded-xl border border-sky-200 shadow-2xs">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">Break-Even Revenue</span>
-                  <span className="text-2xl font-black text-sky-900 block mt-0.5">
-                    {currencySymbol}{results.breakEvenRevenue.toLocaleString()}
-                  </span>
-                  <span className="text-[10px] text-slate-500">Gross sales at $0 profit</span>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3.5 bg-white rounded-xl border border-sky-200 shadow-2xs">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">Break-Even Units</span>
+                    <span className="text-2xl font-black text-slate-900 block mt-0.5">
+                      {(results.breakEvenUnits ?? 0).toLocaleString()}
+                    </span>
+                    <span className="text-[10px] text-slate-500">Units required to cover costs</span>
+                  </div>
+                  <div className="p-3.5 bg-white rounded-xl border border-sky-200 shadow-2xs">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">Break-Even Revenue</span>
+                    <span className="text-2xl font-black text-sky-900 block mt-0.5">
+                      {currencySymbol}{(results.breakEvenRevenue ?? 0).toLocaleString()}
+                    </span>
+                    <span className="text-[10px] text-slate-500">Gross sales at $0 profit</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Target Forecast Box */}
               <div className="bg-white p-4 rounded-xl border border-sky-200 space-y-2">

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { formatNumber, copyToClipboard } from '../../utils/formatters';
 import { Scale, Check, Copy, ShieldCheck, Heart, AlertCircle, Info } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface BmiCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -245,12 +246,9 @@ export const BmiCalculator: React.FC<BmiCalculatorProps> = ({ onSaveCalculation 
 
             <div className="space-y-1.5">
               <label className="text-sm font-semibold text-[#0F172A] block">Age (Years)</label>
-              <input
-                type="number"
-                min="1"
-                max="120"
+              <DecimalInput
                 value={age}
-                onChange={(e) => setAge(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setAge}
                 placeholder="28"
                 className="w-full px-3 py-2 font-mono-numbers text-sm font-semibold border border-[#E2E8F0] rounded-xl focus:border-[#F97316] focus:outline-none bg-[#FFFFFF] text-[#0F172A]"
               />
@@ -263,24 +261,18 @@ export const BmiCalculator: React.FC<BmiCalculatorProps> = ({ onSaveCalculation 
               <label className="text-sm font-semibold text-[#0F172A] block">Height</label>
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative">
-                  <input
-                    type="number"
-                    min="1"
-                    max="8"
+                  <DecimalInput
                     value={feet}
-                    onChange={(e) => setFeet(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={setFeet}
                     placeholder="5"
                     className="w-full px-3 py-2 text-sm font-mono-numbers font-semibold border border-[#E2E8F0] rounded-xl focus:border-[#F97316] focus:outline-none bg-[#FFFFFF] text-[#0F172A]"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#64748B]">ft</span>
                 </div>
                 <div className="relative">
-                  <input
-                    type="number"
-                    min="0"
-                    max="11"
+                  <DecimalInput
                     value={inches}
-                    onChange={(e) => setInches(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={setInches}
                     placeholder="10"
                     className="w-full px-3 py-2 text-sm font-mono-numbers font-semibold border border-[#E2E8F0] rounded-xl focus:border-[#F97316] focus:outline-none bg-[#FFFFFF] text-[#0F172A]"
                   />
@@ -294,12 +286,9 @@ export const BmiCalculator: React.FC<BmiCalculatorProps> = ({ onSaveCalculation 
                 <label className="text-sm font-semibold text-[#0F172A]">Height</label>
                 <span className="text-xs font-mono-numbers font-semibold text-[#64748B]">{numHeightCm} cm</span>
               </div>
-              <input
-                type="number"
-                min="0"
-                max="250"
+              <DecimalInput
                 value={heightCm}
-                onChange={(e) => setHeightCm(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setHeightCm}
                 placeholder="178"
                 className="w-full px-3 py-2 text-sm font-mono-numbers font-semibold border border-[#E2E8F0] rounded-xl focus:border-[#F97316] focus:outline-none bg-[#FFFFFF] text-[#0F172A]"
               />
@@ -307,8 +296,8 @@ export const BmiCalculator: React.FC<BmiCalculatorProps> = ({ onSaveCalculation 
                 type="range"
                 min="100"
                 max="220"
-                value={numHeightCm || 178}
-                onChange={(e) => setHeightCm(e.target.value === '' ? '' : Number(e.target.value))}
+                value={heightCm === '' ? 100 : Math.min(220, Math.max(100, numHeightCm))}
+                onChange={(e) => setHeightCm(Number(e.target.value))}
                 className="w-full accent-[#F97316] cursor-pointer h-2 bg-[#E2E8F0] rounded-lg"
               />
             </div>
@@ -321,12 +310,9 @@ export const BmiCalculator: React.FC<BmiCalculatorProps> = ({ onSaveCalculation 
                 <label className="text-sm font-semibold text-[#0F172A]">Weight</label>
                 <span className="text-xs font-mono-numbers font-semibold text-[#64748B]">{numWeightLbs} lbs</span>
               </div>
-              <input
-                type="number"
-                min="0"
-                max="600"
+              <DecimalInput
                 value={weightLbs}
-                onChange={(e) => setWeightLbs(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setWeightLbs}
                 placeholder="165"
                 className="w-full px-3 py-2 text-sm font-mono-numbers font-semibold border border-[#E2E8F0] rounded-xl focus:border-[#F97316] focus:outline-none bg-[#FFFFFF] text-[#0F172A]"
               />
@@ -334,8 +320,8 @@ export const BmiCalculator: React.FC<BmiCalculatorProps> = ({ onSaveCalculation 
                 type="range"
                 min="80"
                 max="350"
-                value={numWeightLbs || 165}
-                onChange={(e) => setWeightLbs(e.target.value === '' ? '' : Number(e.target.value))}
+                value={weightLbs === '' ? 80 : Math.min(350, Math.max(80, numWeightLbs))}
+                onChange={(e) => setWeightLbs(Number(e.target.value))}
                 className="w-full accent-[#F97316] cursor-pointer h-2 bg-[#E2E8F0] rounded-lg"
               />
             </div>
@@ -345,12 +331,9 @@ export const BmiCalculator: React.FC<BmiCalculatorProps> = ({ onSaveCalculation 
                 <label className="text-sm font-semibold text-[#0F172A]">Weight</label>
                 <span className="text-xs font-mono-numbers font-semibold text-[#64748B]">{numWeightKg} kg</span>
               </div>
-              <input
-                type="number"
-                min="0"
-                max="300"
+              <DecimalInput
                 value={weightKg}
-                onChange={(e) => setWeightKg(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setWeightKg}
                 placeholder="75"
                 className="w-full px-3 py-2 text-sm font-mono-numbers font-semibold border border-[#E2E8F0] rounded-xl focus:border-[#F97316] focus:outline-none bg-[#FFFFFF] text-[#0F172A]"
               />
@@ -358,8 +341,8 @@ export const BmiCalculator: React.FC<BmiCalculatorProps> = ({ onSaveCalculation 
                 type="range"
                 min="35"
                 max="160"
-                value={numWeightKg || 75}
-                onChange={(e) => setWeightKg(e.target.value === '' ? '' : Number(e.target.value))}
+                value={weightKg === '' ? 35 : Math.min(160, Math.max(35, numWeightKg))}
+                onChange={(e) => setWeightKg(Number(e.target.value))}
                 className="w-full accent-[#F97316] cursor-pointer h-2 bg-[#E2E8F0] rounded-lg"
               />
             </div>
@@ -445,16 +428,20 @@ export const BmiCalculator: React.FC<BmiCalculatorProps> = ({ onSaveCalculation 
           {/* Action buttons */}
           <div className="flex flex-wrap items-center gap-2">
             <button
+              type="button"
+              disabled={!result}
               onClick={handleCopy}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] text-[#0F172A] text-xs font-bold transition-all shadow-2xs cursor-pointer"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] hover:bg-[#FFF7ED] hover:text-[#F97316] disabled:opacity-50 disabled:cursor-not-allowed text-[#0F172A] text-xs font-bold transition-all shadow-2xs cursor-pointer"
             >
               {copied ? <Check className="w-4 h-4 text-[#F97316]" /> : <Copy className="w-4 h-4 text-[#64748B]" />}
               <span>{copied ? 'Copied!' : 'Copy Summary'}</span>
             </button>
 
             <button
+              type="button"
+              disabled={!result}
               onClick={handleSave}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-bold transition-all shadow-2xs cursor-pointer"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#F97316] hover:bg-[#EA580C] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold transition-all shadow-2xs cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4" />
               <span>{savedSuccess ? 'Saved!' : 'Save to History'}</span>

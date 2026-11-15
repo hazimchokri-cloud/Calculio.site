@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 import { DollarSign, TrendingUp, Sparkles, Copy, Check, Bookmark, Calendar, Percent } from 'lucide-react';
 
 interface InvestmentCalculatorProps {
@@ -40,7 +41,7 @@ export const InvestmentCalculator: React.FC<InvestmentCalculatorProps> = ({
 
     const P = Math.max(0, numInitialInvestment);
     const PMT = Math.max(0, numMonthlyContribution);
-    const t = Math.max(1, numYears);
+    const t = Math.min(120, Math.max(1, Math.round(numYears)));
     const nominalR = Math.max(0, numAnnualReturn) / 100;
     const rMonthly = nominalR / 12;
     const totalMonths = t * 12;
@@ -171,13 +172,9 @@ ${adjustInflation ? `Inflation-Adjusted Purchasing Power: ${formatCurrency(calcu
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-              <input
-                type="number"
-                min="0"
-                max="5000000"
-                step="1000"
+              <DecimalInput
                 value={initialInvestment}
-                onChange={(e) => setInitialInvestment(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setInitialInvestment}
                 className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
             </div>
@@ -191,13 +188,9 @@ ${adjustInflation ? `Inflation-Adjusted Purchasing Power: ${formatCurrency(calcu
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-              <input
-                type="number"
-                min="0"
-                max="50000"
-                step="50"
+              <DecimalInput
                 value={monthlyContribution}
-                onChange={(e) => setMonthlyContribution(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setMonthlyContribution}
                 className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
             </div>
@@ -206,8 +199,8 @@ ${adjustInflation ? `Inflation-Adjusted Purchasing Power: ${formatCurrency(calcu
               min="0"
               max="5000"
               step="50"
-              value={monthlyContribution}
-              onChange={(e) => setMonthlyContribution(e.target.value === '' ? '' : Number(e.target.value))}
+              value={monthlyContribution === '' ? 0 : Math.min(5000, Math.max(0, numMonthlyContribution))}
+              onChange={(e) => setMonthlyContribution(Number(e.target.value))}
               className="w-full accent-orange-600 cursor-pointer"
             />
           </div>
@@ -243,13 +236,9 @@ ${adjustInflation ? `Inflation-Adjusted Purchasing Power: ${formatCurrency(calcu
               <span className="text-orange-600 font-mono">{annualReturn}%</span>
             </label>
             <div className="relative">
-              <input
-                type="number"
-                min="0.1"
-                max="30"
-                step="0.1"
+              <DecimalInput
                 value={annualReturn}
-                onChange={(e) => setAnnualReturn(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setAnnualReturn}
                 className="w-full pl-3 pr-8 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">%</span>

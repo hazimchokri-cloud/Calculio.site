@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { copyToClipboard, formatNumber } from '../../utils/formatters';
-import { Zap, Copy, Check, Bookmark, BookOpen } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
+import { Zap, Copy, Check, Bookmark } from 'lucide-react';
 
 interface ExponentCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -18,18 +19,28 @@ export const ExponentCalculator: React.FC<ExponentCalculatorProps> = ({ onSaveCa
       if (base === '' || exponent === '' || typeof base !== 'number' || typeof exponent !== 'number') return null;
 
       // Evaluate base ^ exponent
-      let result = Math.pow(base, exponent);
-      let isInfinite = !isFinite(result);
-      let isNanResult = isNaN(result);
+      const result = Math.pow(base, exponent);
+      const isNanResult = Number.isNaN(result);
+      const isInfinite = !isNanResult && !Number.isFinite(result);
 
-      let scientific = !isInfinite && !isNanResult ? result.toExponential() : 'N/A';
-      let formattedResult = !isInfinite && !isNanResult 
-        ? (Math.abs(result) > 1e12 || (Math.abs(result) < 1e-6 && result !== 0) ? scientific : formatNumber(result, 6)) 
-        : 'Overflow / Undefined';
+      const scientific = !isInfinite && !isNanResult ? result.toExponential() : 'N/A';
+      const formattedResult = isNanResult
+        ? 'Undefined (Complex / Not Real)'
+        : isInfinite
+        ? 'Overflow (> 1.8e308)'
+        : Math.abs(result) > 1e12 || (Math.abs(result) < 1e-6 && result !== 0)
+        ? scientific
+        : formatNumber(result, 6);
 
       // Step explanation
       let stepExplanation = '';
-      if (exponent === 0) {
+      if (isNanResult) {
+        stepExplanation = `Raising negative base (${base}) to fractional exponent (${exponent}) produces a complex number outside real numbers.`;
+      } else if (isInfinite) {
+        stepExplanation = `Result exceeds JavaScript 64-bit floating-point maximum (~1.798 × 10³⁰⁸).`;
+      } else if (base === 0 && exponent === 0) {
+        stepExplanation = `By convention in floating-point arithmetic, 0⁰ = 1.`;
+      } else if (exponent === 0) {
         stepExplanation = `Any non-zero number raised to the power of 0 equals 1. (a⁰ = 1)`;
       } else if (exponent === 1) {
         stepExplanation = `Any number raised to the power of 1 equals itself. (a¹ = a)`;
@@ -56,8 +67,10 @@ export const ExponentCalculator: React.FC<ExponentCalculatorProps> = ({ onSaveCa
     }
   }, [base, exponent]);
 
+  const canExport = Boolean(exponentResults && !exponentResults.isInfinite && !exponentResults.isNanResult);
+
   const handleCopy = async () => {
-    if (!exponentResults) return;
+    if (!exponentResults || !canExport) return;
     const text = `${exponentResults.base}^${exponentResults.exponent} = ${exponentResults.formattedResult} (Scientific: ${exponentResults.scientific})`;
     const ok = await copyToClipboard(text);
     if (ok) {
@@ -67,7 +80,7 @@ export const ExponentCalculator: React.FC<ExponentCalculatorProps> = ({ onSaveCa
   };
 
   const handleSave = () => {
-    if (!onSaveCalculation || !exponentResults) return;
+    if (!onSaveCalculation || !exponentResults || !canExport) return;
     onSaveCalculation(
       `${exponentResults.base}^${exponentResults.exponent} = ${exponentResults.formattedResult}`,
       { base, exponent },
@@ -102,21 +115,19 @@ export const ExponentCalculator: React.FC<ExponentCalculatorProps> = ({ onSaveCa
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700">Base Number (a)</label>
-              <input
-                type="number"
-                step="any"
+              <DecimalInput
+                allowNegative
                 value={base}
-                onChange={(e) => setBase(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                onValueChange={(val) => setBase(val)}
                 className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700">Exponent / Power (n)</label>
-              <input
-                type="number"
-                step="any"
+              <DecimalInput
+                allowNegative
                 value={exponent}
-                onChange={(e) => setExponent(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                onValueChange={(val) => setExponent(val)}
                 className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
               />
             </div>
@@ -177,16 +188,20 @@ export const ExponentCalculator: React.FC<ExponentCalculatorProps> = ({ onSaveCa
 
               <div className="flex items-center gap-2 pt-4 border-t border-amber-900/60">
                 <button
+                  type="button"
+                  disabled={!canExport}
                   onClick={handleCopy}
-                  className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copied' : 'Copy Result'}</span>
                 </button>
                 {onSaveCalculation && (
                   <button
+                    type="button"
+                    disabled={!canExport}
                     onClick={handleSave}
-                    className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                    className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                   >
                     <Bookmark className="w-3.5 h-3.5" />
                     <span>{saved ? 'Saved' : 'Save'}</span>

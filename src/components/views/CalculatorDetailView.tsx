@@ -67,11 +67,15 @@ const GasMileageCalculator = React.lazy(() => import('../calculators/GasMileageC
 
 // Expansion Calculators
 const ConcreteCalculator = React.lazy(() => import('../calculators/ConcreteCalculator').then(m => ({ default: m.ConcreteCalculator })));
+const FlooringCalculator = React.lazy(() => import('../calculators/FlooringCalculator').then(m => ({ default: m.FlooringCalculator })));
 const RentalRoiCalculator = React.lazy(() => import('../calculators/RentalRoiCalculator').then(m => ({ default: m.RentalRoiCalculator })));
+const CapRateCalculator = React.lazy(() => import('../calculators/CapRateCalculator').then(m => ({ default: m.CapRateCalculator })));
 const BreakEvenCalculator = React.lazy(() => import('../calculators/BreakEvenCalculator').then(m => ({ default: m.BreakEvenCalculator })));
+const ProfitMarginCalculator = React.lazy(() => import('../calculators/ProfitMarginCalculator').then(m => ({ default: m.ProfitMarginCalculator })));
 const FinalGradeCalculator = React.lazy(() => import('../calculators/FinalGradeCalculator').then(m => ({ default: m.FinalGradeCalculator })));
 const OhmsLawCalculator = React.lazy(() => import('../calculators/OhmsLawCalculator').then(m => ({ default: m.OhmsLawCalculator })));
 const IncomeTaxCalculator = React.lazy(() => import('../calculators/IncomeTaxCalculator').then(m => ({ default: m.IncomeTaxCalculator })));
+const SalesTaxCalculator = React.lazy(() => import('../calculators/SalesTaxCalculator').then(m => ({ default: m.SalesTaxCalculator })));
 const CryptoProfitCalculator = React.lazy(() => import('../calculators/CryptoProfitCalculator').then(m => ({ default: m.CryptoProfitCalculator })));
 const GenericConfigurableCalculator = React.lazy(() => import('../calculators/GenericConfigurableCalculator').then(m => ({ default: m.GenericConfigurableCalculator })));
 
@@ -266,23 +270,27 @@ export const CalculatorDetailView: React.FC<CalculatorDetailProps> = ({
 
       // --- Real Estate ---
       case 'rental-roi-calculator':
-      case 'cap-rate-calculator':
         return <RentalRoiCalculator currencySymbol={currencySymbol} onSave={onSaveCalculation} />;
+      case 'cap-rate-calculator':
+        return <CapRateCalculator currencySymbol={currencySymbol} onSave={onSaveCalculation} />;
 
       // --- Tax ---
       case 'income-tax-calculator':
-      case 'sales-tax-calculator':
         return <IncomeTaxCalculator currencySymbol={currencySymbol} onSave={onSaveCalculation} />;
+      case 'sales-tax-calculator':
+        return <SalesTaxCalculator currencySymbol={currencySymbol} onSave={onSaveCalculation} />;
 
       // --- Business ---
       case 'break-even-calculator':
-      case 'profit-margin-calculator':
         return <BreakEvenCalculator currencySymbol={currencySymbol} onSave={onSaveCalculation} />;
+      case 'profit-margin-calculator':
+        return <ProfitMarginCalculator currencySymbol={currencySymbol} onSave={onSaveCalculation} />;
 
       // --- Construction ---
       case 'concrete-calculator':
-      case 'flooring-calculator':
         return <ConcreteCalculator currencySymbol={currencySymbol} onSave={onSaveCalculation} />;
+      case 'flooring-calculator':
+        return <FlooringCalculator currencySymbol={currencySymbol} onSave={onSaveCalculation} />;
 
       // --- Engineering ---
       case 'ohms-law-calculator':

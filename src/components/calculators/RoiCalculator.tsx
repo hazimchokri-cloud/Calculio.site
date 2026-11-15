@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, copyToClipboard } from '../../utils/formatters';
 import { TrendingUp, Percent, DollarSign, Copy, Check, Bookmark } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface RoiCalculatorProps {
   currencySymbol?: string;
@@ -36,7 +37,9 @@ export const RoiCalculator: React.FC<RoiCalculatorProps> = ({
     // Annualized ROI (Compound Annual Growth Rate / CAGR)
     // CAGR = (F / P)^(1/t) - 1
     let annualizedRoiPct = 0;
-    if (F > 0 && P > 0 && t > 0) {
+    if (F === 0) {
+      annualizedRoiPct = -100;
+    } else if (F > 0 && P > 0 && t > 0) {
       annualizedRoiPct = (Math.pow(F / P, 1 / t) - 1) * 100;
     }
 
@@ -105,13 +108,9 @@ Annualized ROI (CAGR): ${calculations.annualizedRoiPct.toFixed(2)}%/year over ${
               <span>Initial Capital Invested</span>
               <span className="text-orange-600 font-mono">{formatCurrency(numInitialInvestment, currencySymbol)}</span>
             </label>
-            <input
-              type="number"
-              min="1"
-              max="10000000"
-              step="500"
+            <DecimalInput
               value={initialInvestment}
-              onChange={(e) => setInitialInvestment(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setInitialInvestment}
               className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
             />
           </div>
@@ -121,13 +120,9 @@ Annualized ROI (CAGR): ${calculations.annualizedRoiPct.toFixed(2)}%/year over ${
               <span>Final Value Returned / Proceeds</span>
               <span className="text-orange-600 font-mono">{formatCurrency(numReturnedAmount, currencySymbol)}</span>
             </label>
-            <input
-              type="number"
-              min="0"
-              max="50000000"
-              step="500"
+            <DecimalInput
               value={returnedAmount}
-              onChange={(e) => setReturnedAmount(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setReturnedAmount}
               className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
             />
           </div>
@@ -137,13 +132,9 @@ Annualized ROI (CAGR): ${calculations.annualizedRoiPct.toFixed(2)}%/year over ${
               <span>Investment Duration (Years)</span>
               <span className="text-orange-600 font-mono">{holdingPeriodYears} Years</span>
             </label>
-            <input
-              type="number"
-              min="0.1"
-              max="50"
-              step="0.5"
+            <DecimalInput
               value={holdingPeriodYears}
-              onChange={(e) => setHoldingPeriodYears(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setHoldingPeriodYears}
               className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
             />
           </div>

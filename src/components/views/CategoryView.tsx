@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Search, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '../shared/Breadcrumbs';
-import { AffiliateOffersSection } from '../shared/AffiliateOffersSection';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { getCategoryTheme } from '../home/CategoryGrid';
 
@@ -103,13 +102,6 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
           </div>
         ))}
       </div>
-
-      {/* Category-Specific Affiliate Opportunities */}
-      <AffiliateOffersSection
-        categoryId={category.id}
-        title={`${category.name} ${t('calcView.partnerOffers', 'Partner Offers & Discounts')}`}
-        subtitle={t('calcView.partnerOffersSubtitle', `Verified recommendations and savings curated for ${category.name} calculations.`, { category: category.name })}
-      />
 
       {/* Other Categories quick switcher */}
       <div className="pt-8 border-t border-[#E2E8F0]">

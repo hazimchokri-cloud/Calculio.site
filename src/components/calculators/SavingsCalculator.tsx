@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 import { PiggyBank, Target, Calendar, DollarSign, Copy, Check, Bookmark, Percent } from 'lucide-react';
 
 interface SavingsCalculatorProps {
@@ -26,7 +27,12 @@ export const SavingsCalculator: React.FC<SavingsCalculatorProps> = ({
   const numTimeYears = typeof timeYears === 'number' ? timeYears : 0;
   const numApyRate = typeof apyRate === 'number' ? apyRate : 0;
 
-  const isInputEmpty = (mode === 'findMonthly' && savingsGoal === '') || (mode === 'findFuture' && monthlyContribution === '') || timeYears === '';
+  const isInputEmpty =
+    (mode === 'findMonthly' && savingsGoal === '') ||
+    (mode === 'findFuture' && monthlyContribution === '') ||
+    initialSavings === '' ||
+    timeYears === '' ||
+    apyRate === '';
 
   const calculations = useMemo(() => {
     if (isInputEmpty || numTimeYears <= 0) return null;
@@ -35,29 +41,30 @@ export const SavingsCalculator: React.FC<SavingsCalculatorProps> = ({
     const n = Math.max(1, numTimeYears * 12);
 
     if (mode === 'findMonthly') {
-      const target = Math.max(P, numSavingsGoal);
-      // FV = P * (1 + r)^n + PMT * [((1 + r)^n - 1) / r]
-      // PMT = [FV - P * (1 + r)^n] / [((1 + r)^n - 1) / r]
+      const target = Math.max(0, numSavingsGoal);
       let neededMonthly = 0;
       const futureValueOfInitial = P * Math.pow(1 + r, n);
       const remainingTarget = Math.max(0, target - futureValueOfInitial);
+      const goalAlreadyReached = futureValueOfInitial >= target;
 
       if (r === 0) {
         neededMonthly = remainingTarget / n;
       } else {
         const factor = (Math.pow(1 + r, n) - 1) / r;
-        neededMonthly = remainingTarget / factor;
+        neededMonthly = factor > 0 ? remainingTarget / factor : 0;
       }
 
+      const projectedEndingBalance = goalAlreadyReached ? futureValueOfInitial : target;
       const totalContributed = P + neededMonthly * n;
-      const totalInterestEarned = Math.max(0, target - totalContributed);
+      const totalInterestEarned = Math.max(0, projectedEndingBalance - totalContributed);
 
       return {
         neededMonthly,
-        totalTarget: target,
+        totalTarget: projectedEndingBalance,
         totalContributed,
         totalInterestEarned,
-        months: n
+        months: n,
+        goalAlreadyReached
       };
     } else {
       // Find future value given monthly contribution
@@ -168,13 +175,9 @@ Interest Earned (HYSA): ${formatCurrency(calculations.totalInterestEarned, curre
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-                <input
-                  type="number"
-                  min="500"
-                  max="5000000"
-                  step="500"
+                <DecimalInput
                   value={savingsGoal}
-                  onChange={(e) => setSavingsGoal(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setSavingsGoal}
                   className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 />
               </div>
@@ -187,13 +190,9 @@ Interest Earned (HYSA): ${formatCurrency(calculations.totalInterestEarned, curre
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-                <input
-                  type="number"
-                  min="10"
-                  max="100000"
-                  step="25"
+                <DecimalInput
                   value={monthlyContribution}
-                  onChange={(e) => setMonthlyContribution(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setMonthlyContribution}
                   className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 />
               </div>
@@ -208,13 +207,9 @@ Interest Earned (HYSA): ${formatCurrency(calculations.totalInterestEarned, curre
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-              <input
-                type="number"
-                min="0"
-                max="1000000"
-                step="500"
+              <DecimalInput
                 value={initialSavings}
-                onChange={(e) => setInitialSavings(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setInitialSavings}
                 className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
             </div>
@@ -251,13 +246,9 @@ Interest Earned (HYSA): ${formatCurrency(calculations.totalInterestEarned, curre
               <span className="text-orange-600 font-mono">{apyRate}%</span>
             </label>
             <div className="relative">
-              <input
-                type="number"
-                min="0"
-                max="15"
-                step="0.1"
+              <DecimalInput
                 value={apyRate}
-                onChange={(e) => setApyRate(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setApyRate}
                 className="w-full pl-3 pr-8 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">%</span>

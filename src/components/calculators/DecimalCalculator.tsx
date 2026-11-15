@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { copyToClipboard } from '../../utils/formatters';
+import { parseLocaleNumber } from '../../utils/numberInput';
 import { Divide, RefreshCw, Copy, Check, Bookmark, ArrowRightLeft } from 'lucide-react';
 
 interface DecimalCalculatorProps {
@@ -36,18 +37,22 @@ export const DecimalCalculator: React.FC<DecimalCalculatorProps> = ({ onSaveCalc
     return a;
   };
 
-  // Convert decimal to simplified fraction
+  // Convert finite decimal (including scientific notation like 1e-7) to simplified fraction
   const decimalToFraction = (dec: number) => {
-    if (isNaN(dec)) return { num: 0, den: 1, text: '0' };
-    const str = dec.toString();
-    const parts = str.split('.');
+    if (!Number.isFinite(dec)) return { num: 0, den: 1, text: 'N/A' };
+    if (dec === 0) return { num: 0, den: 1, text: '0/1' };
+    if (Number.isInteger(dec)) return { num: dec, den: 1, text: `${dec}/1` };
+
+    const fixedStr = dec.toFixed(10).replace(/\.?0+$/, '');
+    const parts = fixedStr.split('.');
     if (parts.length === 1) {
-      return { num: dec, den: 1, text: `${dec}/1` };
+      const whole = Number(parts[0]);
+      return { num: whole, den: 1, text: `${whole}/1` };
     }
-    const decimalPlacesCount = parts[1].length;
+    const decimalPlacesCount = Math.min(9, parts[1].length);
     const denominator = Math.pow(10, decimalPlacesCount);
     const numerator = Math.round(dec * denominator);
-    const divisor = gcd(numerator, denominator);
+    const divisor = gcd(numerator, denominator) || 1;
     const simpNum = numerator / divisor;
     const simpDen = denominator / divisor;
     return {
@@ -59,8 +64,8 @@ export const DecimalCalculator: React.FC<DecimalCalculatorProps> = ({ onSaveCalc
 
   const conversionResults = useMemo(() => {
     try {
-      const val = parseFloat(decimalInput);
-      if (isNaN(val)) return null;
+      const val = parseLocaleNumber(decimalInput);
+      if (val === null) return null;
 
       const fraction = decimalToFraction(val);
       const percentage = `${(val * 100).toFixed(4).replace(/\.?0+$/, '')}%`;
@@ -81,9 +86,9 @@ export const DecimalCalculator: React.FC<DecimalCalculatorProps> = ({ onSaveCalc
 
   const operationResults = useMemo(() => {
     try {
-      const a = parseFloat(num1);
-      const b = parseFloat(num2);
-      if (isNaN(a) || isNaN(b)) return null;
+      const a = parseLocaleNumber(num1);
+      const b = parseLocaleNumber(num2);
+      if (a === null || b === null) return null;
 
       let res = 0;
       if (op === '+') res = a + b;
@@ -91,12 +96,14 @@ export const DecimalCalculator: React.FC<DecimalCalculatorProps> = ({ onSaveCalc
       else if (op === '*') res = a * b;
       else if (op === '/') res = b !== 0 ? a / b : NaN;
 
+      const cleanRes = Number.isFinite(res) ? Number(res.toPrecision(12)) : NaN;
+
       return {
         a,
         b,
         op,
-        result: isNaN(res) ? 'Undefined (Division by zero)' : res.toString(),
-        fraction: !isNaN(res) ? decimalToFraction(res).text : 'N/A'
+        result: isNaN(cleanRes) ? 'Undefined (Division by zero)' : cleanRes.toString(),
+        fraction: !isNaN(cleanRes) ? decimalToFraction(cleanRes).text : 'N/A'
       };
     } catch {
       return null;
@@ -105,8 +112,8 @@ export const DecimalCalculator: React.FC<DecimalCalculatorProps> = ({ onSaveCalc
 
   const roundingResults = useMemo(() => {
     try {
-      const val = parseFloat(roundInput);
-      if (isNaN(val)) return null;
+      const val = parseLocaleNumber(roundInput);
+      if (val === null) return null;
 
       const fixed = val.toFixed(decimalPlaces);
       const ceil = Math.ceil(val * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);

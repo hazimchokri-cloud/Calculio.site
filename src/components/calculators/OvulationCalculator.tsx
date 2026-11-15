@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { Calendar, Heart, Copy, Check, Bookmark, Sparkles } from 'lucide-react';
 import { copyToClipboard } from '../../utils/formatters';
+import { parseLocalDate, formatLocalIsoDate, addLocalDays } from '../../utils/dateUtils';
 
 interface OvulationCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
 }
 
 export const OvulationCalculator: React.FC<OvulationCalculatorProps> = ({ onSaveCalculation }) => {
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = formatLocalIsoDate(new Date());
   const [lmpDate, setLmpDate] = useState<string>(todayStr);
   const [cycleLength, setCycleLength] = useState<number | ''>(28);
   const [lutealPhase, setLutealPhase] = useState<number | ''>(14);
@@ -18,29 +19,19 @@ export const OvulationCalculator: React.FC<OvulationCalculatorProps> = ({ onSave
   const numLutealPhase = typeof lutealPhase === 'number' ? lutealPhase : 14;
 
   const calculations = useMemo(() => {
-    if (!lmpDate) return null;
-    const lmp = new Date(lmpDate);
-    if (isNaN(lmp.getTime())) return null;
+    const lmp = parseLocalDate(lmpDate);
+    if (!lmp) return null;
 
     // Ovulation occurs approximately (cycleLength - lutealPhase) days after LMP start
     const ovulationDayOffset = Math.max(7, numCycleLength - numLutealPhase);
     
     // Future 3 cycles prediction
     const cycles = [0, 1, 2].map(cycleIdx => {
-      const cycleStart = new Date(lmp);
-      cycleStart.setDate(cycleStart.getDate() + cycleIdx * numCycleLength);
-
-      const ovulationDate = new Date(cycleStart);
-      ovulationDate.setDate(ovulationDate.getDate() + ovulationDayOffset);
-
-      const fertileStart = new Date(ovulationDate);
-      fertileStart.setDate(fertileStart.getDate() - 5);
-
-      const fertileEnd = new Date(ovulationDate);
-      fertileEnd.setDate(fertileEnd.getDate() + 1);
-
-      const nextPeriod = new Date(cycleStart);
-      nextPeriod.setDate(nextPeriod.getDate() + numCycleLength);
+      const cycleStart = addLocalDays(lmp, cycleIdx * numCycleLength);
+      const ovulationDate = addLocalDays(cycleStart, ovulationDayOffset);
+      const fertileStart = addLocalDays(ovulationDate, -5);
+      const fertileEnd = addLocalDays(ovulationDate, 1);
+      const nextPeriod = addLocalDays(cycleStart, numCycleLength);
 
       const fmt = (d: Date) => d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 

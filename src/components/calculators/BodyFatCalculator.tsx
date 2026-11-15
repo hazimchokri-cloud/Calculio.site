@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Activity, ShieldCheck, Check, Copy } from 'lucide-react';
 import { formatNumber, copyToClipboard } from '../../utils/formatters';
 import confetti from 'canvas-confetti';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface BodyFatCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -210,10 +211,9 @@ export const BodyFatCalculator: React.FC<BodyFatCalculatorProps> = ({ onSaveCalc
 
             <div className="space-y-1">
               <label className="text-xs font-semibold text-slate-700 block">Height ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={heightIn}
-                onChange={(e) => setHeightIn(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setHeightIn}
                 className="w-full px-3 py-1.5 text-xs font-mono-numbers border border-slate-200 rounded-lg bg-slate-50"
               />
             </div>
@@ -222,21 +222,18 @@ export const BodyFatCalculator: React.FC<BodyFatCalculatorProps> = ({ onSaveCalc
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-semibold text-slate-700 block mb-1">Weight ({unitSystem === 'imperial' ? 'lbs' : 'kg'})</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={weightLbs}
-                onChange={(e) => setWeightLbs(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setWeightLbs}
                 className="w-full px-3 py-1.5 text-xs font-mono-numbers border border-slate-200 rounded-lg bg-slate-50"
               />
             </div>
 
             <div>
               <label className="text-xs font-semibold text-slate-700 block mb-1">Neck Circumference ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
-              <input
-                type="number"
-                step="0.1"
+              <DecimalInput
                 value={neckIn}
-                onChange={(e) => setNeckIn(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setNeckIn}
                 className="w-full px-3 py-1.5 text-xs font-mono-numbers border border-slate-200 rounded-lg bg-slate-50"
               />
             </div>
@@ -245,11 +242,9 @@ export const BodyFatCalculator: React.FC<BodyFatCalculatorProps> = ({ onSaveCalc
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-semibold text-slate-700 block mb-1">Waist (at navel) ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
-              <input
-                type="number"
-                step="0.1"
+              <DecimalInput
                 value={waistIn}
-                onChange={(e) => setWaistIn(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setWaistIn}
                 className="w-full px-3 py-1.5 text-xs font-mono-numbers border border-slate-200 rounded-lg bg-slate-50"
               />
             </div>
@@ -257,11 +252,9 @@ export const BodyFatCalculator: React.FC<BodyFatCalculatorProps> = ({ onSaveCalc
             {gender === 'female' && (
               <div>
                 <label className="text-xs font-semibold text-slate-700 block mb-1">Hip Circumference ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
-                <input
-                  type="number"
-                  step="0.1"
+                <DecimalInput
                   value={hipIn}
-                  onChange={(e) => setHipIn(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setHipIn}
                   className="w-full px-3 py-1.5 text-xs font-mono-numbers border border-slate-200 rounded-lg bg-slate-50"
                 />
               </div>
@@ -300,8 +293,13 @@ export const BodyFatCalculator: React.FC<BodyFatCalculatorProps> = ({ onSaveCalc
               </div>
             </div>
           ) : (
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-slate-500 text-sm">
-              Please enter valid body measurements to estimate body fat percentage.
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-slate-600 text-sm space-y-1">
+              <p className="font-semibold text-slate-800">Invalid or incomplete measurements</p>
+              <p className="text-xs text-slate-500">
+                {gender === 'male'
+                  ? 'Waist circumference must be greater than neck circumference, with positive height and weight.'
+                  : 'Waist + hip circumference must exceed neck circumference, with positive height and weight.'}
+              </p>
             </div>
           )}
 

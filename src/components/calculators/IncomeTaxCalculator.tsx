@@ -1,15 +1,69 @@
 import React, { useState, useMemo } from 'react';
 import { Receipt, RotateCcw, Copy, Check } from 'lucide-react';
 import { copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface IncomeTaxCalculatorProps {
   currencySymbol?: string;
   onSave?: (summary: string, inputs: any, results: any) => void;
 }
 
+const calcProgressiveTax = (
+  taxableIncome: number,
+  brackets: Array<{ limit: number; rate: number }>
+): { tax: number; marginalRate: number } => {
+  if (taxableIncome <= 0) return { tax: 0, marginalRate: brackets[0].rate * 100 };
+  let tax = 0;
+  let prevLimit = 0;
+  let marginalRate = brackets[0].rate * 100;
+
+  for (const bracket of brackets) {
+    if (taxableIncome <= bracket.limit) {
+      tax += (taxableIncome - prevLimit) * bracket.rate;
+      marginalRate = bracket.rate * 100;
+      break;
+    }
+    tax += (bracket.limit - prevLimit) * bracket.rate;
+    prevLimit = bracket.limit;
+    marginalRate = bracket.rate * 100;
+  }
+
+  return { tax, marginalRate };
+};
+
+// 2025 IRS Federal Income Tax Brackets (Rev. Proc. 2024-40)
+const BRACKETS_2025 = {
+  single: [
+    { limit: 11925, rate: 0.10 },
+    { limit: 48475, rate: 0.12 },
+    { limit: 103350, rate: 0.22 },
+    { limit: 197300, rate: 0.24 },
+    { limit: 250525, rate: 0.32 },
+    { limit: 626350, rate: 0.35 },
+    { limit: Infinity, rate: 0.37 }
+  ],
+  married: [
+    { limit: 23850, rate: 0.10 },
+    { limit: 96950, rate: 0.12 },
+    { limit: 206700, rate: 0.22 },
+    { limit: 394600, rate: 0.24 },
+    { limit: 501050, rate: 0.32 },
+    { limit: 751600, rate: 0.35 },
+    { limit: Infinity, rate: 0.37 }
+  ],
+  head: [
+    { limit: 17000, rate: 0.10 },
+    { limit: 64850, rate: 0.12 },
+    { limit: 103350, rate: 0.22 },
+    { limit: 197300, rate: 0.24 },
+    { limit: 250500, rate: 0.32 },
+    { limit: 626350, rate: 0.35 },
+    { limit: Infinity, rate: 0.37 }
+  ]
+};
+
 export const IncomeTaxCalculator: React.FC<IncomeTaxCalculatorProps> = ({
-  currencySymbol = '$',
-  onSave
+  currencySymbol = '$'
 }) => {
   const [grossAnnualIncome, setGrossAnnualIncome] = useState<number | ''>(85000);
   const [filingStatus, setFilingStatus] = useState<'single' | 'married' | 'head'>('single');
@@ -20,70 +74,36 @@ export const IncomeTaxCalculator: React.FC<IncomeTaxCalculatorProps> = ({
 
   const isInputEmpty = grossAnnualIncome === '';
 
-  // 2026 Estimated Federal Tax Brackets (Standard brackets)
   const results = useMemo(() => {
     if (isInputEmpty) return null;
-    const numGross = typeof grossAnnualIncome === 'number' ? grossAnnualIncome : 0;
-    const numDeductions = typeof preTaxDeductions === 'number' ? preTaxDeductions : 0;
-    const numStateRate = typeof stateTaxRate === 'number' ? stateTaxRate : 0;
+    const numGross = typeof grossAnnualIncome === 'number' ? Math.max(0, grossAnnualIncome) : 0;
+    const numDeductions = typeof preTaxDeductions === 'number' ? Math.max(0, preTaxDeductions) : 0;
+    const numStateRate = typeof stateTaxRate === 'number' ? Math.max(0, stateTaxRate) : 0;
 
-    // 2026 estimated standard deduction
+    // 2025 IRS Standard Deductions
     let standardDeduction = 15000;
     if (filingStatus === 'married') standardDeduction = 30000;
     if (filingStatus === 'head') standardDeduction = 22500;
 
-    const adjustedGrossIncome = Math.max(0, numGross - numDeductions);
+    const effectivePreTaxDeductions = Math.min(numGross, numDeductions);
+    const adjustedGrossIncome = Math.max(0, numGross - effectivePreTaxDeductions);
     const taxableIncome = Math.max(0, adjustedGrossIncome - standardDeduction);
 
-    // Progressive Federal Tax Brackets calculation for Single
-    // 10% up to $11,925, 12% to $48,475, 22% to $103,350, 24% to $197,300, etc.
-    let federalTax = 0;
-    let marginalBracket = 10;
+    const { tax: federalTax, marginalRate: marginalBracket } = calcProgressiveTax(
+      taxableIncome,
+      BRACKETS_2025[filingStatus]
+    );
 
-    if (filingStatus === 'single') {
-      if (taxableIncome <= 11925) {
-        federalTax = taxableIncome * 0.10;
-        marginalBracket = 10;
-      } else if (taxableIncome <= 48475) {
-        federalTax = 1192.5 + (taxableIncome - 11925) * 0.12;
-        marginalBracket = 12;
-      } else if (taxableIncome <= 103350) {
-        federalTax = 5578.5 + (taxableIncome - 48475) * 0.22;
-        marginalBracket = 22;
-      } else if (taxableIncome <= 197300) {
-        federalTax = 17651 + (taxableIncome - 103350) * 0.24;
-        marginalBracket = 24;
-      } else {
-        federalTax = 40199 + (taxableIncome - 197300) * 0.32;
-        marginalBracket = 32;
-      }
-    } else {
-      // Married filing jointly brackets (approx 2x)
-      if (taxableIncome <= 23850) {
-        federalTax = taxableIncome * 0.10;
-        marginalBracket = 10;
-      } else if (taxableIncome <= 96950) {
-        federalTax = 2385 + (taxableIncome - 23850) * 0.12;
-        marginalBracket = 12;
-      } else if (taxableIncome <= 206700) {
-        federalTax = 11157 + (taxableIncome - 96950) * 0.22;
-        marginalBracket = 22;
-      } else {
-        federalTax = 35302 + (taxableIncome - 206700) * 0.24;
-        marginalBracket = 24;
-      }
-    }
-
-    // FICA (Social Security 6.2% up to $168k + Medicare 1.45%)
-    const socialSecurityTax = Math.min(numGross, 168600) * 0.062;
+    // 2025 FICA (Social Security 6.2% up to $176,100 wage base + Medicare 1.45%)
+    const socialSecurityTax = Math.min(numGross, 176100) * 0.062;
     const medicareTax = numGross * 0.0145;
     const ficaTax = socialSecurityTax + medicareTax;
 
-    // State Tax
+    // Estimated State Tax
     const estimatedStateTax = taxableIncome * (numStateRate / 100);
 
     const totalTaxLiability = federalTax + ficaTax + estimatedStateTax;
-    const netTakeHomePay = numGross - totalTaxLiability - numDeductions;
+    const netTakeHomePay = Math.max(0, numGross - totalTaxLiability - effectivePreTaxDeductions);
     const monthlyTakeHome = netTakeHomePay / 12;
     const biweeklyTakeHome = netTakeHomePay / 26;
 
@@ -91,6 +111,7 @@ export const IncomeTaxCalculator: React.FC<IncomeTaxCalculatorProps> = ({
 
     return {
       standardDeduction,
+      effectivePreTaxDeductions,
       taxableIncome: Math.round(taxableIncome),
       federalTax: Math.round(federalTax),
       ficaTax: Math.round(ficaTax),
@@ -110,6 +131,7 @@ export const IncomeTaxCalculator: React.FC<IncomeTaxCalculatorProps> = ({
 Gross Income: ${currencySymbol}${Number(grossAnnualIncome).toLocaleString()} | Filing: ${filingStatus.toUpperCase()}
 Total Taxes: ${currencySymbol}${results.totalTaxLiability.toLocaleString()} (${results.effectiveTaxRate}% Effective Rate)
 Federal: ${currencySymbol}${results.federalTax.toLocaleString()} | FICA: ${currencySymbol}${results.ficaTax.toLocaleString()} | State: ${currencySymbol}${results.stateTax.toLocaleString()}
+Pre-Tax Deductions: ${currencySymbol}${results.effectivePreTaxDeductions.toLocaleString()}
 Net Take-Home Pay: ${currencySymbol}${results.netTakeHomePay.toLocaleString()}/yr (${currencySymbol}${results.monthlyTakeHome.toLocaleString()}/mo)`;
     copyToClipboard(text);
     setCopied(true);
@@ -147,12 +169,9 @@ Net Take-Home Pay: ${currencySymbol}${results.netTakeHomePay.toLocaleString()}/y
             <label className="block text-xs font-bold text-slate-700 mb-1">Gross Annual Salary / Income</label>
             <div className="relative">
               <span className="absolute left-3 top-2.5 text-xs font-bold text-slate-400">{currencySymbol}</span>
-              <input
-                type="number"
-                min="0"
-                step="1000"
+              <DecimalInput
                 value={grossAnnualIncome}
-                onChange={(e) => setGrossAnnualIncome(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setGrossAnnualIncome}
                 className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-teal-500 focus:outline-none"
               />
             </div>
@@ -164,7 +183,7 @@ Net Take-Home Pay: ${currencySymbol}${results.netTakeHomePay.toLocaleString()}/y
               <button
                 type="button"
                 onClick={() => setFilingStatus('single')}
-                className={`py-2 rounded-xl text-xs font-bold border transition-all ${
+                className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                   filingStatus === 'single' ? 'bg-teal-600 text-white border-teal-600 shadow-2xs' : 'bg-slate-50 border-slate-200 text-slate-700'
                 }`}
               >
@@ -173,7 +192,7 @@ Net Take-Home Pay: ${currencySymbol}${results.netTakeHomePay.toLocaleString()}/y
               <button
                 type="button"
                 onClick={() => setFilingStatus('married')}
-                className={`py-2 rounded-xl text-xs font-bold border transition-all ${
+                className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                   filingStatus === 'married' ? 'bg-teal-600 text-white border-teal-600 shadow-2xs' : 'bg-slate-50 border-slate-200 text-slate-700'
                 }`}
               >
@@ -182,7 +201,7 @@ Net Take-Home Pay: ${currencySymbol}${results.netTakeHomePay.toLocaleString()}/y
               <button
                 type="button"
                 onClick={() => setFilingStatus('head')}
-                className={`py-2 rounded-xl text-xs font-bold border transition-all ${
+                className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                   filingStatus === 'head' ? 'bg-teal-600 text-white border-teal-600 shadow-2xs' : 'bg-slate-50 border-slate-200 text-slate-700'
                 }`}
               >
@@ -194,28 +213,22 @@ Net Take-Home Pay: ${currencySymbol}${results.netTakeHomePay.toLocaleString()}/y
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Pre-Tax Deductions (401k, HSA)</label>
-              <input
-                type="number"
-                min="0"
-                step="500"
+              <DecimalInput
                 value={preTaxDeductions}
-                onChange={(e) => setPreTaxDeductions(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setPreTaxDeductions}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Estimated State Tax Rate (%)</label>
-              <input
-                type="number"
-                min="0"
-                max="15"
-                step="0.5"
+              <DecimalInput
                 value={stateTaxRate}
-                onChange={(e) => setStateTaxRate(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setStateTaxRate}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
           </div>
+          <p className="text-[10px] text-slate-500">Uses 2025 IRS federal brackets, standard deduction, and $176,100 Social Security wage cap.</p>
         </div>
 
         {/* Results Card */}
@@ -249,7 +262,7 @@ Net Take-Home Pay: ${currencySymbol}${results.netTakeHomePay.toLocaleString()}/y
               {/* Tax Breakdown List */}
               <div className="bg-white p-3.5 rounded-xl border border-teal-100 space-y-2 text-xs text-slate-700">
                 <div className="flex justify-between">
-                  <span>Federal Income Tax:</span>
+                  <span>Federal Income Tax ({results.marginalBracket}% top bracket):</span>
                   <span className="font-bold text-slate-900">{currencySymbol}{results.federalTax.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
@@ -259,6 +272,10 @@ Net Take-Home Pay: ${currencySymbol}${results.netTakeHomePay.toLocaleString()}/y
                 <div className="flex justify-between">
                   <span>Estimated State Tax:</span>
                   <span className="font-bold text-slate-900">{currencySymbol}{results.stateTax.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Pre-Tax Deductions Withheld:</span>
+                  <span className="font-bold text-slate-900">{currencySymbol}{results.effectivePreTaxDeductions.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between pt-1 border-t border-slate-100 font-extrabold text-teal-950">
                   <span>Total Taxes Paid:</span>
@@ -278,7 +295,7 @@ Net Take-Home Pay: ${currencySymbol}${results.netTakeHomePay.toLocaleString()}/y
               type="button"
               disabled={!results}
               onClick={handleCopy}
-              className="w-full py-2 px-3 rounded-xl bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs"
+              className="w-full py-2 px-3 rounded-xl bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-orange-600" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied Tax Breakdown' : 'Copy Breakdown'}</span>

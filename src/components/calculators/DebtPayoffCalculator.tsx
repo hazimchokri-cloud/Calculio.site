@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 import { DollarSign, Zap, TrendingDown, Plus, Trash2, Copy, Check, Bookmark, Layers } from 'lucide-react';
 
 interface DebtItem {
@@ -122,6 +123,9 @@ export const DebtPayoffCalculator: React.FC<DebtPayoffCalculatorProps> = ({
         }
       }
 
+      const remainingBalance = currentDebts.reduce((sum, d) => sum + d.currentBal, 0);
+      const isUncappedPayoff = remainingBalance <= 0.01;
+
       return {
         totalBalance,
         totalMinPayments,
@@ -129,7 +133,9 @@ export const DebtPayoffCalculator: React.FC<DebtPayoffCalculatorProps> = ({
         monthsToPayoff: months,
         yearsToPayoff: (months / 12).toFixed(1),
         totalInterestPaid,
-        totalPaid: totalBalance + totalInterestPaid
+        totalPaid: totalBalance + totalInterestPaid - remainingBalance,
+        isUncappedPayoff,
+        remainingBalance
       };
     } catch {
       return null;
@@ -239,29 +245,25 @@ Total Repayment: ${formatCurrency(calculations.totalPaid, currencySymbol)}`;
                 <div className="grid grid-cols-3 gap-2">
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 block">Balance ({currencySymbol})</label>
-                    <input
-                      type="number"
+                    <DecimalInput
                       value={debt.balance}
-                      onChange={(e) => handleUpdateDebt(debt.id, 'balance', e.target.value === '' ? '' : Number(e.target.value))}
+                      onValueChange={(v) => handleUpdateDebt(debt.id, 'balance', v)}
                       className="w-full p-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                     />
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 block">Interest Rate (%)</label>
-                    <input
-                      type="number"
-                      step="0.1"
+                    <DecimalInput
                       value={debt.rate}
-                      onChange={(e) => handleUpdateDebt(debt.id, 'rate', e.target.value === '' ? '' : Number(e.target.value))}
+                      onValueChange={(v) => handleUpdateDebt(debt.id, 'rate', v)}
                       className="w-full p-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                     />
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 block">Min Payment ({currencySymbol})</label>
-                    <input
-                      type="number"
+                    <DecimalInput
                       value={debt.minPayment}
-                      onChange={(e) => handleUpdateDebt(debt.id, 'minPayment', e.target.value === '' ? '' : Number(e.target.value))}
+                      onValueChange={(v) => handleUpdateDebt(debt.id, 'minPayment', v)}
                       className="w-full p-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                     />
                   </div>
@@ -288,13 +290,9 @@ Total Repayment: ${formatCurrency(calculations.totalPaid, currencySymbol)}`;
               </span>
               <span className="text-orange-600 font-mono">+{formatCurrency(numExtraMonthly, currencySymbol)}/mo</span>
             </label>
-            <input
-              type="number"
-              min="0"
-              max="5000"
-              step="50"
+            <DecimalInput
               value={extraMonthly}
-              onChange={(e) => setExtraMonthly(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setExtraMonthly}
               className="w-full p-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
             />
           </div>
@@ -310,11 +308,19 @@ Total Repayment: ${formatCurrency(calculations.totalPaid, currencySymbol)}`;
                     Total Debt Freedom in
                   </span>
                   <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1">
-                    {calculations.monthsToPayoff} Months
-                    <span className="text-sm font-normal text-slate-300 ml-1">({calculations.yearsToPayoff} yrs)</span>
+                    {calculations.isUncappedPayoff ? (
+                      <>
+                        {calculations.monthsToPayoff} Months
+                        <span className="text-sm font-normal text-slate-300 ml-1">({calculations.yearsToPayoff} yrs)</span>
+                      </>
+                    ) : (
+                      <span className="text-2xl sm:text-3xl text-amber-300">&gt; 30 Years (Unpaid Balance)</span>
+                    )}
                   </div>
                   <div className="text-xs font-medium text-orange-300 mt-1">
-                    Total Monthly Budget: {formatCurrency(calculations.totalMonthlyBudget, currencySymbol)}/mo
+                    {calculations.isUncappedPayoff
+                      ? `Total Monthly Budget: ${formatCurrency(calculations.totalMonthlyBudget, currencySymbol)}/mo`
+                      : `Still owes ${formatCurrency(calculations.remainingBalance, currencySymbol)} after 360 months — increase monthly budget.`}
                   </div>
                 </div>
 

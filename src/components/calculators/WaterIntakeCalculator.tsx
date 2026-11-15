@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Droplet, Activity, Sun, Copy, Check, Bookmark } from 'lucide-react';
 import { copyToClipboard, formatNumber } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface WaterIntakeCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -127,15 +128,15 @@ Factors: ${numExerciseMinutes} min daily activity, ${climate} climate`;
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex justify-between">
               <span>Body Weight</span>
-              <span className="text-cyan-600 font-mono">{unitSystem === 'imperial' ? `${weightLbs} lbs` : `${weightKg} kg`}</span>
+              <span className="text-cyan-600 font-mono">
+                {unitSystem === 'imperial'
+                  ? weightLbs !== '' ? `${weightLbs} lbs` : '—'
+                  : weightKg !== '' ? `${weightKg} kg` : '—'}
+              </span>
             </label>
-            <input
-              type="number"
-              min="50"
-              max="400"
-              value={unitSystem === 'imperial' ? (weightLbs || '') : (weightKg || '')}
-              onChange={(e) => {
-                const val = Number(e.target.value);
+            <DecimalInput
+              value={unitSystem === 'imperial' ? weightLbs : weightKg}
+              onValueChange={(val) => {
                 if (unitSystem === 'imperial') setWeightLbs(val);
                 else setWeightKg(val);
               }}

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { formatCurrency, copyToClipboard } from '../../utils/formatters';
 import { Percent, Copy, Check, Bookmark, TrendingUp, AlertTriangle } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface InterestCalculatorProps {
   currencySymbol?: string;
@@ -32,8 +33,8 @@ export const InterestCalculator: React.FC<InterestCalculatorProps> = ({
       const t = Number(timeYears);
       const n = Number(compoundFreq) > 0 ? Number(compoundFreq) : 12;
 
-      // Validate inputs are valid finite positive numbers
-      if (isNaN(P) || isNaN(r) || isNaN(t) || isNaN(n) || P < 0 || t <= 0) {
+      // Validate inputs are valid finite numbers
+      if (isNaN(P) || isNaN(r) || isNaN(t) || isNaN(n) || P < 0 || r < 0 || t <= 0 || t > 120) {
         return null;
       }
 
@@ -157,14 +158,10 @@ Estimated Time to Double: ~${calculations.yearsToDouble > 0 ? `${calculations.ye
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-              <input
-                type="number"
-                min="100"
-                max="10000000"
-                step="500"
+              <DecimalInput
                 value={principal}
                 placeholder="e.g. 10000"
-                onChange={(e) => setPrincipal(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setPrincipal}
                 className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
@@ -174,7 +171,7 @@ Estimated Time to Double: ~${calculations.yearsToDouble > 0 ? `${calculations.ye
               max="250000"
               step="1000"
               value={typeof principal === 'number' ? principal : 1000}
-              onChange={(e) => setPrincipal(e.target.value === '' ? '' : Number(e.target.value))}
+              onChange={(e) => setPrincipal(Number(e.target.value))}
               className="w-full accent-blue-600 cursor-pointer"
             />
           </div>
@@ -186,25 +183,21 @@ Estimated Time to Double: ~${calculations.yearsToDouble > 0 ? `${calculations.ye
               <span className="text-blue-600 font-mono">{interestRate !== '' ? `${interestRate}%` : '—'}</span>
             </label>
             <div className="relative">
-              <input
-                type="number"
-                min="0.1"
-                max="30"
-                step="0.1"
+              <DecimalInput
                 value={interestRate}
                 placeholder="e.g. 7.0"
-                onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setInterestRate}
                 className="w-full pl-3 pr-8 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">%</span>
             </div>
             <input
               type="range"
-              min="0.5"
+              min="0"
               max="20"
               step="0.25"
-              value={typeof interestRate === 'number' ? interestRate : 1}
-              onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+              value={typeof interestRate === 'number' ? interestRate : 0}
+              onChange={(e) => setInterestRate(Number(e.target.value))}
               className="w-full accent-blue-600 cursor-pointer"
             />
           </div>

@@ -1,18 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { BarChart2, Check, Copy } from 'lucide-react';
 import { formatNumber, copyToClipboard } from '../../utils/formatters';
+import { parseNumberList } from '../../utils/numberInput';
 
 export const StatisticsCalculator: React.FC = () => {
   const [dataInput, setDataInput] = useState<string>('12, 18, 24, 30, 30, 42, 55, 68, 72, 90');
   const [copied, setCopied] = useState<boolean>(false);
 
   const stats = useMemo(() => {
-    // Parse numbers separated by commas, spaces, or newlines
-    const raw = dataInput
-      .split(/[\s,;\n]+/)
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !isNaN(Number(s)))
-      .map(Number);
+    const raw = parseNumberList(dataInput);
 
     if (raw.length === 0) return null;
 

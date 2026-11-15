@@ -129,10 +129,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           <path d="M17.472 14.382c-.301-.15-1.782-.879-2.058-.98-.276-.1-.477-.15-.678.15-.2.3-.777.98-.953 1.18-.175.2-.351.225-.652.075-.3-.15-1.267-.467-2.413-1.488-.893-.796-1.496-1.78-1.672-2.08-.176-.301-.019-.464.132-.614.136-.135.301-.351.452-.527.15-.175.2-.3.301-.5.1-.2.05-.376-.025-.526-.075-.15-.678-1.635-.93-2.241-.244-.59-.493-.51-.678-.52l-.578-.01c-.2 0-.526.075-.802.376-.276.3-1.054 1.03-1.054 2.51 0 1.48 1.08 2.91 1.23 3.11.15.2 2.126 3.246 5.15 4.553.72.31 1.282.495 1.72.634.723.23 1.381.197 1.901.12.579-.087 1.782-.728 2.033-1.43.25-.703.25-1.305.175-1.43-.075-.126-.276-.2-.577-.351zM12.05 2C6.52 2 2.037 6.48 2.037 12c0 1.97.575 3.81 1.573 5.37L2 22l4.807-1.558A9.94 9.94 0 0 0 12.05 22c5.53 0 10.013-4.48 10.013-10S17.58 2 12.05 2zm0 18.232c-1.634 0-3.146-.474-4.42-1.29l-.317-.202-3.284 1.063 1.085-3.2-.22-.35A8.188 8.188 0 0 1 3.86 12c0-4.516 3.673-8.19 8.19-8.19 4.516 0 8.19 3.674 8.19 8.19 0 4.516-3.674 8.232-8.19 8.232z"/>
         </svg>
       ),
-      action: () => {
-        const text = `${title} – ${defaultDesc}\n\nCheck it out here: ${resolvedUrl}`;
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
-      }
+      href: `https://api.whatsapp.com/send?text=${encodeURIComponent(`${title} – ${defaultDesc}\n\nCheck it out here: ${resolvedUrl}`)}`,
+      external: true
     },
     {
       id: 'facebook',
@@ -145,9 +143,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
         </svg>
       ),
-      action: () => {
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(resolvedUrl)}`, '_blank', 'width=620,height=580,noopener,noreferrer');
-      }
+      href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(resolvedUrl)}`,
+      external: true
     },
     {
       id: 'twitter',
@@ -160,10 +157,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
         </svg>
       ),
-      action: () => {
-        const text = `${title} on Calculio`;
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(resolvedUrl)}`, '_blank', 'width=620,height=480,noopener,noreferrer');
-      }
+      href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${title} on Calculio`)}&url=${encodeURIComponent(resolvedUrl)}`,
+      external: true
     },
     {
       id: 'linkedin',
@@ -176,9 +171,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
         </svg>
       ),
-      action: () => {
-        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(resolvedUrl)}`, '_blank', 'width=620,height=580,noopener,noreferrer');
-      }
+      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(resolvedUrl)}`,
+      external: true
     },
     {
       id: 'email',
@@ -187,11 +181,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({
       textColor: 'text-white',
       borderColor: 'border-[#EA4335]',
       icon: <Mail className="w-5 h-5 shrink-0" />,
-      action: () => {
-        const subject = `${title} | Calculio`;
-        const body = `Hi,\n\nI thought you might find this calculator on Calculio useful:\n\n${title}\n${defaultDesc}\n\nLink: ${resolvedUrl}\n\nCalculio – Free, transparent calculation tools.`;
-        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      }
+      href: `mailto:?subject=${encodeURIComponent(`${title} | Calculio`)}&body=${encodeURIComponent(`Hi,\n\nI thought you might find this calculator on Calculio useful:\n\n${title}\n${defaultDesc}\n\nLink: ${resolvedUrl}\n\nCalculio – Free, transparent calculation tools.`)}`,
+      external: false
     }
   ];
 
@@ -269,16 +260,17 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
               {shareChannels.map((channel) => (
-                <button
+                <a
                   key={channel.id}
-                  type="button"
-                  onClick={channel.action}
+                  href={channel.href}
+                  target={channel.external ? '_blank' : undefined}
+                  rel={channel.external ? 'noopener noreferrer' : undefined}
                   className={`min-h-[46px] flex items-center gap-2.5 p-3 rounded-2xl ${channel.bgColor} ${channel.textColor} font-bold text-xs sm:text-sm transition-all transform active:scale-95 shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F97316]`}
                   aria-label={`Share on ${channel.name}`}
                 >
                   {channel.icon}
                   <span className="truncate">{channel.name}</span>
-                </button>
+                </a>
               ))}
 
               {/* Native Device Share Button (if supported by device) */}

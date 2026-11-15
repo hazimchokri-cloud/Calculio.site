@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Fuel, DollarSign, Users, Check, Copy, RefreshCw, Bookmark, Sparkles, Navigation, Gauge } from 'lucide-react';
-import { formatCurrency, formatNumber, copyToClipboard } from '../../utils/formatters';
+import { Fuel, Check, Copy, RefreshCw, Bookmark, Sparkles } from 'lucide-react';
+import { formatCurrency, copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface GasMileageProps {
   currencySymbol?: string;
@@ -23,7 +24,7 @@ export const GasMileageCalculator: React.FC<GasMileageProps> = ({
   const numDistanceMiles = typeof distanceMiles === 'number' ? distanceMiles : 0;
   const numFuelEfficiencyMpg = typeof fuelEfficiencyMpg === 'number' ? fuelEfficiencyMpg : 0;
   const numGasPricePerGallon = typeof gasPricePerGallon === 'number' ? gasPricePerGallon : 0;
-  const numPassengersCount = typeof passengersCount === 'number' ? passengersCount : 1;
+  const numPassengersCount = typeof passengersCount === 'number' && passengersCount >= 1 ? Math.round(passengersCount) : 1;
 
   const isInputEmpty = distanceMiles === '' || fuelEfficiencyMpg === '' || gasPricePerGallon === '';
 
@@ -34,7 +35,7 @@ export const GasMileageCalculator: React.FC<GasMileageProps> = ({
     const gallonsUsed = numFuelEfficiencyMpg > 0 ? effectiveDistance / numFuelEfficiencyMpg : 0;
     const totalCost = gallonsUsed * numGasPricePerGallon;
     const costPerMile = effectiveDistance > 0 ? totalCost / effectiveDistance : 0;
-    const costPerPerson = numPassengersCount > 0 ? totalCost / numPassengersCount : totalCost;
+    const costPerPerson = totalCost / numPassengersCount;
 
     // Metric equivalent
     const distanceKm = effectiveDistance * 1.60934;
@@ -118,11 +119,9 @@ export const GasMileageCalculator: React.FC<GasMileageProps> = ({
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 block">Trip Distance (Miles)</label>
               <div className="relative">
-                <input
-                  type="number"
-                  min="1"
+                <DecimalInput
                   value={distanceMiles}
-                  onChange={(e) => setDistanceMiles(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={(val) => setDistanceMiles(val)}
                   className="w-full px-3 py-2 font-mono font-semibold text-sm border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">mi</span>
@@ -132,11 +131,9 @@ export const GasMileageCalculator: React.FC<GasMileageProps> = ({
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 block">Fuel Economy (MPG)</label>
               <div className="relative">
-                <input
-                  type="number"
-                  min="1"
+                <DecimalInput
                   value={fuelEfficiencyMpg}
-                  onChange={(e) => setFuelEfficiencyMpg(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={(val) => setFuelEfficiencyMpg(val)}
                   className="w-full px-3 py-2 font-mono font-semibold text-sm border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">MPG</span>
@@ -147,12 +144,9 @@ export const GasMileageCalculator: React.FC<GasMileageProps> = ({
               <label className="text-xs font-bold text-slate-700 block">Gas Price per Gallon</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-bold">{currencySymbol}</span>
-                <input
-                  type="number"
-                  step="0.05"
-                  min="0.1"
+                <DecimalInput
                   value={gasPricePerGallon}
-                  onChange={(e) => setGasPricePerGallon(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={(val) => setGasPricePerGallon(val)}
                   className="w-full pl-7 pr-3 py-2 font-mono font-semibold text-sm border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -161,12 +155,10 @@ export const GasMileageCalculator: React.FC<GasMileageProps> = ({
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 block">Number of Passengers (Split)</label>
               <div className="relative">
-                <input
-                  type="number"
-                  min="1"
-                  max="50"
+                <DecimalInput
+                  allowDecimal={false}
                   value={passengersCount}
-                  onChange={(e) => setPassengersCount(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={(val) => setPassengersCount(val)}
                   className="w-full px-3 py-2 font-mono font-semibold text-sm border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">people</span>
@@ -234,7 +226,7 @@ export const GasMileageCalculator: React.FC<GasMileageProps> = ({
 
                 <div className="border-t border-slate-700/80 pt-4 space-y-2.5 text-xs">
                   <div className="flex justify-between text-slate-300 items-center bg-white/10 p-2.5 rounded-xl">
-                    <span>Cost Per Person ({passengersCount} people):</span>
+                    <span>Cost Per Person ({numPassengersCount} {numPassengersCount === 1 ? 'person' : 'people'}):</span>
                     <strong className="text-orange-300 font-mono text-base">{formatCurrency(stats.costPerPerson, currencySymbol)}</strong>
                   </div>
                   <div className="flex justify-between text-slate-300">

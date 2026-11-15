@@ -40,8 +40,8 @@ const HEADING_2_LIST = [
   "Sources and Further Reading"
 ];
 
-const FALLBACK_BLOG_IMAGE = 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=1200&h=675&q=80';
-const FALLBACK_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80';
+const FALLBACK_BLOG_IMAGE = '/og-image.png';
+const FALLBACK_AVATAR = '/favicon.svg';
 
 interface BlogPostViewProps {
   post: BlogPost;
@@ -304,7 +304,7 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 max-w-7xl">
           
           {/* Main Article Content Column (8 cols) */}
-          <main className="lg:col-span-8 space-y-8">
+          <div className="lg:col-span-8 space-y-8">
             
             {/* Key Takeaways Card */}
             {localizedPost.keyTakeaways && localizedPost.keyTakeaways.length > 0 && (
@@ -586,7 +586,7 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
 
 
 
-          </main>
+          </div>
 
           {/* Sidebar Column (4 cols) */}
           <aside className="lg:col-span-4 space-y-6">

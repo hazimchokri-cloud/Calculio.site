@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Divide, Plus, Minus, X, ArrowRight, Check, Copy, RefreshCw, Bookmark, Sparkles, PieChart } from 'lucide-react';
 import { formatNumber, copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface FractionCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -49,6 +50,10 @@ export const FractionCalculator: React.FC<FractionCalculatorProps> = ({ onSaveCa
       const d1 = typeof den1 === 'number' ? den1 : 1;
       const n2 = typeof num2 === 'number' ? num2 : 0;
       const d2 = typeof den2 === 'number' ? den2 : 1;
+
+      if (!Number.isInteger(n1) || !Number.isInteger(d1) || !Number.isInteger(n2) || !Number.isInteger(d2)) {
+        return { error: 'Please enter whole integer values for fraction numerators and denominators', simpNum: 0, simpDen: 1, divisor: 1, decimal: 0, steps: '', mixedStr: '' };
+      }
 
       if (d1 === 0 || d2 === 0) {
         return { error: 'Denominator cannot be zero (division by zero)', simpNum: 0, simpDen: 1, divisor: 1, decimal: 0, steps: '', mixedStr: '' };
@@ -156,17 +161,19 @@ export const FractionCalculator: React.FC<FractionCalculatorProps> = ({ onSaveCa
             {/* Fraction 1 */}
             <div className="flex flex-col items-center gap-1.5 w-20">
               <label className="text-[10px] text-slate-500 font-bold uppercase">Fraction 1</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={num1}
-                onChange={(e) => setNum1(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setNum1}
+                allowNegative
+                allowDecimal={false}
                 className="w-full text-center px-2 py-2 font-mono font-bold text-lg border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <div className="w-full h-1 bg-slate-700 rounded-full" />
-              <input
-                type="number"
+              <DecimalInput
                 value={den1}
-                onChange={(e) => setDen1(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setDen1}
+                allowNegative
+                allowDecimal={false}
                 className="w-full text-center px-2 py-2 font-mono font-bold text-lg border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -193,17 +200,19 @@ export const FractionCalculator: React.FC<FractionCalculatorProps> = ({ onSaveCa
             {/* Fraction 2 */}
             <div className="flex flex-col items-center gap-1.5 w-20">
               <label className="text-[10px] text-slate-500 font-bold uppercase">Fraction 2</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={num2}
-                onChange={(e) => setNum2(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setNum2}
+                allowNegative
+                allowDecimal={false}
                 className="w-full text-center px-2 py-2 font-mono font-bold text-lg border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <div className="w-full h-1 bg-slate-700 rounded-full" />
-              <input
-                type="number"
+              <DecimalInput
                 value={den2}
-                onChange={(e) => setDen2(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setDen2}
+                allowNegative
+                allowDecimal={false}
                 className="w-full text-center px-2 py-2 font-mono font-bold text-lg border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

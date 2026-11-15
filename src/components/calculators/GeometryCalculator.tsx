@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { copyToClipboard, formatNumber } from '../../utils/formatters';
-import { Shapes, Copy, Check, Bookmark, Box } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
+import { Shapes, Copy, Check, Bookmark } from 'lucide-react';
 
 interface GeometryCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -91,7 +92,8 @@ export const GeometryCalculator: React.FC<GeometryCalculatorProps> = ({ onSaveCa
           primaryValue: isValid ? formatNumber(area, 4) : 'Invalid Triangle Sides',
           secondaryLabel: 'Perimeter',
           secondaryValue: formatNumber(perimeter, 4),
-          extra: isValid ? `Semi-perimeter s = ${formatNumber(s, 2)}` : 'Sides do not form a valid closed triangle'
+          extra: isValid ? `Semi-perimeter s = ${formatNumber(s, 2)}` : 'Sides must satisfy triangle inequality (a + b > c)',
+          isInvalidTriangle: !isValid
         };
       }
       case 'trapezoid': {
@@ -261,12 +263,9 @@ ${geometryResults.extra}`;
           {(shape === 'circle' || shape === 'sphere') && (
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700">Radius (r)</label>
-              <input
-                type="number"
-                min="0"
-                step="any"
+              <DecimalInput
                 value={radius}
-                onChange={(e) => setRadius(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                onValueChange={(val) => setRadius(val)}
                 className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
               />
             </div>
@@ -276,23 +275,17 @@ ${geometryResults.extra}`;
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Length (l)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="any"
+                <DecimalInput
                   value={length}
-                  onChange={(e) => setLength(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={(val) => setLength(val)}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Width (w)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="any"
+                <DecimalInput
                   value={width}
-                  onChange={(e) => setWidth(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={(val) => setWidth(val)}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -303,34 +296,25 @@ ${geometryResults.extra}`;
             <div className="grid grid-cols-3 gap-2">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Side a</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="any"
+                <DecimalInput
                   value={sideA}
-                  onChange={(e) => setSideA(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={(val) => setSideA(val)}
                   className="w-full p-2 text-sm font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Side b</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="any"
+                <DecimalInput
                   value={sideB}
-                  onChange={(e) => setSideB(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={(val) => setSideB(val)}
                   className="w-full p-2 text-sm font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Side c</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="any"
+                <DecimalInput
                   value={sideC}
-                  onChange={(e) => setSideC(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={(val) => setSideC(val)}
                   className="w-full p-2 text-sm font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -342,35 +326,26 @@ ${geometryResults.extra}`;
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700">Top Base (a)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="any"
+                  <DecimalInput
                     value={baseA}
-                    onChange={(e) => setBaseA(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                    onValueChange={(val) => setBaseA(val)}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700">Bottom Base (b)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="any"
+                  <DecimalInput
                     value={baseB}
-                    onChange={(e) => setBaseB(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                    onValueChange={(val) => setBaseB(val)}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Vertical Height (h)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="any"
+                <DecimalInput
                   value={height}
-                  onChange={(e) => setHeight(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={(val) => setHeight(val)}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -381,23 +356,17 @@ ${geometryResults.extra}`;
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Radius (r)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="any"
+                <DecimalInput
                   value={radius}
-                  onChange={(e) => setRadius(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={(val) => setRadius(val)}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Height (h)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="any"
+                <DecimalInput
                   value={height}
-                  onChange={(e) => setHeight(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  onValueChange={(val) => setHeight(val)}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -407,12 +376,9 @@ ${geometryResults.extra}`;
           {shape === 'cube' && (
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700">Side Edge Length (s)</label>
-              <input
-                type="number"
-                min="0"
-                step="any"
+              <DecimalInput
                 value={length}
-                onChange={(e) => setLength(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                onValueChange={(val) => setLength(val)}
                 className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
               />
             </div>
@@ -452,18 +418,20 @@ ${geometryResults.extra}`;
 
             <div className="flex items-center gap-2 pt-4 border-t border-teal-900/60">
               <button
-                disabled={!geometryResults}
+                type="button"
+                disabled={!geometryResults || Boolean(geometryResults.isInvalidTriangle)}
                 onClick={handleCopy}
-                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? 'Copied' : 'Copy Shape Results'}</span>
               </button>
               {onSaveCalculation && (
                 <button
-                  disabled={!geometryResults}
+                  type="button"
+                  disabled={!geometryResults || Boolean(geometryResults.isInvalidTriangle)}
                   onClick={handleSave}
-                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                 >
                   <Bookmark className="w-3.5 h-3.5" />
                   <span>{saved ? 'Saved' : 'Save'}</span>

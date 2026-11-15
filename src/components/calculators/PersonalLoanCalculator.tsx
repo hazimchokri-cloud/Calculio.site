@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, copyToClipboard, downloadCsv } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 import { 
   DollarSign, 
   Percent, 
@@ -71,17 +72,19 @@ export const PersonalLoanCalculator: React.FC<PersonalLoanCalculatorProps> = ({
     const totalInterest = Math.max(0, totalRepaid - P);
     const totalFinanceCost = totalInterest + originationFee;
 
-    // Approximate Effective APR taking origination fee into account
-    // Newton-Raphson approximation for APR
+    // Effective APR taking origination fee into account (Newton-Raphson)
     let effectiveApr = numInterestRate;
-    if (originationFee > 0 && netCashReceived > 0 && monthlyR > 0) {
-      let rGuess = monthlyR;
-      for (let i = 0; i < 20; i++) {
-        const f = (monthlyPayment * (1 - Math.pow(1 + rGuess, -n))) / rGuess - netCashReceived;
-        const fPrime = (monthlyPayment * (n * Math.pow(1 + rGuess, -n - 1) * rGuess - (1 - Math.pow(1 + rGuess, -n)))) / (rGuess * rGuess);
-        if (Math.abs(fPrime) < 1e-10) break;
+    if (originationFee > 0 && netCashReceived > 0 && monthlyPayment * n > netCashReceived) {
+      let rGuess = monthlyR > 0 ? monthlyR : Math.max(0.0005, (monthlyPayment * n - netCashReceived) / (netCashReceived * n * 0.5) / 12);
+      for (let i = 0; i < 40; i++) {
+        if (rGuess <= 1e-8) break;
+        const pow = Math.pow(1 + rGuess, -n);
+        const f = (monthlyPayment * (1 - pow)) / rGuess - netCashReceived;
+        const fPrime = (monthlyPayment * (n * Math.pow(1 + rGuess, -n - 1) * rGuess - (1 - pow))) / (rGuess * rGuess);
+        if (Math.abs(fPrime) < 1e-12) break;
         const rNext = rGuess - f / fPrime;
-        if (Math.abs(rNext - rGuess) < 1e-7) {
+        if (!Number.isFinite(rNext) || rNext <= 0) break;
+        if (Math.abs(rNext - rGuess) < 1e-8) {
           rGuess = rNext;
           break;
         }
@@ -190,13 +193,9 @@ Total Cost: ${formatCurrency(calculations.totalRepaid, currencySymbol)}`;
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-              <input
-                type="number"
-                min="1000"
-                max="100000"
-                step="500"
+              <DecimalInput
                 value={loanAmount}
-                onChange={(e) => setLoanAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setLoanAmount}
                 placeholder="15000"
                 className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
@@ -206,8 +205,8 @@ Total Cost: ${formatCurrency(calculations.totalRepaid, currencySymbol)}`;
               min="1000"
               max="50000"
               step="1000"
-              value={numLoanAmount || 15000}
-              onChange={(e) => setLoanAmount(e.target.value === '' ? '' : Number(e.target.value))}
+              value={loanAmount === '' ? 1000 : Math.min(50000, Math.max(1000, numLoanAmount))}
+              onChange={(e) => setLoanAmount(Number(e.target.value))}
               className="w-full accent-indigo-600 cursor-pointer"
             />
           </div>
@@ -219,13 +218,9 @@ Total Cost: ${formatCurrency(calculations.totalRepaid, currencySymbol)}`;
               <span className="text-indigo-600 font-mono">{interestRate}%</span>
             </label>
             <div className="relative">
-              <input
-                type="number"
-                min="1"
-                max="36"
-                step="0.1"
+              <DecimalInput
                 value={interestRate}
-                onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setInterestRate}
                 placeholder="11.5"
                 className="w-full pl-3 pr-8 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
@@ -264,13 +259,9 @@ Total Cost: ${formatCurrency(calculations.totalRepaid, currencySymbol)}`;
               <span className="text-slate-500 font-mono">{originationFeePct}% ({formatCurrency(calculations ? calculations.originationFee : 0, currencySymbol)})</span>
             </label>
             <div className="relative">
-              <input
-                type="number"
-                min="0"
-                max="10"
-                step="0.5"
+              <DecimalInput
                 value={originationFeePct}
-                onChange={(e) => setOriginationFeePct(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setOriginationFeePct}
                 placeholder="3.0"
                 className="w-full pl-3 pr-8 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
@@ -308,7 +299,7 @@ Total Cost: ${formatCurrency(calculations.totalRepaid, currencySymbol)}`;
                     <span className="text-base font-bold text-orange-300 font-mono">{formatCurrency(calculations.totalInterest, currencySymbol)}</span>
                   </div>
                   <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
-                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Total Repayment</span>
+                    <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Repayment</span>
                     <span className="text-base font-bold text-white font-mono">{formatCurrency(calculations.totalRepaid, currencySymbol)}</span>
                   </div>
                 </div>

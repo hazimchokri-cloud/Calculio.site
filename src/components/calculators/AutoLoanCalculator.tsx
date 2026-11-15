@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, downloadCsv, copyToClipboard } from '../../utils/formatters';
 import { Car, DollarSign, Calendar, Percent, ShieldCheck, Check, Copy } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface AutoLoanProps {
   currencySymbol?: string;
@@ -138,10 +139,9 @@ export const AutoLoanCalculator: React.FC<AutoLoanProps> = ({
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 text-sm font-semibold">{currencySymbol}</span>
-                <input
-                  type="number"
+                <DecimalInput
                   value={vehiclePrice}
-                  onChange={(e) => setVehiclePrice(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setVehiclePrice}
                   placeholder="35000"
                   className="w-36 pl-7 pr-3 py-1.5 text-right font-mono-numbers font-semibold text-sm border border-slate-200 rounded-lg bg-slate-50/50"
                 />
@@ -152,8 +152,8 @@ export const AutoLoanCalculator: React.FC<AutoLoanProps> = ({
               min="5000"
               max="150000"
               step="1000"
-              value={numVehiclePrice || 35000}
-              onChange={(e) => setVehiclePrice(e.target.value === '' ? '' : Number(e.target.value))}
+              value={numVehiclePrice || 5000}
+              onChange={(e) => setVehiclePrice(Number(e.target.value))}
               className="w-full accent-blue-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
             />
           </div>
@@ -164,10 +164,9 @@ export const AutoLoanCalculator: React.FC<AutoLoanProps> = ({
               <label className="text-xs font-semibold text-slate-700 mb-1 block">Cash Down Payment</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 text-xs font-semibold">{currencySymbol}</span>
-                <input
-                  type="number"
+                <DecimalInput
                   value={downPayment}
-                  onChange={(e) => setDownPayment(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setDownPayment}
                   placeholder="5000"
                   className="w-full pl-6 pr-2 py-1.5 text-xs font-mono-numbers border border-slate-200 rounded-lg bg-slate-50/50"
                 />
@@ -178,10 +177,9 @@ export const AutoLoanCalculator: React.FC<AutoLoanProps> = ({
               <label className="text-xs font-semibold text-slate-700 mb-1 block">Trade-in Allowance</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 text-xs font-semibold">{currencySymbol}</span>
-                <input
-                  type="number"
+                <DecimalInput
                   value={tradeInValue}
-                  onChange={(e) => setTradeInValue(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setTradeInValue}
                   placeholder="2000"
                   className="w-full pl-6 pr-2 py-1.5 text-xs font-mono-numbers border border-slate-200 rounded-lg bg-slate-50/50"
                 />
@@ -214,13 +212,9 @@ export const AutoLoanCalculator: React.FC<AutoLoanProps> = ({
             <div className="space-y-1.5">
               <label className="text-sm font-semibold text-slate-700 block">Interest Rate (APR)</label>
               <div className="relative">
-                <input
-                  type="number"
-                  min="0"
-                  max="25"
-                  step="0.1"
+                <DecimalInput
                   value={interestRate}
-                  onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setInterestRate}
                   placeholder="5.9"
                   className="w-full pl-3 pr-7 py-2 font-mono-numbers text-sm font-semibold border border-slate-200 rounded-lg bg-slate-50/50"
                 />
@@ -233,10 +227,9 @@ export const AutoLoanCalculator: React.FC<AutoLoanProps> = ({
           <div className="pt-2 border-t border-slate-100 grid grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-semibold text-slate-700 mb-1 block">Sales Tax Rate (%)</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={salesTaxPercent}
-                onChange={(e) => setSalesTaxPercent(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setSalesTaxPercent}
                 placeholder="6.5"
                 className="w-full px-3 py-1.5 text-xs font-mono-numbers border border-slate-200 rounded-lg bg-slate-50/50"
               />
@@ -245,10 +238,9 @@ export const AutoLoanCalculator: React.FC<AutoLoanProps> = ({
               <label className="text-xs font-semibold text-slate-700 mb-1 block">Title, Reg & Dealer Fees</label>
               <div className="relative">
                 <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-700 text-xs font-semibold">{currencySymbol}</span>
-                <input
-                  type="number"
+                <DecimalInput
                   value={titleAndFees}
-                  onChange={(e) => setTitleAndFees(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setTitleAndFees}
                   placeholder="850"
                   className="w-full pl-6 pr-2 py-1.5 text-xs font-mono-numbers border border-slate-200 rounded-lg bg-slate-50/50"
                 />

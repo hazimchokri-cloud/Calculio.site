@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Coins, DollarSign, TrendingUp, TrendingDown, RotateCcw, Copy, Check, Info } from 'lucide-react';
+import { Coins, TrendingUp, TrendingDown, Copy, Check } from 'lucide-react';
 import { copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface CryptoProfitCalculatorProps {
   currencySymbol?: string;
@@ -8,8 +9,7 @@ interface CryptoProfitCalculatorProps {
 }
 
 export const CryptoProfitCalculator: React.FC<CryptoProfitCalculatorProps> = ({
-  currencySymbol = '$',
-  onSave
+  currencySymbol = '$'
 }) => {
   const [investmentAmount, setInvestmentAmount] = useState<number | ''>(1000);
   const [buyPrice, setBuyPrice] = useState<number | ''>(60000); // e.g. BTC at $60k
@@ -29,18 +29,29 @@ export const CryptoProfitCalculator: React.FC<CryptoProfitCalculatorProps> = ({
 
   const results = useMemo(() => {
     try {
-      if (isInputEmpty || numBuyPrice <= 0 || numInvestmentAmount <= 0) return null;
+      if (
+        isInputEmpty ||
+        numBuyPrice <= 0 ||
+        numInvestmentAmount <= 0 ||
+        numSellPrice < 0 ||
+        numBuyFeePercent < 0 ||
+        numBuyFeePercent >= 100 ||
+        numSellFeePercent < 0 ||
+        numSellFeePercent > 100
+      ) {
+        return null;
+      }
 
       const buyFee = numInvestmentAmount * (numBuyFeePercent / 100);
       const netInvestment = Math.max(0, numInvestmentAmount - buyFee);
-      const coinsAcquired = numBuyPrice > 0 ? netInvestment / numBuyPrice : 0;
+      const coinsAcquired = netInvestment / numBuyPrice;
 
       const grossExitValue = coinsAcquired * numSellPrice;
       const sellFee = grossExitValue * (numSellFeePercent / 100);
       const totalPayout = Math.max(0, grossExitValue - sellFee);
 
       const netProfit = totalPayout - numInvestmentAmount;
-      const returnOnInvestment = numInvestmentAmount > 0 ? (netProfit / numInvestmentAmount) * 100 : 0;
+      const returnOnInvestment = (netProfit / numInvestmentAmount) * 100;
       const totalFees = buyFee + sellFee;
 
       return {
@@ -85,8 +96,9 @@ Total Exit Value: ${currencySymbol}${results.totalPayout.toLocaleString()}`;
               <span>Trade Parameters & Prices</span>
             </h4>
             <button
+              type="button"
               onClick={handleReset}
-              className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+              className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer"
             >
               Reset
             </button>
@@ -96,12 +108,9 @@ Total Exit Value: ${currencySymbol}${results.totalPayout.toLocaleString()}`;
             <label className="block text-xs font-bold text-slate-700 mb-1">Total Investment Amount</label>
             <div className="relative">
               <span className="absolute left-3 top-2.5 text-xs font-bold text-slate-400">{currencySymbol}</span>
-              <input
-                type="number"
-                min="1"
-                step="50"
+              <DecimalInput
                 value={investmentAmount}
-                onChange={(e) => setInvestmentAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setInvestmentAmount}
                 className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
@@ -112,12 +121,9 @@ Total Exit Value: ${currencySymbol}${results.totalPayout.toLocaleString()}`;
               <label className="block text-xs font-bold text-slate-700 mb-1">Buy Price per Coin</label>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-xs font-bold text-slate-400">{currencySymbol}</span>
-                <input
-                  type="number"
-                  min="0.000001"
-                  step="any"
+                <DecimalInput
                   value={buyPrice}
-                  onChange={(e) => setBuyPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setBuyPrice}
                   className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
                 />
               </div>
@@ -126,12 +132,9 @@ Total Exit Value: ${currencySymbol}${results.totalPayout.toLocaleString()}`;
               <label className="block text-xs font-bold text-slate-700 mb-1">Sell / Target Price</label>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-xs font-bold text-slate-400">{currencySymbol}</span>
-                <input
-                  type="number"
-                  min="0.000001"
-                  step="any"
+                <DecimalInput
                   value={sellPrice}
-                  onChange={(e) => setSellPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setSellPrice}
                   className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold text-orange-950"
                 />
               </div>
@@ -141,25 +144,17 @@ Total Exit Value: ${currencySymbol}${results.totalPayout.toLocaleString()}`;
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Buy Fee (%)</label>
-              <input
-                type="number"
-                min="0"
-                max="10"
-                step="0.1"
+              <DecimalInput
                 value={buyFeePercent}
-                onChange={(e) => setBuyFeePercent(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setBuyFeePercent}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Sell Fee (%)</label>
-              <input
-                type="number"
-                min="0"
-                max="10"
-                step="0.1"
+              <DecimalInput
                 value={sellFeePercent}
-                onChange={(e) => setSellFeePercent(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setSellFeePercent}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
               />
             </div>
@@ -205,7 +200,7 @@ Total Exit Value: ${currencySymbol}${results.totalPayout.toLocaleString()}`;
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="w-full py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs"
+                  className="w-full py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-orange-600" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copied PnL' : 'Copy Trade Summary'}</span>
@@ -215,7 +210,7 @@ Total Exit Value: ${currencySymbol}${results.totalPayout.toLocaleString()}`;
           ) : (
             <div className="py-12 text-center space-y-2">
               <p className="text-orange-950 font-bold text-sm">Please enter valid trade parameters.</p>
-              <p className="text-slate-500 text-xs">Enter your investment amount, buy price, and target sell price to calculate profit and ROI.</p>
+              <p className="text-slate-500 text-xs">Enter a positive investment amount, positive buy price, target sell price, and fee rates under 100%.</p>
             </div>
           )}
         </div>

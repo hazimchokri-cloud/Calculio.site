@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Building, DollarSign, Receipt, Percent, RotateCcw, Copy, Check, TrendingUp } from 'lucide-react';
-import { copyToClipboard, formatCurrency } from '../../utils/formatters';
+import { RotateCcw } from 'lucide-react';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface BaseCalcProps {
   currencySymbol?: string;
@@ -17,33 +17,49 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
   const [homeAppreciation, setHomeAppreciation] = useState<number | ''>(3.5);
   const [rentIncrease, setRentIncrease] = useState<number | ''>(3.0);
 
+  const handleReset = () => {
+    setHomePrice(400000);
+    setMonthlyRent(2100);
+    setStayYears(7);
+    setDownPaymentPct(20);
+    setInterestRate(6.5);
+    setHomeAppreciation(3.5);
+    setRentIncrease(3.0);
+  };
+
   const results = useMemo(() => {
     if (
       homePrice === '' ||
       monthlyRent === '' ||
       interestRate === '' ||
-      downPaymentPct === ''
+      downPaymentPct === '' ||
+      homeAppreciation === '' ||
+      rentIncrease === ''
     ) {
       return null;
     }
 
     const hp = homePrice;
     const mr = monthlyRent;
-    const sy = typeof stayYears === 'number' ? stayYears : 7;
+    const sy = stayYears;
     const dpPct = downPaymentPct;
     const ir = interestRate;
-    const ha = typeof homeAppreciation === 'number' ? homeAppreciation : 0;
-    const ri = typeof rentIncrease === 'number' ? rentIncrease : 0;
+    const ha = homeAppreciation;
+    const ri = rentIncrease;
+
+    if (hp <= 0 || mr < 0 || dpPct < 0 || dpPct > 100 || ir < 0 || ri < -100 || ha < -100) {
+      return { error: 'Enter a positive home price, 0–100% down payment, and valid rates.' } as const;
+    }
 
     const downPayment = hp * (dpPct / 100);
     const loanPrincipal = hp - downPayment;
     const r = (ir / 100) / 12;
     const n = 30 * 12;
-    const monthlyMortgage = r > 0 && loanPrincipal > 0 
+    const monthlyMortgage = r > 0 && loanPrincipal > 0
       ? (loanPrincipal * (r * Math.pow(1 + r, n))) / (Math.pow(1 + r, n) - 1)
       : (loanPrincipal > 0 ? loanPrincipal / n : 0);
-    
-    // Property tax & insurance (~1.5% of home price / yr)
+
+    // Property tax & insurance (~1.5% of home price / yr) + maintenance (~1% / yr)
     const monthlyTaxAndIns = (hp * 0.015) / 12;
     const monthlyMaintenance = (hp * 0.01) / 12;
     const totalMonthlyBuyCost = monthlyMortgage + monthlyTaxAndIns + monthlyMaintenance;
@@ -55,9 +71,16 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
       currentRent *= (1 + ri / 100);
     }
 
+    const p = Math.min(n, sy * 12);
+    const remainingBalance = loanPrincipal <= 0
+      ? 0
+      : r > 0
+        ? loanPrincipal * ((Math.pow(1 + r, n) - Math.pow(1 + r, p)) / (Math.pow(1 + r, n) - 1))
+        : loanPrincipal * Math.max(0, 1 - p / n);
+
     const futureHomeVal = hp * Math.pow(1 + ha / 100, sy);
     const cumulativeBuyCost = (totalMonthlyBuyCost * 12 * sy) + downPayment;
-    const estimatedHomeEquity = futureHomeVal - (loanPrincipal * 0.85); // approx principal paid off
+    const estimatedHomeEquity = futureHomeVal - remainingBalance;
     const netCostBuying = cumulativeBuyCost - estimatedHomeEquity;
 
     const cheaperOption = netCostBuying < cumulativeRent ? 'Buying' : 'Renting';
@@ -68,6 +91,8 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
       totalMonthlyBuyCost,
       cumulativeRent,
       futureHomeVal,
+      remainingBalance,
+      estimatedHomeEquity,
       netCostBuying,
       cheaperOption,
       difference
@@ -78,23 +103,31 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Housing Scenario</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Housing Scenario</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Target Home Price ({currencySymbol})</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={homePrice}
-                onChange={(e) => setHomePrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setHomePrice}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Comparable Rent ({currencySymbol}/mo)</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={monthlyRent}
-                onChange={(e) => setMonthlyRent(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setMonthlyRent}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -106,7 +139,7 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
               <select
                 value={stayYears}
                 onChange={(e) => setStayYears(Number(e.target.value))}
-                className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
+                className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold bg-white"
               >
                 <option value={3}>3 Years</option>
                 <option value={5}>5 Years</option>
@@ -117,34 +150,55 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
             </div>
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-1">Mortgage Rate %</label>
-              <input
-                type="number"
-                step="0.1"
+              <DecimalInput
                 value={interestRate}
-                onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setInterestRate}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-1">Down Pmt %</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={downPaymentPct}
-                onChange={(e) => setDownPaymentPct(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setDownPaymentPct}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-semibold text-slate-600 mb-1">Home Apprec. (%/yr)</label>
+              <DecimalInput
+                value={homeAppreciation}
+                onValueChange={setHomeAppreciation}
+                allowNegative
+                className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-semibold text-slate-600 mb-1">Rent Growth (%/yr)</label>
+              <DecimalInput
+                value={rentIncrease}
+                onValueChange={setRentIncrease}
+                allowNegative
+                className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
+              />
+            </div>
+          </div>
+          <p className="text-[11px] text-slate-500">
+            Includes estimated 1.5%/yr property tax &amp; insurance plus 1.0%/yr maintenance on a 30-year fixed loan.
+          </p>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">{stayYears}-Year Financial Verdict</span>
               <div className="text-2xl font-black text-blue-950 mt-1">
                 {results.cheaperOption} is cheaper by {currencySymbol}{results.difference.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </div>
-              <p className="text-xs text-slate-600 mt-1">Total estimated net cost over {stayYears} years factoring equity.</p>
+              <p className="text-xs text-slate-600 mt-1">Total estimated net cost over {stayYears} years factoring amortized home equity.</p>
             </div>
 
             <div className="bg-white p-3 rounded-lg border border-blue-100 text-xs text-slate-700 space-y-1.5">
@@ -154,7 +208,13 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
               </div>
               <div className="flex justify-between">
                 <span>Net Cost of Buying ({stayYears} yrs):</span>
-                <span className="font-bold">{currencySymbol}{results.netCostBuying.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                <span className="font-bold">
+                  {results.netCostBuying < 0 ? '-' : ''}{currencySymbol}{Math.abs(results.netCostBuying).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Remaining Loan Balance at Year {stayYears}:</span>
+                <span className="font-semibold">{currencySymbol}{results.remainingBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
               </div>
               <div className="flex justify-between border-t pt-1">
                 <span>Projected Home Value in {stayYears} yrs:</span>
@@ -164,7 +224,9 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter home price, rent, and mortgage details to compare renting vs buying.
+            {results && 'error' in results
+              ? results.error
+              : 'Enter home price, rent, and mortgage details to compare renting vs buying.'}
           </div>
         )}
       </div>
@@ -176,10 +238,19 @@ export const RentVsBuyCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
 export const RefinanceCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
   const [currentBalance, setCurrentBalance] = useState<number | ''>(300000);
   const [currentRate, setCurrentRate] = useState<number | ''>(7.0);
-  const [currentTermRemaining, setCurrentTermRemaining] = useState<number | ''>(27); // years
+  const [currentTermRemaining, setCurrentTermRemaining] = useState<number | ''>(27);
   const [newRate, setNewRate] = useState<number | ''>(5.5);
   const [newTerm, setNewTerm] = useState<number | ''>(30);
   const [closingCosts, setClosingCosts] = useState<number | ''>(6000);
+
+  const handleReset = () => {
+    setCurrentBalance(300000);
+    setCurrentRate(7.0);
+    setCurrentTermRemaining(27);
+    setNewRate(5.5);
+    setNewTerm(30);
+    setClosingCosts(6000);
+  };
 
   const results = useMemo(() => {
     if (
@@ -200,17 +271,21 @@ export const RefinanceCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
     const nt = newTerm;
     const cc = closingCosts;
 
+    if (cb <= 0 || ctr <= 0 || nt <= 0 || cr < 0 || nr < 0 || cc < 0) {
+      return { error: 'Enter a positive loan balance, term lengths above 0 years, and non-negative rates/costs.' } as const;
+    }
+
     const rCurrent = (cr / 100) / 12;
     const nCurrent = ctr * 12;
-    const currentMonthly = (rCurrent > 0 && nCurrent > 0)
+    const currentMonthly = rCurrent > 0
       ? (cb * (rCurrent * Math.pow(1 + rCurrent, nCurrent))) / (Math.pow(1 + rCurrent, nCurrent) - 1)
-      : (nCurrent > 0 ? cb / nCurrent : 0);
+      : cb / nCurrent;
 
     const rNew = (nr / 100) / 12;
     const nNew = nt * 12;
-    const newMonthly = (rNew > 0 && nNew > 0)
+    const newMonthly = rNew > 0
       ? (cb * (rNew * Math.pow(1 + rNew, nNew))) / (Math.pow(1 + rNew, nNew) - 1)
-      : (nNew > 0 ? cb / nNew : 0);
+      : cb / nNew;
 
     const monthlySavings = currentMonthly - newMonthly;
     const breakevenMonths = monthlySavings > 0 ? Math.ceil(cc / monthlySavings) : Infinity;
@@ -227,60 +302,85 @@ export const RefinanceCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Mortgage Details</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Mortgage Details</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Current Balance ({currencySymbol})</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={currentBalance}
-                onChange={(e) => setCurrentBalance(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setCurrentBalance}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Closing Costs ({currencySymbol})</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={closingCosts}
-                onChange={(e) => setClosingCosts(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setClosingCosts}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-2.5 bg-slate-50 rounded-lg border space-y-1.5">
-              <span className="text-[11px] font-bold text-slate-700">Current Loan Rate (%)</span>
-              <input
-                type="number"
-                step="0.1"
-                value={currentRate}
-                onChange={(e) => setCurrentRate(e.target.value === '' ? '' : Number(e.target.value))}
-                placeholder="Rate %"
-                className="w-full p-1 border rounded text-xs font-bold bg-white"
-              />
+            <div className="p-2.5 bg-slate-50 rounded-lg border space-y-2">
+              <span className="text-[11px] font-bold text-slate-700 block">Current Loan</span>
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-0.5">Rate (%)</label>
+                <DecimalInput
+                  value={currentRate}
+                  onValueChange={setCurrentRate}
+                  className="w-full p-1 border rounded text-xs font-bold bg-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-0.5">Remaining Term (Yrs)</label>
+                <DecimalInput
+                  value={currentTermRemaining}
+                  onValueChange={setCurrentTermRemaining}
+                  className="w-full p-1 border rounded text-xs font-bold bg-white"
+                />
+              </div>
             </div>
-            <div className="p-2.5 bg-orange-50 rounded-lg border border-orange-200 space-y-1.5">
-              <span className="text-[11px] font-bold text-orange-800">New Refinance Loan Rate (%)</span>
-              <input
-                type="number"
-                step="0.1"
-                value={newRate}
-                onChange={(e) => setNewRate(e.target.value === '' ? '' : Number(e.target.value))}
-                placeholder="Rate %"
-                className="w-full p-1 border rounded text-xs font-bold bg-white"
-              />
+
+            <div className="p-2.5 bg-orange-50 rounded-lg border border-orange-200 space-y-2">
+              <span className="text-[11px] font-bold text-orange-800 block">New Refinance Loan</span>
+              <div>
+                <label className="block text-[10px] text-orange-800 mb-0.5">Rate (%)</label>
+                <DecimalInput
+                  value={newRate}
+                  onValueChange={setNewRate}
+                  className="w-full p-1 border rounded text-xs font-bold bg-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] text-orange-800 mb-0.5">New Term (Yrs)</label>
+                <DecimalInput
+                  value={newTerm}
+                  onValueChange={setNewTerm}
+                  className="w-full p-1 border rounded text-xs font-bold bg-white"
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-orange-50 to-teal-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-orange-900 uppercase tracking-wider">Monthly Payment Savings</span>
               <div className="text-3xl font-black text-orange-950 font-mono-numbers mt-1">
-                {currencySymbol}{results.monthlySavings.toFixed(2)}
+                {results.monthlySavings < 0 ? '-' : ''}{currencySymbol}{Math.abs(results.monthlySavings).toFixed(2)}
                 <span className="text-xs font-normal text-orange-700"> / month</span>
               </div>
             </div>
@@ -289,22 +389,24 @@ export const RefinanceCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
               <div className="flex justify-between">
                 <span>Closing Cost Breakeven Time:</span>
                 <span className="font-bold text-orange-800">
-                  {results.breakevenMonths === Infinity ? 'No savings' : `${results.breakevenMonths} months (${(results.breakevenMonths / 12).toFixed(1)} yrs)`}
+                  {results.breakevenMonths === Infinity ? 'No monthly savings' : `${results.breakevenMonths} months (${(results.breakevenMonths / 12).toFixed(1)} yrs)`}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>Old Monthly P&I:</span>
+                <span>Old Monthly P&amp;I:</span>
                 <span>{currencySymbol}{results.currentMonthly.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>New Monthly P&I:</span>
+                <span>New Monthly P&amp;I:</span>
                 <span>{currencySymbol}{results.newMonthly.toFixed(2)}</span>
               </div>
             </div>
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter loan balance, rates, and closing costs to calculate refinance savings.
+            {results && 'error' in results
+              ? results.error
+              : 'Enter loan balance, rates, terms, and closing costs to calculate refinance savings.'}
           </div>
         )}
       </div>
@@ -314,10 +416,17 @@ export const RefinanceCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = 
 
 // 3. Cash-on-Cash Return Calculator
 export const CashOnCashCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [annualCashFlow, setAnnualCashFlow] = useState<number | ''>(8400); // $700/mo net
+  const [annualCashFlow, setAnnualCashFlow] = useState<number | ''>(8400);
   const [downPayment, setDownPayment] = useState<number | ''>(60000);
   const [closingCosts, setClosingCosts] = useState<number | ''>(5000);
   const [rehabRepairs, setRehabRepairs] = useState<number | ''>(15000);
+
+  const handleReset = () => {
+    setAnnualCashFlow(8400);
+    setDownPayment(60000);
+    setClosingCosts(5000);
+    setRehabRepairs(15000);
+  };
 
   const results = useMemo(() => {
     if (annualCashFlow === '' || downPayment === '') return null;
@@ -327,7 +436,10 @@ export const CashOnCashCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
     const rr = typeof rehabRepairs === 'number' ? rehabRepairs : 0;
 
     const totalCashInvested = dp + cc + rr;
-    const cocReturn = totalCashInvested > 0 ? (acf / totalCashInvested) * 100 : 0;
+    if (totalCashInvested <= 0) {
+      return { error: 'Total out-of-pocket cash invested must be greater than zero.' } as const;
+    }
+    const cocReturn = (acf / totalCashInvested) * 100;
 
     return { acf, totalCashInvested, cocReturn };
   }, [annualCashFlow, downPayment, closingCosts, rehabRepairs]);
@@ -336,48 +448,55 @@ export const CashOnCashCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Cash Invested & Pre-Tax Income</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Cash Invested &amp; Pre-Tax Income</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
+
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Annual Pre-Tax Net Cash Flow ({currencySymbol})</label>
-            <input
-              type="number"
+            <DecimalInput
               value={annualCashFlow}
-              onChange={(e) => setAnnualCashFlow(e.target.value === '' ? '' : Number(e.target.value))}
+              onValueChange={setAnnualCashFlow}
+              allowNegative
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
           <div className="grid grid-cols-3 gap-2">
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-1">Down Payment</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={downPayment}
-                onChange={(e) => setDownPayment(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setDownPayment}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-1">Closing Costs</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={closingCosts}
-                onChange={(e) => setClosingCosts(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setClosingCosts}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-1">Rehab / Repairs</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={rehabRepairs}
-                onChange={(e) => setRehabRepairs(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setRehabRepairs}
                 className="w-full px-2 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">Cash-on-Cash (CoC) Return</span>
@@ -393,13 +512,17 @@ export const CashOnCashCalculator: React.FC<BaseCalcProps> = ({ currencySymbol =
               </div>
               <div className="flex justify-between">
                 <span>Monthly Cash Flow:</span>
-                <span className="font-bold text-orange-700">{currencySymbol}{(results.acf / 12).toFixed(2)} / mo</span>
+                <span className={`font-bold ${results.acf < 0 ? 'text-red-700' : 'text-orange-700'}`}>
+                  {results.acf < 0 ? '-' : ''}{currencySymbol}{Math.abs(results.acf / 12).toFixed(2)} / mo
+                </span>
               </div>
             </div>
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter annual cash flow and down payment to calculate cash-on-cash return.
+            {results && 'error' in results
+              ? results.error
+              : 'Enter annual cash flow and down payment to calculate cash-on-cash return.'}
           </div>
         )}
       </div>
@@ -412,11 +535,17 @@ export const GrmCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
   const [propertyPrice, setPropertyPrice] = useState<number | ''>(350000);
   const [annualGrossRent, setAnnualGrossRent] = useState<number | ''>(36000);
 
+  const handleReset = () => {
+    setPropertyPrice(350000);
+    setAnnualGrossRent(36000);
+  };
+
   const results = useMemo(() => {
-    if (propertyPrice === '' || annualGrossRent === '' || annualGrossRent <= 0) return null;
-    const pp = propertyPrice;
-    const agr = annualGrossRent;
-    const grm = pp / agr;
+    if (propertyPrice === '' || annualGrossRent === '') return null;
+    if (propertyPrice <= 0 || annualGrossRent <= 0) {
+      return { error: 'Both property purchase price and gross annual rent must be greater than zero.' } as const;
+    }
+    const grm = propertyPrice / annualGrossRent;
     return { grm };
   }, [propertyPrice, annualGrossRent]);
 
@@ -424,40 +553,49 @@ export const GrmCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Property & Rent Price</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Property &amp; Rent Price</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Property Purchase Price ({currencySymbol})</label>
-            <input
-              type="number"
+            <DecimalInput
               value={propertyPrice}
-              onChange={(e) => setPropertyPrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setPropertyPrice}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Gross Annual Rental Income ({currencySymbol})</label>
-            <input
-              type="number"
+            <DecimalInput
               value={annualGrossRent}
-              onChange={(e) => setAnnualGrossRent(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setAnnualGrossRent}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Gross Rent Multiplier (GRM)</span>
               <div className="text-3xl font-black text-slate-900 font-mono-numbers mt-1">
                 {results.grm.toFixed(2)}
               </div>
-              <p className="text-xs text-slate-500 mt-1">A GRM between 6 and 9 is generally considered attractive in most rental markets.</p>
+              <p className="text-xs text-slate-500 mt-1">Lower GRM indicates gross rent recovers the purchase price faster; compare against local market comps.</p>
             </div>
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter purchase price and gross annual rent to calculate GRM.
+            {results && 'error' in results
+              ? results.error
+              : 'Enter purchase price and gross annual rent to calculate GRM.'}
           </div>
         )}
       </div>
@@ -472,6 +610,13 @@ export const CapitalGainsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
   const [holdingPeriodMonths, setHoldingPeriodMonths] = useState<number | ''>(18);
   const [taxableIncome, setTaxableIncome] = useState<number | ''>(90000);
 
+  const handleReset = () => {
+    setPurchasePrice(10000);
+    setSellingPrice(25000);
+    setHoldingPeriodMonths(18);
+    setTaxableIncome(90000);
+  };
+
   const results = useMemo(() => {
     if (purchasePrice === '' || sellingPrice === '' || taxableIncome === '') return null;
     const pp = purchasePrice;
@@ -479,21 +624,29 @@ export const CapitalGainsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
     const hpm = typeof holdingPeriodMonths === 'number' ? holdingPeriodMonths : 0;
     const ti = taxableIncome;
 
+    if (pp < 0 || sp < 0 || hpm < 0 || ti < 0) {
+      return { error: 'Enter non-negative prices, holding months, and taxable income.' } as const;
+    }
+
     const gain = sp - pp;
     const isLongTerm = hpm >= 12;
 
-    // Approx US federal capital gains brackets
+    // Estimated US Single-filer Federal brackets
     let taxRate = 0;
-    if (isLongTerm) {
+    if (gain <= 0) {
+      taxRate = 0;
+    } else if (isLongTerm) {
       if (ti > 518900) taxRate = 20;
       else if (ti > 47025) taxRate = 15;
       else taxRate = 0;
     } else {
-      // Short term -> standard income tax bracket approximation
-      if (ti > 231250) taxRate = 35;
+      if (ti > 609350) taxRate = 37;
+      else if (ti > 243725) taxRate = 35;
+      else if (ti > 191950) taxRate = 32;
       else if (ti > 100525) taxRate = 24;
       else if (ti > 47150) taxRate = 22;
-      else taxRate = 12;
+      else if (ti > 11600) taxRate = 12;
+      else taxRate = 10;
     }
 
     const estimatedTax = gain > 0 ? (gain * taxRate) / 100 : 0;
@@ -506,23 +659,31 @@ export const CapitalGainsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Asset Purchase & Sale</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Asset Purchase &amp; Sale</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Cost Basis / Purchase ({currencySymbol})</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={purchasePrice}
-                onChange={(e) => setPurchasePrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setPurchasePrice}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Selling Price ({currencySymbol})</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={sellingPrice}
-                onChange={(e) => setSellingPrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setSellingPrice}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
@@ -531,54 +692,59 @@ export const CapitalGainsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Holding Period (Months)</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={holdingPeriodMonths}
-                onChange={(e) => setHoldingPeriodMonths(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setHoldingPeriodMonths}
+                allowDecimal={false}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Taxable Income ({currencySymbol})</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={taxableIncome}
-                onChange={(e) => setTaxableIncome(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onValueChange={setTaxableIncome}
                 className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-bold"
               />
             </div>
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-5 rounded-xl border border-amber-200 flex flex-col justify-between space-y-4">
             <div>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center gap-2">
                 <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">Estimated Tax Owed</span>
-                <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${results.isLongTerm ? 'bg-orange-100 text-orange-800' : 'bg-amber-100 text-amber-900'}`}>
-                  {results.isLongTerm ? 'Long-Term Gain (≥ 1 Year)' : 'Short-Term Ordinary Rate'}
+                <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${results.gain < 0 ? 'bg-red-100 text-red-800' : results.isLongTerm ? 'bg-orange-100 text-orange-800' : 'bg-amber-100 text-amber-900'}`}>
+                  {results.gain < 0 ? 'Capital Loss' : results.isLongTerm ? 'Long-Term Gain (≥ 12 mo)' : 'Short-Term Ordinary Rate'}
                 </span>
               </div>
               <div className="text-3xl font-black text-amber-950 font-mono-numbers mt-2">
-                {currencySymbol}{results.estimatedTax.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                {currencySymbol}{results.estimatedTax.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
-              <span className="text-xs text-amber-800 font-semibold">Effective Rate: {results.taxRate}%</span>
+              <span className="text-xs text-amber-800 font-semibold">
+                {results.gain <= 0 ? 'No capital gains tax on a loss or $0 gain' : `Bracket Rate: ${results.taxRate}%`}
+              </span>
             </div>
 
             <div className="bg-white p-3 rounded-lg border border-amber-100 text-xs text-slate-700 space-y-1">
               <div className="flex justify-between">
-                <span>Gross Capital Gain:</span>
-                <span className="font-bold text-orange-700">{currencySymbol}{results.gain.toLocaleString()}</span>
+                <span>{results.gain < 0 ? 'Realized Capital Loss:' : 'Gross Capital Gain:'}</span>
+                <span className={`font-bold ${results.gain < 0 ? 'text-red-700' : 'text-orange-700'}`}>
+                  {results.gain < 0 ? '-' : ''}{currencySymbol}{Math.abs(results.gain).toLocaleString()}
+                </span>
               </div>
               <div className="flex justify-between border-t pt-1">
                 <span>Net After-Tax Proceeds:</span>
-                <span className="font-bold text-slate-900">{currencySymbol}{results.netProceeds.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <span className="font-bold text-slate-900">{currencySymbol}{results.netProceeds.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter purchase price, selling price, and taxable income to calculate capital gains tax.
+            {results && 'error' in results
+              ? results.error
+              : 'Enter purchase price, selling price, and taxable income to calculate capital gains tax.'}
           </div>
         )}
       </div>
@@ -588,12 +754,18 @@ export const CapitalGainsCalculator: React.FC<BaseCalcProps> = ({ currencySymbol
 
 // 6. Tip & Bill Splitter Calculator
 export const TipCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
-  const [billAmount, setBillAmount] = useState<number | ''>(84.50);
+  const [billAmount, setBillAmount] = useState<number | ''>(84.5);
   const [tipPercent, setTipPercent] = useState<number>(18);
   const [splitCount, setSplitCount] = useState<number>(2);
 
+  const handleReset = () => {
+    setBillAmount(84.5);
+    setTipPercent(18);
+    setSplitCount(2);
+  };
+
   const results = useMemo(() => {
-    if (billAmount === '') return null;
+    if (billAmount === '' || billAmount < 0) return null;
     const ba = billAmount;
     const tipAmount = (ba * tipPercent) / 100;
     const totalWithTip = ba + tipAmount;
@@ -607,14 +779,21 @@ export const TipCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-4">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Bill & Tip Setup</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">Bill &amp; Tip Setup</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">Check / Bill Total ({currencySymbol})</label>
-            <input
-              type="number"
-              step="0.01"
+            <DecimalInput
               value={billAmount}
-              onChange={(e) => setBillAmount(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setBillAmount}
               className="w-full px-3 py-2 border rounded-lg text-sm font-bold"
             />
           </div>
@@ -638,7 +817,7 @@ export const TipCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Split Between ({splitCount} People)</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Split Between ({splitCount} {splitCount === 1 ? 'Person' : 'People'})</label>
             <input
               type="range"
               min="1"
@@ -684,15 +863,24 @@ export const TipCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
 // 7. VAT & Reverse VAT Calculator
 export const VatCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' }) => {
   const [amount, setAmount] = useState<number | ''>(120);
-  const [vatRate, setVatRate] = useState<number | ''>(20); // 20% standard UK/EU
+  const [vatRate, setVatRate] = useState<number | ''>(20);
   const [mode, setMode] = useState<'add' | 'remove'>('add');
+
+  const handleReset = () => {
+    setAmount(120);
+    setVatRate(20);
+    setMode('add');
+  };
 
   const results = useMemo(() => {
     if (amount === '' || vatRate === '') return null;
     const a = amount;
     const vr = vatRate;
 
-    if (a <= 0 || vr < 0) return { net: 0, vat: 0, gross: 0 };
+    if (a <= 0 || vr < 0) {
+      return { error: 'Enter a positive amount and a non-negative VAT percentage.' } as const;
+    }
+
     if (mode === 'add') {
       const net = a;
       const vat = (net * vr) / 100;
@@ -710,7 +898,17 @@ export const VatCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
         <div className="space-y-3.5">
-          <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">VAT Computation Mode</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-slate-700 tracking-wider">VAT Computation Mode</h4>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </button>
+          </div>
+
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
@@ -732,27 +930,24 @@ export const VatCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
             <label className="block text-xs font-semibold text-slate-600 mb-1">
               {mode === 'add' ? 'Net Amount (Excl. VAT)' : 'Gross Amount (Incl. VAT)'} ({currencySymbol})
             </label>
-            <input
-              type="number"
+            <DecimalInput
               value={amount}
-              onChange={(e) => setAmount(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setAmount}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">VAT Rate (%)</label>
-            <input
-              type="number"
-              step="0.5"
+            <DecimalInput
               value={vatRate}
-              onChange={(e) => setVatRate(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+              onValueChange={setVatRate}
               className="w-full px-3 py-1.5 border rounded-lg text-xs font-bold"
             />
           </div>
         </div>
 
-        {results ? (
+        {results && !('error' in results) ? (
           <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-xl border border-indigo-200 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">
@@ -780,7 +975,9 @@ export const VatCalculator: React.FC<BaseCalcProps> = ({ currencySymbol = '$' })
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 text-xs flex items-center justify-center">
-            Enter price amount and VAT rate to calculate tax.
+            {results && 'error' in results
+              ? results.error
+              : 'Enter price amount and VAT rate to calculate tax.'}
           </div>
         )}
       </div>

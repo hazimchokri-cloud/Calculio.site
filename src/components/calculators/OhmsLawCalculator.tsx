@@ -1,81 +1,82 @@
 import React, { useState, useMemo } from 'react';
-import { Cpu, Zap, Activity, RotateCcw, Copy, Check, Info } from 'lucide-react';
+import { Cpu, RotateCcw, Copy, Check } from 'lucide-react';
 import { copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface OhmsLawCalculatorProps {
   onSave?: (summary: string, inputs: any, results: any) => void;
 }
 
-export const OhmsLawCalculator: React.FC<OhmsLawCalculatorProps> = ({
-  onSave
-}) => {
+export const OhmsLawCalculator: React.FC<OhmsLawCalculatorProps> = () => {
   // Two known parameters will calculate the other two
-  const [voltage, setVoltage] = useState<string>('12'); // Volts (V)
-  const [current, setCurrent] = useState<string>('2'); // Amperes (I / A)
-  const [resistance, setResistance] = useState<string>(''); // Ohms (R / Ω)
-  const [power, setPower] = useState<string>(''); // Watts (P / W)
+  const [voltage, setVoltage] = useState<number | ''>(12); // Volts (V)
+  const [current, setCurrent] = useState<number | ''>(2); // Amperes (I / A)
+  const [resistance, setResistance] = useState<number | ''>(''); // Ohms (R / Ω)
+  const [power, setPower] = useState<number | ''>(''); // Watts (P / W)
 
   const [copied, setCopied] = useState(false);
 
-  const results = useMemo(() => {
-    const v = voltage.trim() === '' ? null : parseFloat(voltage);
-    const i = current.trim() === '' ? null : parseFloat(current);
-    const r = resistance.trim() === '' ? null : parseFloat(resistance);
-    const p = power.trim() === '' ? null : parseFloat(power);
+  const analysis = useMemo(() => {
+    const entries = [
+      { key: 'V', val: voltage },
+      { key: 'I', val: current },
+      { key: 'R', val: resistance },
+      { key: 'P', val: power }
+    ].filter((item): item is { key: string; val: number } => typeof item.val === 'number');
 
-    const validV = v !== null && !isNaN(v) && v > 0;
-    const validI = i !== null && !isNaN(i) && i > 0;
-    const validR = r !== null && !isNaN(r) && r > 0;
-    const validP = p !== null && !isNaN(p) && p > 0;
-
-    const count = [validV, validI, validR, validP].filter(Boolean).length;
-    if (count < 2) {
-      return null;
+    const hasNonPositive = entries.some((item) => item.val <= 0);
+    if (hasNonPositive) {
+      return { results: null, error: 'Entered electrical values must be greater than zero.' };
     }
 
-    let calcV = validV ? v : null;
-    let calcI = validI ? i : null;
-    let calcR = validR ? r : null;
-    let calcP = validP ? p : null;
+    if (entries.length > 2) {
+      return {
+        results: null,
+        error: `You entered ${entries.length} values. Clear inputs so exactly 2 known values remain.`
+      };
+    }
 
-    // Case 1: V and I known
-    if (calcV !== null && calcI !== null && calcI !== 0) {
+    if (entries.length < 2) {
+      return { results: null, error: null };
+    }
+
+    let calcV = typeof voltage === 'number' ? voltage : null;
+    let calcI = typeof current === 'number' ? current : null;
+    let calcR = typeof resistance === 'number' ? resistance : null;
+    let calcP = typeof power === 'number' ? power : null;
+
+    if (calcV !== null && calcI !== null) {
       calcR = calcV / calcI;
       calcP = calcV * calcI;
-    }
-    // Case 2: V and R known
-    else if (calcV !== null && calcR !== null && calcR !== 0) {
+    } else if (calcV !== null && calcR !== null) {
       calcI = calcV / calcR;
       calcP = Math.pow(calcV, 2) / calcR;
-    }
-    // Case 3: V and P known
-    else if (calcV !== null && calcP !== null && calcV !== 0) {
+    } else if (calcV !== null && calcP !== null) {
       calcI = calcP / calcV;
       calcR = Math.pow(calcV, 2) / calcP;
-    }
-    // Case 4: I and R known
-    else if (calcI !== null && calcR !== null) {
+    } else if (calcI !== null && calcR !== null) {
       calcV = calcI * calcR;
       calcP = Math.pow(calcI, 2) * calcR;
-    }
-    // Case 5: I and P known
-    else if (calcI !== null && calcP !== null && calcI !== 0) {
+    } else if (calcI !== null && calcP !== null) {
       calcV = calcP / calcI;
       calcR = calcP / Math.pow(calcI, 2);
-    }
-    // Case 6: R and P known
-    else if (calcR !== null && calcP !== null && calcR !== 0) {
+    } else if (calcR !== null && calcP !== null) {
       calcV = Math.sqrt(calcP * calcR);
       calcI = Math.sqrt(calcP / calcR);
     }
 
     return {
-      voltage: calcV !== null ? Math.round(calcV * 1000) / 1000 : 0,
-      current: calcI !== null ? Math.round(calcI * 1000) / 1000 : 0,
-      resistance: calcR !== null ? Math.round(calcR * 1000) / 1000 : 0,
-      power: calcP !== null ? Math.round(calcP * 1000) / 1000 : 0
+      error: null,
+      results: {
+        voltage: calcV !== null ? Math.round(calcV * 1000) / 1000 : 0,
+        current: calcI !== null ? Math.round(calcI * 1000) / 1000 : 0,
+        resistance: calcR !== null ? Math.round(calcR * 1000) / 1000 : 0,
+        power: calcP !== null ? Math.round(calcP * 1000) / 1000 : 0
+      }
     };
   }, [voltage, current, resistance, power]);
+
+  const results = analysis.results;
 
   const handleCopy = () => {
     if (!results) return;
@@ -90,8 +91,8 @@ Power (P): ${results.power} W`;
   };
 
   const handleReset = () => {
-    setVoltage('12');
-    setCurrent('2');
+    setVoltage(12);
+    setCurrent(2);
     setResistance('');
     setPower('');
   };
@@ -105,12 +106,12 @@ Power (P): ${results.power} W`;
               <Cpu className="w-4 h-4 text-violet-600" />
               <span>Ohm's Law & Electrical Power Engine</span>
             </h4>
-            <p className="text-[11px] text-slate-500 mt-0.5">Enter any 2 values to calculate the remaining 2 variables.</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">Enter any 2 positive values (leave the other 2 blank) to calculate the remaining variables.</p>
           </div>
           <button
             type="button"
             onClick={handleReset}
-            className="text-xs font-bold text-violet-700 hover:text-violet-900 flex items-center gap-1 self-start"
+            className="text-xs font-bold text-violet-700 hover:text-violet-900 flex items-center gap-1 self-start cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset Inputs</span>
@@ -124,12 +125,10 @@ Power (P): ${results.power} W`;
               <label className="text-xs font-black text-slate-900">Voltage (V)</label>
               <span className="text-[10px] font-bold text-violet-600 bg-violet-100 px-1.5 py-0.5 rounded">Volts (V)</span>
             </div>
-            <input
-              type="number"
-              step="any"
+            <DecimalInput
               placeholder="e.g. 12"
               value={voltage}
-              onChange={(e) => setVoltage(e.target.value)}
+              onValueChange={setVoltage}
               className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-bold focus:ring-2 focus:ring-violet-500"
             />
             <span className="text-[10px] text-slate-500 block">Formula: V = I × R</span>
@@ -140,12 +139,10 @@ Power (P): ${results.power} W`;
               <label className="text-xs font-black text-slate-900">Current (I)</label>
               <span className="text-[10px] font-bold text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded">Amps (A)</span>
             </div>
-            <input
-              type="number"
-              step="any"
+            <DecimalInput
               placeholder="e.g. 2"
               value={current}
-              onChange={(e) => setCurrent(e.target.value)}
+              onValueChange={setCurrent}
               className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-bold focus:ring-2 focus:ring-violet-500"
             />
             <span className="text-[10px] text-slate-500 block">Formula: I = V / R</span>
@@ -156,12 +153,10 @@ Power (P): ${results.power} W`;
               <label className="text-xs font-black text-slate-900">Resistance (R)</label>
               <span className="text-[10px] font-bold text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded">Ohms (Ω)</span>
             </div>
-            <input
-              type="number"
-              step="any"
+            <DecimalInput
               placeholder="e.g. 6"
               value={resistance}
-              onChange={(e) => setResistance(e.target.value)}
+              onValueChange={setResistance}
               className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-bold focus:ring-2 focus:ring-violet-500"
             />
             <span className="text-[10px] text-slate-500 block">Formula: R = V / I</span>
@@ -172,12 +167,10 @@ Power (P): ${results.power} W`;
               <label className="text-xs font-black text-slate-900">Power (P)</label>
               <span className="text-[10px] font-bold text-rose-600 bg-rose-100 px-1.5 py-0.5 rounded">Watts (W)</span>
             </div>
-            <input
-              type="number"
-              step="any"
+            <DecimalInput
               placeholder="e.g. 24"
               value={power}
-              onChange={(e) => setPower(e.target.value)}
+              onValueChange={setPower}
               className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-bold focus:ring-2 focus:ring-violet-500"
             />
             <span className="text-[10px] text-slate-500 block">Formula: P = V × I</span>
@@ -209,15 +202,19 @@ Power (P): ${results.power} W`;
             <button
               type="button"
               onClick={handleCopy}
-              className="w-full md:w-auto px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-all shrink-0"
+              className="w-full md:w-auto px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-all shrink-0 cursor-pointer"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-orange-400" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied' : 'Copy All'}</span>
             </button>
           </div>
         ) : (
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center text-slate-500 text-xs">
-            Enter any two valid electrical values above to calculate the remaining parameters.
+          <div className={`p-4 rounded-xl border text-center text-xs ${
+            analysis.error
+              ? 'bg-rose-50 border-rose-200 text-rose-700 font-semibold'
+              : 'bg-slate-50 border-slate-200 text-slate-500'
+          }`}>
+            {analysis.error || 'Enter any two valid electrical values above to calculate the remaining parameters.'}
           </div>
         )}
       </div>

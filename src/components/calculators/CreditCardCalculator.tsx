@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, copyToClipboard } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 import { CreditCard, AlertTriangle, TrendingDown, DollarSign, Copy, Check, Bookmark } from 'lucide-react';
 
 interface CreditCardCalculatorProps {
@@ -68,6 +69,7 @@ export const CreditCardCalculator: React.FC<CreditCardCalculatorProps> = ({
       let customMonths = 0;
       let customTotalInterest = 0;
       let customTotalPaid = 0;
+      let neverPaidOff = false;
 
       while (customBal > 0.01 && customMonths < 600) {
         customMonths++;
@@ -75,8 +77,7 @@ export const CreditCardCalculator: React.FC<CreditCardCalculatorProps> = ({
         const payment = Math.min(customBal + interest, Math.max(customMonthly, 1));
         const principal = payment - interest;
         if (principal <= 0) {
-          // Payment doesn't even cover interest!
-          customMonths = 999;
+          neverPaidOff = true;
           break;
         }
         customBal = Math.max(0, customBal - principal);
@@ -84,8 +85,12 @@ export const CreditCardCalculator: React.FC<CreditCardCalculatorProps> = ({
         customTotalPaid += payment;
       }
 
-      const interestSaved = Math.max(0, minTotalInterest - customTotalInterest);
-      const monthsSaved = Math.max(0, minMonths - customMonths);
+      if (customMonths >= 600 && customBal > 0.01) {
+        neverPaidOff = true;
+      }
+
+      const interestSaved = neverPaidOff ? 0 : Math.max(0, minTotalInterest - customTotalInterest);
+      const monthsSaved = neverPaidOff ? 0 : Math.max(0, minMonths - customMonths);
 
       return {
         minMonths,
@@ -96,7 +101,8 @@ export const CreditCardCalculator: React.FC<CreditCardCalculatorProps> = ({
         customTotalInterest,
         customTotalPaid,
         interestSaved,
-        monthsSaved
+        monthsSaved,
+        neverPaidOff
       };
     } catch {
       return null;
@@ -170,13 +176,9 @@ Savings by following plan: ${formatCurrency(calculations.interestSaved, currency
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-              <input
-                type="number"
-                min="100"
-                max="500000"
-                step="250"
+              <DecimalInput
                 value={balance}
-                onChange={(e) => setBalance(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setBalance}
                 className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none"
               />
             </div>
@@ -185,8 +187,8 @@ Savings by following plan: ${formatCurrency(calculations.interestSaved, currency
               min="500"
               max="30000"
               step="500"
-              value={balance}
-              onChange={(e) => setBalance(e.target.value === '' ? '' : Number(e.target.value))}
+              value={balance === '' ? 500 : Math.min(30000, Math.max(500, numBalance))}
+              onChange={(e) => setBalance(Number(e.target.value))}
               className="w-full accent-rose-600 cursor-pointer"
             />
           </div>
@@ -198,13 +200,9 @@ Savings by following plan: ${formatCurrency(calculations.interestSaved, currency
               <span className="text-rose-600 font-mono">{interestRate}%</span>
             </label>
             <div className="relative">
-              <input
-                type="number"
-                min="1"
-                max="45"
-                step="0.25"
+              <DecimalInput
                 value={interestRate}
-                onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setInterestRate}
                 className="w-full pl-3 pr-8 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">%</span>
@@ -247,13 +245,9 @@ Savings by following plan: ${formatCurrency(calculations.interestSaved, currency
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{currencySymbol}</span>
-                  <input
-                    type="number"
-                    min="25"
-                    max="10000"
-                    step="25"
+                  <DecimalInput
                     value={fixedMonthlyPayment}
-                    onChange={(e) => setFixedMonthlyPayment(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={setFixedMonthlyPayment}
                     className="w-full pl-8 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none"
                   />
                 </div>
@@ -294,8 +288,12 @@ Savings by following plan: ${formatCurrency(calculations.interestSaved, currency
                   Target Debt-Free Timeline
                 </span>
                 <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1">
-                  {calculations ? `${calculations.customMonths} Months` : '—'}
-                  {calculations && (
+                  {calculations
+                    ? (calculations.neverPaidOff
+                        ? 'Payment Too Low'
+                        : `${calculations.customMonths} Months`)
+                    : '—'}
+                  {calculations && !calculations.neverPaidOff && (
                     <span className="text-sm font-normal text-slate-300 ml-1">
                       ({(calculations.customMonths / 12).toFixed(1)} years)
                     </span>
@@ -303,7 +301,9 @@ Savings by following plan: ${formatCurrency(calculations.interestSaved, currency
                 </div>
                 {calculations && (
                   <div className="text-xs font-medium text-orange-300 mt-1">
-                    Monthly Payment: {formatCurrency(calculations.customMonthly, currencySymbol)}/mo
+                    {calculations.neverPaidOff
+                      ? 'Monthly payment does not exceed monthly interest accrued. Increase monthly payment.'
+                      : `Monthly Payment: ${formatCurrency(calculations.customMonthly, currencySymbol)}/mo`}
                   </div>
                 )}
               </div>
@@ -312,13 +312,13 @@ Savings by following plan: ${formatCurrency(calculations.interestSaved, currency
                 <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
                   <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Interest Paid</span>
                   <span className="text-base font-bold text-amber-300 font-mono">
-                    {calculations ? formatCurrency(calculations.customTotalInterest, currencySymbol) : '—'}
+                    {calculations ? (calculations.neverPaidOff ? 'Unbounded' : formatCurrency(calculations.customTotalInterest, currencySymbol)) : '—'}
                   </span>
                 </div>
                 <div className="bg-white/10 rounded-xl p-3 backdrop-blur-xs">
                   <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Overall Cost</span>
                   <span className="text-base font-bold text-white font-mono">
-                    {calculations ? formatCurrency(calculations.customTotalPaid, currencySymbol) : '—'}
+                    {calculations ? (calculations.neverPaidOff ? 'Unbounded' : formatCurrency(calculations.customTotalPaid, currencySymbol)) : '—'}
                   </span>
                 </div>
               </div>
@@ -328,14 +328,16 @@ Savings by following plan: ${formatCurrency(calculations.interestSaved, currency
                 <div className="bg-rose-500/20 border border-rose-400/30 rounded-xl p-3 text-xs space-y-1">
                   <div className="flex items-center gap-1.5 font-bold text-rose-300">
                     <AlertTriangle className="w-4 h-4" />
-                    <span>The Minimum Payment Trap</span>
+                    <span>Minimum Payment Comparison ({minPaymentPercent}% + Interest)</span>
                   </div>
                   <p className="text-slate-200">
                     Paying only the minimum takes <strong>{calculations.minMonths} months</strong> and costs <strong>{formatCurrency(calculations.minTotalInterest, currencySymbol)}</strong> in interest alone!
                   </p>
-                  <p className="text-orange-300 font-bold">
-                    Your strategy saves {formatCurrency(calculations.interestSaved, currencySymbol)} and {calculations.monthsSaved} months!
-                  </p>
+                  {!calculations.neverPaidOff && (
+                    <p className="text-orange-300 font-bold">
+                      Your strategy saves {formatCurrency(calculations.interestSaved, currencySymbol)} and {calculations.monthsSaved} months!
+                    </p>
+                  )}
                 </div>
               )}
 

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { copyToClipboard, formatNumber } from '../../utils/formatters';
+import { DecimalInput } from '../shared/DecimalInput';
 import { Dices, Copy, Check, Bookmark, Sparkles } from 'lucide-react';
 
 interface ProbabilityCalculatorProps {
@@ -32,23 +33,13 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
   const numNVal = typeof nVal === 'number' ? nVal : 0;
   const numRVal = typeof rVal === 'number' ? rVal : 0;
 
-  // Factorial helper
-  const factorial = (n: number): number => {
-    if (n < 0) return NaN;
-    if (n === 0 || n === 1) return 1;
-    let res = 1;
-    for (let i = 2; i <= n; i++) {
-      res *= i;
-    }
-    return res;
-  };
-
   // Permutations nPr
   const nPr = (n: number, r: number): number => {
     if (n < 0 || r < 0 || r > n) return 0;
     let res = 1;
     for (let i = n; i > n - r; i--) {
       res *= i;
+      if (!Number.isFinite(res)) return Infinity;
     }
     return res;
   };
@@ -61,6 +52,7 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
     let res = 1;
     for (let i = 1; i <= r; i++) {
       res = (res * (n - i + 1)) / i;
+      if (!Number.isFinite(res)) return Infinity;
     }
     return Math.round(res);
   };
@@ -68,10 +60,12 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
   // Single event results
   const singleResults = useMemo(() => {
     if (favorableOutcomes === '' || totalOutcomes === '') return null;
-    const fav = Math.max(0, numFavorableOutcomes);
-    const tot = Math.max(1, numTotalOutcomes);
-
-    if (fav > tot) return null;
+    if (numFavorableOutcomes < 0 || numTotalOutcomes <= 0 || numFavorableOutcomes > numTotalOutcomes) {
+      return null;
+    }
+    const fav = Math.round(numFavorableOutcomes);
+    const tot = Math.round(numTotalOutcomes);
+    if (fav > tot || tot <= 0) return null;
 
     const prob = fav / tot;
     const percentage = `${(prob * 100).toFixed(2)}%`;
@@ -93,8 +87,17 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
   // Two events results
   const twoEventsResults = useMemo(() => {
     if (probA === '' || probB === '') return null;
-    const pa = Math.min(1, Math.max(0, numProbA));
-    const pb = Math.min(1, Math.max(0, numProbB));
+    if (numProbA < 0 || numProbA > 1 || numProbB < 0 || numProbB > 1) {
+      return { error: 'Probabilities P(A) and P(B) must be between 0 and 1.' };
+    }
+    const pa = numProbA;
+    const pb = numProbB;
+
+    if (!areIndependent && pa + pb > 1 + 1e-9) {
+      return {
+        error: 'Mutually exclusive events cannot have P(A) + P(B) > 1 (100%). Reduce one probability or switch to Independent Events.'
+      };
+    }
 
     let pAnd = 0;
     let pOr = 0;
@@ -103,7 +106,7 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
       pAnd = pa * pb;
       pOr = pa + pb - pAnd;
     } else {
-      // Assuming mutually exclusive
+      // Mutually exclusive: P(A and B) = 0, P(A or B) = P(A) + P(B)
       pAnd = 0;
       pOr = Math.min(1, pa + pb);
     }
@@ -112,6 +115,7 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
     const pNotB = 1 - pb;
 
     return {
+      error: null as string | null,
       pa,
       pb,
       pAnd: (pAnd * 100).toFixed(2) + '%',
@@ -124,10 +128,11 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
   // Combinatorics results
   const combinatoricsResults = useMemo(() => {
     if (nVal === '' || rVal === '') return null;
-    const n = Math.max(0, Math.round(numNVal));
-    const r = Math.max(0, Math.round(numRVal));
+    if (numNVal < 0 || numRVal < 0) return null;
+    const n = Math.round(numNVal);
+    const r = Math.round(numRVal);
 
-    if (r > n) return null;
+    if (r > n || n > 1000) return null;
 
     const perm = nPr(n, r);
     const comb = nCr(n, r);
@@ -135,10 +140,15 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
     return {
       n,
       r,
-      permutations: formatNumber(perm, 0),
-      combinations: formatNumber(comb, 0)
+      permutations: Number.isFinite(perm) ? formatNumber(perm, 0) : 'Overflow (> 1.8e308)',
+      combinations: Number.isFinite(comb) ? formatNumber(comb, 0) : 'Overflow (> 1.8e308)'
     };
   }, [nVal, rVal, numNVal, numRVal]);
+
+  const activeValid =
+    (tab === 'single' && Boolean(singleResults)) ||
+    (tab === 'two-events' && Boolean(twoEventsResults && !twoEventsResults.error)) ||
+    (tab === 'combinatorics' && Boolean(combinatoricsResults));
 
   const handleReset = () => {
     setTab('single');
@@ -152,10 +162,11 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
   };
 
   const handleCopy = async () => {
+    if (!activeValid) return;
     let text = '';
     if (tab === 'single' && singleResults) {
       text = `Probability of Event: ${singleResults.percentage} (Fraction: ${singleResults.favorableOutcomes}/${singleResults.totalOutcomes}, Odds: ${singleResults.oddsInFavor})`;
-    } else if (tab === 'two-events' && twoEventsResults) {
+    } else if (tab === 'two-events' && twoEventsResults && !twoEventsResults.error) {
       text = `P(A and B): ${twoEventsResults.pAnd} | P(A or B): ${twoEventsResults.pOr} (P(A)=${twoEventsResults.pa}, P(B)=${twoEventsResults.pb})`;
     } else if (tab === 'combinatorics' && combinatoricsResults) {
       text = `Permutations nPr(${combinatoricsResults.n}, ${combinatoricsResults.r}) = ${combinatoricsResults.permutations} | Combinations nCr = ${combinatoricsResults.combinations}`;
@@ -169,12 +180,18 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
   };
 
   const handleSave = () => {
-    if (!onSaveCalculation) return;
+    if (!onSaveCalculation || !activeValid) return;
     if (tab === 'single' && singleResults) {
       onSaveCalculation(
         `Probability P(E) = ${singleResults.percentage} (${singleResults.favorableOutcomes}/${singleResults.totalOutcomes})`,
         { favorableOutcomes, totalOutcomes },
         singleResults
+      );
+    } else if (tab === 'two-events' && twoEventsResults && !twoEventsResults.error) {
+      onSaveCalculation(
+        `P(A and B): ${twoEventsResults.pAnd} | P(A or B): ${twoEventsResults.pOr}`,
+        { probA, probB, areIndependent },
+        twoEventsResults
       );
     } else if (tab === 'combinatorics' && combinatoricsResults) {
       onSaveCalculation(
@@ -193,6 +210,7 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
       <div className="flex items-center justify-between gap-3">
         <div className="flex gap-2 p-1.5 bg-slate-200/60 rounded-2xl max-w-md flex-1">
           <button
+            type="button"
             onClick={() => setTab('single')}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
               tab === 'single' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
@@ -201,6 +219,7 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
             Single Event
           </button>
           <button
+            type="button"
             onClick={() => setTab('two-events')}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
               tab === 'two-events' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
@@ -209,6 +228,7 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
             Two Events (A & B)
           </button>
           <button
+            type="button"
             onClick={() => setTab('combinatorics')}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
               tab === 'combinatorics' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
@@ -239,21 +259,19 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Number of Favorable Outcomes</label>
-                <input
-                  type="number"
-                  min="0"
+                <DecimalInput
+                  allowDecimal={false}
                   value={favorableOutcomes}
-                  onChange={(e) => setFavorableOutcomes(e.target.value === '' ? '' : Math.max(0, parseInt(e.target.value)))}
+                  onValueChange={(val) => setFavorableOutcomes(val)}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Total Possible Outcomes</label>
-                <input
-                  type="number"
-                  min="1"
+                <DecimalInput
+                  allowDecimal={false}
                   value={totalOutcomes}
-                  onChange={(e) => setTotalOutcomes(e.target.value === '' ? '' : Math.max(1, parseInt(e.target.value)))}
+                  onValueChange={(val) => setTotalOutcomes(val)}
                   className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -292,25 +310,17 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700">Probability of A (0 to 1)</label>
-                  <input
-                    type="number"
-                    step="0.05"
-                    min="0"
-                    max="1"
+                  <DecimalInput
                     value={probA}
-                    onChange={(e) => setProbA(e.target.value === '' ? '' : Math.max(0, Math.min(1, parseFloat(e.target.value))))}
+                    onValueChange={(val) => setProbA(val)}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700">Probability of B (0 to 1)</label>
-                  <input
-                    type="number"
-                    step="0.05"
-                    min="0"
-                    max="1"
+                  <DecimalInput
                     value={probB}
-                    onChange={(e) => setProbB(e.target.value === '' ? '' : Math.max(0, Math.min(1, parseFloat(e.target.value))))}
+                    onValueChange={(val) => setProbB(val)}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
@@ -356,23 +366,19 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700">Total Items (n)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="100"
+                  <DecimalInput
+                    allowDecimal={false}
                     value={nVal}
-                    onChange={(e) => setNVal(e.target.value === '' ? '' : Math.max(1, parseInt(e.target.value)))}
+                    onValueChange={(val) => setNVal(val)}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700">Items Chosen (r)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max={typeof nVal === 'number' ? nVal : 100}
+                  <DecimalInput
+                    allowDecimal={false}
                     value={rVal}
-                    onChange={(e) => setRVal(e.target.value === '' ? '' : Math.max(0, parseInt(e.target.value)))}
+                    onValueChange={(val) => setRVal(val)}
                     className="w-full p-2.5 text-base font-mono font-semibold border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-none"
                   />
                 </div>
@@ -417,13 +423,13 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
               ) : (
                 <div className="py-8 text-center space-y-2">
                   <p className="text-purple-300 text-sm font-semibold">Please enter valid outcomes.</p>
-                  <p className="text-xs text-slate-400">Ensure favorable outcomes do not exceed total outcomes.</p>
+                  <p className="text-xs text-slate-400">Ensure total outcomes ≥ 1 and favorable outcomes do not exceed total outcomes.</p>
                 </div>
               )
             )}
 
             {tab === 'two-events' && (
-              twoEventsResults ? (
+              twoEventsResults && !twoEventsResults.error ? (
                 <div className="space-y-4">
                   <div>
                     <span className="text-[11px] font-bold uppercase tracking-wider text-purple-300">
@@ -447,8 +453,12 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
                 </div>
               ) : (
                 <div className="py-8 text-center space-y-2">
-                  <p className="text-purple-300 text-sm font-semibold">Please enter valid probabilities.</p>
-                  <p className="text-xs text-slate-400">Values must be between 0 and 1.</p>
+                  <p className="text-purple-300 text-sm font-semibold">
+                    {twoEventsResults?.error ? 'Invalid Event Probabilities' : 'Please enter valid probabilities.'}
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    {twoEventsResults?.error || 'Values must be between 0 and 1.'}
+                  </p>
                 </div>
               )
             )}
@@ -473,14 +483,15 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
               ) : (
                 <div className="py-8 text-center space-y-2">
                   <p className="text-purple-300 text-sm font-semibold">Please enter valid integers.</p>
-                  <p className="text-xs text-slate-400">Total items (n) must be greater than or equal to sample size (r).</p>
+                  <p className="text-xs text-slate-400">Total items (n ≤ 1000) must be greater than or equal to sample size (r).</p>
                 </div>
               )
             )}
 
             <div className="flex items-center gap-2 pt-4 border-t border-purple-900/60">
               <button
-                disabled={!(singleResults || twoEventsResults || combinatoricsResults)}
+                type="button"
+                disabled={!activeValid}
                 onClick={handleCopy}
                 className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
               >
@@ -489,7 +500,8 @@ export const ProbabilityCalculator: React.FC<ProbabilityCalculatorProps> = ({ on
               </button>
               {onSaveCalculation && (
                 <button
-                  disabled={!(singleResults || twoEventsResults || combinatoricsResults)}
+                  type="button"
+                  disabled={!activeValid}
                   onClick={handleSave}
                   className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                 >

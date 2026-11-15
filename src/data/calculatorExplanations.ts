@@ -72,15 +72,15 @@ export const CURATED_EXPLANATIONS: Record<string, CalculatorExplanation> = {
       },
       {
         title: 'FHA Loan with 3.5% Down',
-        scenario: 'A first-time buyer uses an FHA loan for a $300,000 home with 3.5% down ($10,500) at 7% interest for 30 years.',
+        scenario: 'A first-time buyer uses an FHA loan for a $300,000 home with 3.5% down ($10,500) at 7% interest for 30 years. This example excludes the upfront MIP of 1.75%.',
         inputs: {
           'Home Price': '$300,000',
           'Down Payment': '$10,500',
           'Interest Rate': '7.0%',
-          'PMI/MIP': '0.55% annual'
+          'Annual MIP': '0.55% annual'
         },
         steps: [
-          'Loan Amount = $289,500',
+          'Base Loan Amount = $300,000 - $10,500 = $289,500',
           'Monthly P&I = $1,926.05',
           'Monthly MIP = ($289,500 * 0.0055) / 12 = $132.69',
           'Total (excl. tax/ins) = $2,058.74'

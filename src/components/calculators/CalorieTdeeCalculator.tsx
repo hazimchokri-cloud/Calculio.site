@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Flame, ShieldCheck, Check, Copy, Activity, Utensils, Award } from 'lucide-react';
 import { formatNumber, copyToClipboard } from '../../utils/formatters';
 import confetti from 'canvas-confetti';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface CalorieTdeeProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
@@ -89,7 +90,9 @@ export const CalorieTdeeCalculator: React.FC<CalorieTdeeProps> = ({ onSaveCalcul
       if (goal === 'mild_bulk') targetCalories = tdee + 250; // +0.5 lb / week
       if (goal === 'bulk') targetCalories = tdee + 500; // +1 lb / week
 
-      targetCalories = Math.max(1200, Math.round(targetCalories));
+      const rawTargetCalories = Math.round(targetCalories);
+      const isFloored = rawTargetCalories < 1200;
+      targetCalories = Math.max(1200, rawTargetCalories);
 
       // Macro distributions
       let carbPct = 0.45;
@@ -119,6 +122,7 @@ export const CalorieTdeeCalculator: React.FC<CalorieTdeeProps> = ({ onSaveCalcul
         bmr: Math.round(bmr),
         tdee: Math.round(tdee),
         targetCalories,
+        isFloored,
         proteinGrams,
         carbGrams,
         fatGrams,
@@ -236,12 +240,9 @@ export const CalorieTdeeCalculator: React.FC<CalorieTdeeProps> = ({ onSaveCalcul
 
             <div className="space-y-1.5">
               <label className="text-sm font-semibold text-slate-700 block">Age</label>
-              <input
-                type="number"
-                min="10"
-                max="110"
+              <DecimalInput
                 value={age}
-                onChange={(e) => setAge(e.target.value === '' ? '' : Number(e.target.value))}
+                onValueChange={setAge}
                 className="w-full px-3 py-2 font-mono-numbers text-sm font-semibold border border-slate-200 rounded-lg focus:ring-2 focus:ring-orange-500 bg-slate-50/50"
               />
             </div>
@@ -253,17 +254,15 @@ export const CalorieTdeeCalculator: React.FC<CalorieTdeeProps> = ({ onSaveCalcul
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold text-slate-700 block">Height (ft & in)</label>
                 <div className="grid grid-cols-2 gap-2">
-                  <input
-                    type="number"
+                  <DecimalInput
                     value={feet}
-                    onChange={(e) => setFeet(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={setFeet}
                     placeholder="Feet"
                     className="w-full px-3 py-2 text-sm font-mono-numbers border border-slate-200 rounded-lg bg-slate-50/50"
                   />
-                  <input
-                    type="number"
+                  <DecimalInput
                     value={inches}
-                    onChange={(e) => setInches(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={setInches}
                     placeholder="Inches"
                     className="w-full px-3 py-2 text-sm font-mono-numbers border border-slate-200 rounded-lg bg-slate-50/50"
                   />
@@ -272,10 +271,9 @@ export const CalorieTdeeCalculator: React.FC<CalorieTdeeProps> = ({ onSaveCalcul
             ) : (
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold text-slate-700 block">Height (cm)</label>
-                <input
-                  type="number"
+                <DecimalInput
                   value={heightCm}
-                  onChange={(e) => setHeightCm(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setHeightCm}
                   className="w-full px-3 py-2 text-sm font-mono-numbers border border-slate-200 rounded-lg bg-slate-50/50"
                 />
               </div>
@@ -283,11 +281,9 @@ export const CalorieTdeeCalculator: React.FC<CalorieTdeeProps> = ({ onSaveCalcul
 
             <div className="space-y-1.5">
               <label className="text-sm font-semibold text-slate-700 block">Weight ({unitSystem === 'imperial' ? 'lbs' : 'kg'})</label>
-              <input
-                type="number"
+              <DecimalInput
                 value={unitSystem === 'imperial' ? weightLbs : weightKg}
-                onChange={(e) => {
-                  const val = e.target.value === '' ? '' : Number(e.target.value);
+                onValueChange={(val) => {
                   if (unitSystem === 'imperial') setWeightLbs(val);
                   else setWeightKg(val);
                 }}
@@ -399,6 +395,11 @@ export const CalorieTdeeCalculator: React.FC<CalorieTdeeProps> = ({ onSaveCalcul
                     <strong className="text-orange-300 font-mono-numbers">{stats.tdee} kcal</strong>
                   </div>
                 </div>
+                {stats.isFloored && (
+                  <p className="mt-3 text-[11px] text-amber-200 bg-amber-500/10 border border-amber-400/20 rounded-lg px-2.5 py-1.5">
+                    Capped at the 1,200 kcal/day minimum safety floor for deficit planning.
+                  </p>
+                )}
               </>
             ) : (
               <div className="py-8 text-center space-y-2">

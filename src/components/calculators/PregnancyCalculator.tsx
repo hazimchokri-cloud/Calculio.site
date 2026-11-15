@@ -1,16 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { Calendar, Heart, Baby, Copy, Check, Bookmark, Sparkles } from 'lucide-react';
 import { copyToClipboard } from '../../utils/formatters';
+import { parseLocalDate, formatLocalIsoDate, addLocalDays, diffLocalCalendarDays } from '../../utils/dateUtils';
 
 interface PregnancyCalculatorProps {
   onSaveCalculation?: (summary: string, inputs: any, results: any) => void;
 }
 
 export const PregnancyCalculator: React.FC<PregnancyCalculatorProps> = ({ onSaveCalculation }) => {
-  // Default to ~12 weeks ago
-  const defaultDate = new Date();
-  defaultDate.setDate(defaultDate.getDate() - 84);
-  const defaultDateStr = defaultDate.toISOString().split('T')[0];
+  // Default to ~12 weeks ago using local calendar date
+  const defaultDateStr = formatLocalIsoDate(addLocalDays(new Date(), -84));
 
   const [lmpDate, setLmpDate] = useState<string>(defaultDateStr);
   const [cycleLength, setCycleLength] = useState<number | ''>(28);
@@ -20,26 +19,23 @@ export const PregnancyCalculator: React.FC<PregnancyCalculatorProps> = ({ onSave
   const numCycleLength = typeof cycleLength === 'number' ? cycleLength : 28;
 
   const calculations = useMemo(() => {
-    if (!lmpDate) return null;
-    const lmp = new Date(lmpDate);
-    if (isNaN(lmp.getTime())) {
+    const lmp = parseLocalDate(lmpDate);
+    if (!lmp) {
       return null;
     }
 
-    const today = new Date();
-    const diffTime = today.getTime() - lmp.getTime();
-    const totalDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const totalDays = Math.max(0, diffLocalCalendarDays(lmp, today));
     const currentWeeks = Math.floor(totalDays / 7);
     const currentDays = totalDays % 7;
 
     // Due Date Naegele's rule: LMP + 280 days + (cycleLength - 28)
     const cycleAdjustment = numCycleLength - 28;
-    const dueDate = new Date(lmp);
-    dueDate.setDate(dueDate.getDate() + 280 + cycleAdjustment);
+    const dueDate = addLocalDays(lmp, 280 + cycleAdjustment);
 
     // Conception Date: LMP + 14 + cycleAdjustment
-    const conceptionDate = new Date(lmp);
-    conceptionDate.setDate(conceptionDate.getDate() + 14 + cycleAdjustment);
+    const conceptionDate = addLocalDays(lmp, 14 + cycleAdjustment);
 
     // Trimester
     let trimester = 'First Trimester (Weeks 1 - 13)';
@@ -66,7 +62,7 @@ export const PregnancyCalculator: React.FC<PregnancyCalculatorProps> = ({ onSave
     let nearestWeek = Math.min(40, Math.max(4, Math.round(currentWeeks / 4) * 4));
     const fruitInfo = COMPARISONS[nearestWeek] || COMPARISONS[12];
 
-    const daysRemaining = Math.max(0, Math.floor((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
+    const daysRemaining = Math.max(0, diffLocalCalendarDays(today, dueDate));
     const percentComplete = Math.min(100, Math.max(0, Math.round((totalDays / 280) * 100)));
 
     return {
@@ -152,8 +148,8 @@ Fetal Size: About the size of a ${calculations.fruitInfo.fruit}`;
               type="range"
               min="21"
               max="40"
-              value={cycleLength}
-              onChange={(e) => setCycleLength(e.target.value === '' ? '' : Number(e.target.value))}
+              value={numCycleLength}
+              onChange={(e) => setCycleLength(Number(e.target.value))}
               className="w-full accent-rose-600 cursor-pointer"
             />
           </div>

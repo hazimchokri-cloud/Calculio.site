@@ -18,10 +18,10 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
 
   // Helper for factorial
   const factorial = (n: number): number => {
-    if (n < 0 || !Number.isInteger(n)) return NaN;
+    if (n < 0 || !Number.isInteger(n) || n > 170) return NaN;
     if (n === 0 || n === 1) return 1;
     let res = 1;
-    for (let i = 2; i <= Math.min(n, 170); i++) res *= i;
+    for (let i = 2; i <= n; i++) res *= i;
     return res;
   };
 
@@ -204,7 +204,8 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
         .replace(/÷/g, '/')
         .replace(/−/g, '-')
         .replace(/\^/g, '**')
-        .replace(/π/g, 'Math.PI');
+        .replace(/π/g, 'Math.PI')
+        .replace(/(^|[^0-9.])\be\b/g, '$1Math.E');
 
       // Auto-close open parentheses
       const openCount = (s.match(/\(/g) || []).length;
@@ -213,17 +214,21 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
         s += ')'.repeat(openCount - closeCount);
       }
 
-      // Implicit multiplication: (2+3)(4+5) -> (2+3)*(4+5), 2(3) -> 2*(3), (3)2 -> (3)*2
+      // Implicit multiplication: (2+3)(4+5) -> (2+3)*(4+5), 2(3) -> 2*(3), 2π -> 2*Math.PI
       s = s.replace(/\)(\s*\()/g, ')*(');
       s = s.replace(/(\d)(\s*\()/g, '$1*(');
       s = s.replace(/(\))(\s*\d)/g, ')*$2');
-      s = s.replace(/(\d)\s*(sin|cos|tan|sqrt|cbrt|ln|log|asin|acos|atan|exp)\b/g, '$1*$2');
+      s = s.replace(/(\d|\))\s*(Math\.PI|Math\.E)/g, '$1*$2');
+      s = s.replace(/(Math\.PI|Math\.E)\s*(\d|\()/g, '$1*$2');
+      s = s.replace(/(Math\.PI|Math\.E)\s*(Math\.PI|Math\.E)/g, '$1*$2');
+      s = s.replace(/(\d|Math\.PI|Math\.E|\))\s*(sin|cos|tan|sqrt|cbrt|ln|log|asin|acos|atan|exp)\b/g, '$1*$2');
 
-      // Check allowed tokens
+      // Check allowed tokens (preserve scientific notation like 1e-5 while rejecting words)
       const stripped = s
         .replace(/Math\.PI/g, '')
         .replace(/Math\.E/g, '')
-        .replace(/\b(sin|cos|tan|asin|acos|atan|sqrt|cbrt|ln|log|exp)\b/g, '');
+        .replace(/\b(sin|cos|tan|asin|acos|atan|sqrt|cbrt|ln|log|exp)\b/g, '')
+        .replace(/(\d)[eE]([+\-]?\d+)/g, '$1$2');
 
       if (!/^[0-9+\-*/().\s*%]+$/.test(stripped)) {
         setDisplay('Error');
@@ -391,14 +396,20 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({ onSa
               </button>
               <button
                 type="button"
-                onClick={() => setMemory(m => m + parseFloat(display || '0'))}
+                onClick={() => {
+                  const v = parseFloat(display);
+                  if (Number.isFinite(v)) setMemory(m => m + v);
+                }}
                 className="h-7.5 sm:h-8.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 text-slate-300 text-xs font-semibold flex items-center justify-center transition-all cursor-pointer select-none active:scale-95"
               >
                 M+
               </button>
               <button
                 type="button"
-                onClick={() => setMemory(m => m - parseFloat(display || '0'))}
+                onClick={() => {
+                  const v = parseFloat(display);
+                  if (Number.isFinite(v)) setMemory(m => m - v);
+                }}
                 className="h-7.5 sm:h-8.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 text-slate-300 text-xs font-semibold flex items-center justify-center transition-all cursor-pointer select-none active:scale-95"
               >
                 M-
