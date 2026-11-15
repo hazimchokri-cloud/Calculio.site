@@ -71,7 +71,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     featured: false,
     tags: ['personal loan', 'debt', 'borrowing', 'origination fee', 'unsecured loan'],
     metaDescription: 'Calculate personal loan monthly payments and origination fees. Compare different loan terms and see the total cost of borrowing for any credit score.',
-    metaKeywords: ['personal loan calculator', 'unsecured loan', 'origination fee', 'debt consolidation calculator']
+    metaKeywords: ['personal loan calculator', 'unsecured loan', 'origination fee', 'debt consolidation calculator'],
+    formulaSummary: 'P = [r × Principal] / [1 - (1 + r)^-n]; Net Proceeds = Principal - Origination Fee.'
   },
   {
     id: 'interest-calculator',
@@ -85,7 +86,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     featured: false,
     tags: ['interest', 'simple interest', 'compound interest', 'growth', 'apr'],
     metaDescription: 'Free interest calculator to compare simple vs compound interest growth. See how different compounding frequencies (daily, monthly, yearly) affect your savings.',
-    metaKeywords: ['interest calculator', 'simple interest vs compound interest', 'savings interest', 'apy calculator']
+    metaKeywords: ['interest calculator', 'simple interest vs compound interest', 'savings interest', 'apy calculator'],
+    formulaSummary: 'Simple: A = P(1 + rt); Compound: A = P(1 + r/n)^(nt).'
   },
   {
     id: 'compound-interest-calculator',
@@ -114,7 +116,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     featured: true,
     tags: ['investment', 'stocks', 'portfolio', 'index funds', 'inflation adjusted', 'real return'],
     metaDescription: 'Calculate investment returns with inflation adjustments and tax estimates. Plan your portfolio growth across stocks, bonds, and mutual funds.',
-    metaKeywords: ['investment calculator', 'portfolio growth', 'real return calculator', 'stock market calculator']
+    metaKeywords: ['investment calculator', 'portfolio growth', 'real return calculator', 'stock market calculator'],
+    formulaSummary: 'Real Return = ((1 + Nominal Rate) / (1 + Inflation Rate)) - 1; Future Value = P(1+r)^t + PMT[((1+r)^t - 1)/r].'
   },
   {
     id: 'savings-calculator',
@@ -128,7 +131,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     featured: false,
     tags: ['savings', 'hysa', 'emergency fund', 'goal', 'bank', 'interest'],
     metaDescription: 'Calculate how to reach your savings goals. Find the monthly contribution needed to hit a target balance or see your high-yield savings growth.',
-    metaKeywords: ['savings calculator', 'savings goal calculator', 'hysa calculator', 'emergency fund savings']
+    metaKeywords: ['savings calculator', 'savings goal calculator', 'hysa calculator', 'emergency fund savings'],
+    formulaSummary: 'FV = P(1 + r/12)^(12t) + PMT × [((1 + r/12)^(12t) - 1) / (r/12)].'
   },
   {
     id: 'retirement-calculator',
@@ -142,7 +146,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     featured: true,
     tags: ['retirement', '401k', 'ira', 'nest egg', 'fire', 'financial independence', '4 percent rule'],
     metaDescription: 'Estimate your retirement nest egg and annual income. Evaluate the 4% withdrawal rule and see if you are on track for financial independence.',
-    metaKeywords: ['retirement calculator', '401k calculator', 'ira calculator', 'fire calculator', 'retirement nest egg']
+    metaKeywords: ['retirement calculator', '401k calculator', 'ira calculator', 'fire calculator', 'retirement nest egg'],
+    formulaSummary: 'Safe Annual Income (4% Rule) = Projected Retirement Nest Egg × 0.04.'
   },
   {
     id: 'inflation-calculator',
@@ -156,7 +161,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     recentlyAdded: true,
     tags: ['inflation', 'cpi', 'purchasing power', 'money', 'economy'],
     metaDescription: 'Calculate the impact of inflation on your money. See how purchasing power has changed over the years using CPI data models.',
-    metaKeywords: ['inflation calculator', 'cpi calculator', 'purchasing power calculator', 'value of money over time']
+    metaKeywords: ['inflation calculator', 'cpi calculator', 'purchasing power calculator', 'value of money over time'],
+    formulaSummary: 'Future Cost = Present Amount × (1 + i)^t; Real Purchasing Power = Amount / (1 + i)^t.'
   },
   {
     id: 'credit-card-calculator',
@@ -170,7 +176,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     featured: true,
     tags: ['credit card', 'debt', 'minimum payment', 'revolving debt', 'apr', 'interest'],
     metaDescription: 'Free credit card payoff calculator. See how long it takes to pay off credit card debt and how much interest you can save with higher payments.',
-    metaKeywords: ['credit card payoff calculator', 'debt repayment calculator', 'credit card interest calculator']
+    metaKeywords: ['credit card payoff calculator', 'debt repayment calculator', 'credit card interest calculator'],
+    formulaSummary: 'Months to Payoff n = -ln(1 - (r × Balance) / Payment) / ln(1 + r).'
   },
   {
     id: 'debt-payoff-calculator',
@@ -184,7 +191,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     featured: false,
     tags: ['debt payoff', 'snowball', 'avalanche', 'credit cards', 'debt free', 'accelerator'],
     metaDescription: 'Compare the Debt Snowball vs Debt Avalanche methods. Create a custom plan to pay off your debts faster and save on total interest.',
-    metaKeywords: ['debt payoff calculator', 'debt snowball calculator', 'debt avalanche calculator', 'get out of debt']
+    metaKeywords: ['debt payoff calculator', 'debt snowball calculator', 'debt avalanche calculator', 'get out of debt'],
+    formulaSummary: 'Monthly Balance = Previous Balance × (1 + APR/12) - (Minimum Payment + Extra Rollover).'
   },
   {
     id: 'apr-calculator',
@@ -197,7 +205,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     tags: ['apr', 'interest rate', 'closing costs', 'points', 'origination', 'mortgage'],
     metaDescription: 'Calculate the true APR of any loan. Factor in origination fees and closing costs to see the real annual cost of borrowing.',
-    metaKeywords: ['apr calculator', 'annual percentage rate', 'real interest rate', 'loan fee calculator']
+    metaKeywords: ['apr calculator', 'annual percentage rate', 'real interest rate', 'loan fee calculator'],
+    formulaSummary: 'Net Financed = Loan Amount - Fees = Σ Payment / (1 + APR/12)^k (solved iteratively).'
   },
   {
     id: 'amortization-calculator',
@@ -211,7 +220,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     featured: false,
     tags: ['amortization', 'schedule', 'principal', 'interest', 'csv', 'table'],
     metaDescription: 'Generate a free printable loan amortization schedule. See exactly how much of each payment goes toward principal vs interest.',
-    metaKeywords: ['amortization calculator', 'amortization schedule', 'loan schedule', 'mortgage payoff table']
+    metaKeywords: ['amortization calculator', 'amortization schedule', 'loan schedule', 'mortgage payoff table'],
+    formulaSummary: 'Monthly Interest = Remaining Balance × (APR / 12); Principal Paid = Payment - Monthly Interest.'
   },
   {
     id: 'roi-calculator',
@@ -224,7 +234,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     tags: ['roi', 'return on investment', 'cagr', 'profit', 'yield', 'investing'],
     metaDescription: 'Calculate ROI and CAGR for any investment. Find your total profit and annualized return percentages for business or personal assets.',
-    metaKeywords: ['roi calculator', 'return on investment', 'cagr calculator', 'profit calculator']
+    metaKeywords: ['roi calculator', 'return on investment', 'cagr calculator', 'profit calculator'],
+    formulaSummary: 'ROI = [(Final - Initial) / Initial] × 100; CAGR = (Final / Initial)^(1/t) - 1.'
   },
   {
     id: 'salary-calculator',
@@ -238,7 +249,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     featured: true,
     tags: ['salary', 'wage', 'hourly', 'income', 'paycheck', 'taxes', 'net pay', 'gross pay'],
     metaDescription: 'Convert hourly wage to annual salary and vice versa. Calculate take-home pay after federal and state tax estimates.',
-    metaKeywords: ['salary calculator', 'hourly to salary', 'take home pay calculator', 'paycheck calculator']
+    metaKeywords: ['salary calculator', 'hourly to salary', 'take home pay calculator', 'paycheck calculator'],
+    formulaSummary: 'Annual Gross = Hourly Wage × Hours/Week × Weeks/Year; Net Pay = Gross × (1 - Tax Rate).'
   },
 
   // ==========================================
@@ -256,7 +268,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     featured: true,
     tags: ['bmi', 'body mass index', 'weight', 'health', 'fitness', 'diet', 'obesity', 'underweight'],
     metaDescription: 'Free online BMI calculator for adults. Find your body mass index classification and healthy weight range based on WHO standards.',
-    metaKeywords: ['bmi calculator', 'body mass index', 'weight classification', 'healthy weight range']
+    metaKeywords: ['bmi calculator', 'body mass index', 'weight classification', 'healthy weight range'],
+    formulaSummary: 'Metric: BMI = Weight (kg) / Height (m)²; Imperial: BMI = 703 × Weight (lb) / Height (in)².'
   },
   {
     id: 'body-fat-calculator',
@@ -267,7 +280,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     shortDescription: 'Estimate body fat % and lean mass using Navy circumference method.',
     iconName: 'Activity',
     popular: true,
-    tags: ['body fat', 'navy method', 'lean mass', 'fat mass', 'fitness']
+    tags: ['body fat', 'navy method', 'lean mass', 'fat mass', 'fitness'],
+    formulaSummary: 'U.S. Navy Method: Men %BF = 86.010×log10(waist - neck) - 70.041×log10(height) + 36.76.'
   },
   {
     id: 'calorie-tdee-calculator',
@@ -279,7 +293,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Flame',
     popular: true,
     featured: true,
-    tags: ['calorie', 'tdee', 'bmr', 'macros', 'protein', 'weight loss', 'deficit', 'nutrition']
+    tags: ['calorie', 'tdee', 'bmr', 'macros', 'protein', 'weight loss', 'deficit', 'nutrition'],
+    formulaSummary: 'TDEE = BMR × Activity Factor, where Mifflin-St Jeor BMR = 10W + 6.25H - 5A + s.'
   },
   {
     id: 'bmr-calculator',
@@ -291,7 +306,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Flame',
     popular: true,
     featured: false,
-    tags: ['bmr', 'basal metabolic rate', 'calories', 'metabolism', 'mifflin']
+    tags: ['bmr', 'basal metabolic rate', 'calories', 'metabolism', 'mifflin'],
+    formulaSummary: 'Mifflin-St Jeor: BMR = 10×Weight(kg) + 6.25×Height(cm) - 5×Age + (+5 Men / -161 Women).'
   },
   {
     id: 'ideal-weight-calculator',
@@ -303,7 +319,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Scale',
     popular: true,
     featured: false,
-    tags: ['ideal weight', 'ibw', 'healthy weight', 'devine', 'hamwi', 'weight loss']
+    tags: ['ideal weight', 'ibw', 'healthy weight', 'devine', 'hamwi', 'weight loss'],
+    formulaSummary: 'Devine: Men = 50 kg + 2.3 kg/in over 5 ft; Women = 45.5 kg + 2.3 kg/in over 5 ft.'
   },
   {
     id: 'pregnancy-calculator',
@@ -315,7 +332,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Baby',
     popular: true,
     featured: true,
-    tags: ['pregnancy', 'due date', 'gestation', 'trimester', 'baby', 'conception']
+    tags: ['pregnancy', 'due date', 'gestation', 'trimester', 'baby', 'conception'],
+    formulaSummary: 'Naegele’s Rule: EDD = LMP + 280 days (40 weeks); Gestational Age = Today - LMP.'
   },
   {
     id: 'due-date-calculator',
@@ -327,7 +345,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Baby',
     popular: true,
     featured: false,
-    tags: ['due date', 'edd', 'pregnancy', 'ultrasound', 'ivf', 'conception']
+    tags: ['due date', 'edd', 'pregnancy', 'ultrasound', 'ivf', 'conception'],
+    formulaSummary: 'LMP: +280 days (cycle adjusted); Conception: +266 days; IVF: +266 days - embryo age.'
   },
   {
     id: 'ovulation-calculator',
@@ -339,7 +358,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Calendar',
     popular: true,
     featured: false,
-    tags: ['ovulation', 'fertility', 'fertile window', 'menstrual cycle', 'conception']
+    tags: ['ovulation', 'fertility', 'fertile window', 'menstrual cycle', 'conception'],
+    formulaSummary: 'Estimated Ovulation = LMP Start + (Cycle Length - 14 days); Fertile Window = Ovulation -5 to +1 days.'
   },
   {
     id: 'water-intake-calculator',
@@ -351,7 +371,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Droplet',
     popular: true,
     featured: false,
-    tags: ['water', 'hydration', 'fluid', 'glasses', 'oz', 'liters', 'exercise']
+    tags: ['water', 'hydration', 'fluid', 'glasses', 'oz', 'liters', 'exercise'],
+    formulaSummary: 'Daily Fluid (oz) = 0.5 × Weight(lbs) + 12 oz per 30 min exercise + climate adjustment.'
   },
   {
     id: 'macro-calculator',
@@ -363,7 +384,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Flame',
     popular: true,
     featured: false,
-    tags: ['macros', 'macronutrients', 'protein', 'carbs', 'fats', 'keto', 'diet']
+    tags: ['macros', 'macronutrients', 'protein', 'carbs', 'fats', 'keto', 'diet'],
+    formulaSummary: 'Protein = (Cal × %P)/4; Carbs = (Cal × %C)/4; Fat = (Cal × %F)/9.'
   },
   {
     id: 'heart-rate-calculator',
@@ -375,7 +397,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Heart',
     popular: true,
     featured: true,
-    tags: ['heart rate', 'cardio', 'zones', 'zone 2', 'vo2 max', 'karvonen', 'bpm']
+    tags: ['heart rate', 'cardio', 'zones', 'zone 2', 'vo2 max', 'karvonen', 'bpm'],
+    formulaSummary: 'Tanaka HRmax = 208 - 0.7×Age; Karvonen Target HR = (HRmax - HRrest) × Intensity% + HRrest.'
   },
 
   // ==========================================
@@ -391,7 +414,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Percent',
     popular: true,
     featured: true,
-    tags: ['percentage', 'percent', 'discount', 'percent change', 'increase', 'decrease', 'math']
+    tags: ['percentage', 'percent', 'discount', 'percent change', 'increase', 'decrease', 'math'],
+    formulaSummary: 'Value = (P / 100) × Total; % Change = [(New - Old) / Old] × 100.'
   },
   {
     id: 'fraction-calculator',
@@ -404,7 +428,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: false,
     recentlyAdded: true,
-    tags: ['fraction', 'math', 'simplify', 'numerator', 'denominator', 'gcd', 'lcm']
+    tags: ['fraction', 'math', 'simplify', 'numerator', 'denominator', 'gcd', 'lcm'],
+    formulaSummary: '(a/b) ± (c/d) = (ad ± bc) / bd; (a/b) × (c/d) = ac / bd; simplified by GCD.'
   },
   {
     id: 'decimal-calculator',
@@ -416,7 +441,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'ArrowRightLeft',
     popular: true,
     featured: false,
-    tags: ['decimal', 'fraction', 'percentage', 'rounding', 'precision', 'math']
+    tags: ['decimal', 'fraction', 'percentage', 'rounding', 'precision', 'math'],
+    formulaSummary: 'Decimal d with n fractional digits converts to fraction (d × 10^n) / 10^n reduced by GCD.'
   },
   {
     id: 'scientific-calculator',
@@ -428,7 +454,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Calculator',
     popular: true,
     featured: true,
-    tags: ['scientific', 'calculator', 'trigonometry', 'sin', 'cos', 'tan', 'log', 'ln', 'square root', 'math']
+    tags: ['scientific', 'calculator', 'trigonometry', 'sin', 'cos', 'tan', 'log', 'ln', 'square root', 'math'],
+    formulaSummary: 'Evaluates expressions via PEMDAS/BODMAS with DEG/RAD trig, log₁₀, ln, powers, and n!.'
   },
   {
     id: 'ratio-calculator',
@@ -440,7 +467,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Percent',
     popular: true,
     featured: false,
-    tags: ['ratio', 'proportion', 'simplify ratio', 'scale', 'math']
+    tags: ['ratio', 'proportion', 'simplify ratio', 'scale', 'math'],
+    formulaSummary: 'A : B = C : D ⇔ A × D = B × C; Simplified Ratio = (A / GCD) : (B / GCD).'
   },
   {
     id: 'average-calculator',
@@ -452,7 +480,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'BarChart3',
     popular: true,
     featured: false,
-    tags: ['average', 'mean', 'median', 'mode', 'weighted average', 'geometric mean']
+    tags: ['average', 'mean', 'median', 'mode', 'weighted average', 'geometric mean'],
+    formulaSummary: 'Arithmetic Mean = (Σx_i)/n; Geometric = (Πx_i)^(1/n); Harmonic = n / Σ(1/x_i).'
   },
   {
     id: 'probability-calculator',
@@ -464,7 +493,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Dices',
     popular: true,
     featured: false,
-    tags: ['probability', 'odds', 'permutations', 'combinations', 'dice', 'coin', 'stats']
+    tags: ['probability', 'odds', 'permutations', 'combinations', 'dice', 'coin', 'stats'],
+    formulaSummary: 'P(A ∩ B) = P(A)×P(B); P(A ∪ B) = P(A)+P(B)-P(A ∩ B); nCr = n! / [r!(n-r)!].'
   },
   {
     id: 'statistics-calculator',
@@ -475,7 +505,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     shortDescription: 'Mean, median, mode, standard deviation, and variance for datasets.',
     iconName: 'BarChart2',
     popular: true,
-    tags: ['statistics', 'mean', 'median', 'mode', 'standard deviation', 'variance', 'sample', 'population']
+    tags: ['statistics', 'mean', 'median', 'mode', 'standard deviation', 'variance', 'sample', 'population'],
+    formulaSummary: 'Sample SD s = √[Σ(x_i - x̄)² / (n - 1)]; Population SD σ = √[Σ(x_i - μ)² / N].'
   },
   {
     id: 'exponent-calculator',
@@ -486,7 +517,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     shortDescription: 'Calculate powers, negative exponents, and scientific notation.',
     iconName: 'Zap',
     popular: false,
-    tags: ['exponent', 'power', 'base', 'scientific notation', 'algebra', 'math']
+    tags: ['exponent', 'power', 'base', 'scientific notation', 'algebra', 'math'],
+    formulaSummary: 'y = b^x, where b^-n = 1/b^n and b^(p/q) = (q√b)^p.'
   },
   {
     id: 'square-root-calculator',
@@ -498,7 +530,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Radical',
     popular: true,
     featured: false,
-    tags: ['square root', 'cube root', 'nth root', 'radicals', 'simplify radical', 'math']
+    tags: ['square root', 'cube root', 'nth root', 'radicals', 'simplify radical', 'math'],
+    formulaSummary: 'n-th Root = x^(1/n); Exact Radical Simplification: √x = a√b.'
   },
   {
     id: 'geometry-calculator',
@@ -510,7 +543,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Shapes',
     popular: true,
     featured: true,
-    tags: ['geometry', 'area', 'perimeter', 'volume', 'surface area', 'circle', 'triangle', 'sphere', 'cone']
+    tags: ['geometry', 'area', 'perimeter', 'volume', 'surface area', 'circle', 'triangle', 'sphere', 'cone'],
+    formulaSummary: 'Circle A = πr²; Triangle A = ½bh; Sphere V = (4/3)πr³; Cylinder V = πr²h.'
   },
 
   // ==========================================
@@ -526,7 +560,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'ArrowLeftRight',
     popular: true,
     featured: true,
-    tags: ['convert', 'unit converter', 'length', 'weight', 'temperature', 'meters', 'feet', 'celsius', 'fahrenheit', 'kg', 'lbs']
+    tags: ['convert', 'unit converter', 'length', 'weight', 'temperature', 'meters', 'feet', 'celsius', 'fahrenheit', 'kg', 'lbs'],
+    formulaSummary: 'Target Value = (Source Value × Base Factor_from) / Base Factor_to; °F = °C×9/5 + 32.'
   },
 
   // ==========================================
@@ -542,7 +577,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Calendar',
     popular: true,
     featured: true,
-    tags: ['date', 'days between', 'calendar', 'business days', 'work days', 'age', 'weeks', 'time']
+    tags: ['date', 'days between', 'calendar', 'business days', 'work days', 'age', 'weeks', 'time'],
+    formulaSummary: 'Total Days = |Date_End - Date_Start| / 86,400,000 ms; Business Days exclude Sat & Sun.'
   },
 
   // ==========================================
@@ -570,7 +606,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     shortDescription: 'Calculate property capitalization rate and Net Operating Income.',
     iconName: 'Building2',
     popular: false,
-    tags: ['cap rate', 'noi', 'valuation', 'real estate', 'commercial property']
+    tags: ['cap rate', 'noi', 'valuation', 'real estate', 'commercial property'],
+    formulaSummary: 'Cap Rate = (Annual NOI / Property Price) × 100, where NOI = Gross Income - Operating Expenses.'
   },
 
   // ==========================================
@@ -598,7 +635,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     shortDescription: 'Calculate sales tax, total purchase cost, and reverse pre-tax price.',
     iconName: 'Tag',
     popular: false,
-    tags: ['sales tax', 'tax rate', 'vat', 'checkout', 'receipt', 'price']
+    tags: ['sales tax', 'tax rate', 'vat', 'checkout', 'receipt', 'price'],
+    formulaSummary: 'Total Price = Pre-Tax × (1 + Tax Rate); Pre-Tax Price = Total / (1 + Tax Rate).'
   },
 
   // ==========================================
@@ -626,7 +664,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     shortDescription: 'Gross margin, net margin, and markup percentage.',
     iconName: 'TrendingUp',
     popular: true,
-    tags: ['profit margin', 'markup', 'gross margin', 'cost of goods', 'pricing']
+    tags: ['profit margin', 'markup', 'gross margin', 'cost of goods', 'pricing'],
+    formulaSummary: 'Profit Margin % = [(Price - Cost) / Price] × 100; Markup % = [(Price - Cost) / Cost] × 100.'
   },
 
   // ==========================================
@@ -654,7 +693,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     shortDescription: 'Square footage, tile counts, box quantities, and waste allowance.',
     iconName: 'Square',
     popular: false,
-    tags: ['flooring', 'tile', 'hardwood', 'laminate', 'square feet', 'remodel']
+    tags: ['flooring', 'tile', 'hardwood', 'laminate', 'square feet', 'remodel'],
+    formulaSummary: 'Total Area = (Length × Width) × (1 + Waste%); Boxes = ⌈ Total Area / Box Coverage ⌉.'
   },
 
   // ==========================================
@@ -721,7 +761,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'GraduationCap',
     popular: true,
     recentlyAdded: true,
-    tags: ['gpa', 'grades', 'college', 'school', 'credits', 'weighted gpa', 'academic']
+    tags: ['gpa', 'grades', 'college', 'school', 'credits', 'weighted gpa', 'academic'],
+    formulaSummary: 'GPA = Σ(Grade Points_i × Credits_i) / Σ(Credits_i).'
   },
   {
     id: 'gas-mileage-calculator',
@@ -733,7 +774,8 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Fuel',
     popular: false,
     recentlyAdded: true,
-    tags: ['gas', 'fuel', 'mpg', 'trip cost', 'mileage', 'road trip', 'split cost']
+    tags: ['gas', 'fuel', 'mpg', 'trip cost', 'mileage', 'road trip', 'split cost'],
+    formulaSummary: 'Gallons = Distance / MPG; Total Fuel Cost = Gallons × Gas Price; Per Person = Cost / Passengers.'
   },
 
   // ==========================================

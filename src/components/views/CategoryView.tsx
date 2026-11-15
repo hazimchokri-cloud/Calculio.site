@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Search, ArrowRight } from 'lucide-react';
-import { AdSlot } from '../shared/AdSlot';
 import { Breadcrumbs } from '../shared/Breadcrumbs';
 import { AffiliateOffersSection } from '../shared/AffiliateOffersSection';
 import { useLanguage } from '../../i18n/LanguageContext';
@@ -38,9 +37,6 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
     <div className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10 bg-[#F8FAFC]">
       {/* Breadcrumbs */}
       <Breadcrumbs items={breadcrumbItems} onGoHome={onGoHome} />
-
-      {/* Header Banner Ad */}
-      <AdSlot type="header-banner" />
 
       {/* Category Clean Header */}
       {(() => {
@@ -108,9 +104,6 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
         ))}
       </div>
 
-      {/* In-Content Advertisement Slot */}
-      <AdSlot type="in-content" />
-
       {/* Category-Specific Affiliate Opportunities */}
       <AffiliateOffersSection
         categoryId={category.id}
@@ -135,9 +128,6 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
           ))}
         </div>
       </div>
-
-      {/* Footer Banner Ad */}
-      <AdSlot type="footer-banner" />
     </div>
   );
 };

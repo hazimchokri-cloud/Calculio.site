@@ -50,7 +50,6 @@ import {
   Repeat
 } from 'lucide-react';
 import { Breadcrumbs } from '../shared/Breadcrumbs';
-import { AdSlot } from '../shared/AdSlot';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { CalculatorMeta, CategoryId } from '../../types';
 import { getCategoryTheme } from '../home/CategoryGrid';
@@ -224,9 +223,6 @@ export const AllCalculatorsView: React.FC<AllCalculatorsViewProps> = ({
           </p>
         </div>
       </div>
-
-      {/* Top Banner Ad */}
-      <AdSlot type="header-banner" />
 
       {/* Controls & Search Toolbar */}
       <div className="bg-[#FFFFFF] rounded-xl p-4 sm:p-5 border border-[#E2E8F0] shadow-xs space-y-4">
@@ -440,9 +436,6 @@ export const AllCalculatorsView: React.FC<AllCalculatorsViewProps> = ({
         </div>
       )}
 
-      {/* Mid Content Ad Slot */}
-      <AdSlot type="in-content" />
-
       {/* Bottom Category Quick Navigation */}
       <div className="bg-[#FFFFFF] rounded-2xl p-6 sm:p-8 border border-[#E2E8F0] shadow-xs space-y-4">
         <h3 className="text-lg font-[700] text-[#0F172A]">
@@ -476,9 +469,6 @@ export const AllCalculatorsView: React.FC<AllCalculatorsViewProps> = ({
           })}
         </div>
       </div>
-
-      {/* Footer Banner Ad */}
-      <AdSlot type="footer-banner" />
     </div>
   );
 };

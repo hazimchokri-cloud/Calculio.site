@@ -13,7 +13,6 @@ import {
   Calculator,
   ShieldAlert
 } from 'lucide-react';
-import { AdSlot } from './AdSlot';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 interface CalculatorExplanationSectionProps {
@@ -51,8 +50,6 @@ export const CalculatorExplanationSection: React.FC<CalculatorExplanationSection
           ))}
         </div>
       </article>
-
-      <AdSlot type="in-content" />
 
       {/* 2. How It Works Section */}
       <section id="how-it-works" className="space-y-6">
@@ -256,8 +253,6 @@ export const CalculatorExplanationSection: React.FC<CalculatorExplanationSection
           </div>
         </div>
       </section>
-
-      <AdSlot type="in-content" />
 
       {/* 6. Practical Use Cases */}
       <section id="use-cases" className="space-y-6">

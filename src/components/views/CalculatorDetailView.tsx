@@ -8,11 +8,9 @@ import {
   Info,
   ArrowRight
 } from 'lucide-react';
-import { AdSlot } from '../shared/AdSlot';
 import { Breadcrumbs } from '../shared/Breadcrumbs';
 import { CalculatorExplanationSection } from '../shared/CalculatorExplanationSection';
 import { RelatedCalculators } from '../shared/RelatedCalculators';
-import { AffiliateOffersSection } from '../shared/AffiliateOffersSection';
 import { ShareModal } from '../shared/ShareModal';
 import { PrintReportHeader } from '../shared/PrintReportHeader';
 import { PrintReportFooter } from '../shared/PrintReportFooter';
@@ -591,8 +589,6 @@ export const CalculatorDetailView: React.FC<CalculatorDetailProps> = ({
 
         {/* Right Column (4 cols): Sticky Sidebar with Quick Similar Links */}
         <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-20">
-          <AdSlot type="sidebar" />
-
           {/* Compact Sidebar Related Calculators list */}
           <RelatedCalculators
             currentCalculator={localizedCalc}

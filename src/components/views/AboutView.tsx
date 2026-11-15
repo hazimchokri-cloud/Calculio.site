@@ -22,7 +22,6 @@ import {
   Compass
 } from 'lucide-react';
 import { Breadcrumbs } from '../shared/Breadcrumbs';
-import { AdSlot } from '../shared/AdSlot';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { CATEGORIES } from '../../data/categories';
 
@@ -154,9 +153,6 @@ export const AboutView: React.FC<AboutViewProps> = ({
             </div>
           </div>
         </section>
-
-        {/* Top Ad Slot */}
-        <AdSlot type="header-banner" />
 
         {/* 2. WHO WE ARE */}
         <section 

@@ -8,7 +8,6 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Breadcrumbs } from '../shared/Breadcrumbs';
-import { AdSlot } from '../shared/AdSlot';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 const FALLBACK_BLOG_IMAGE = 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=1200&h=675&q=80';
@@ -102,9 +101,6 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
             </div>
           </div>
         </div>
-
-        {/* Ad Placement: Top Leaderboard */}
-        <AdSlot type="header-banner" />
 
         {/* Featured Hero Article */}
         {featuredPost && !searchQuery && selectedCatFilter === 'all' && (
@@ -397,9 +393,6 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
             </article>
           ))}
         </div>
-
-        {/* Ad Placement: Bottom In-Feed */}
-        <AdSlot type="banner" />
 
         {/* Quick Categories Bar */}
         <div className="bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 space-y-4">

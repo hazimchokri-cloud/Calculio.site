@@ -8,7 +8,6 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Breadcrumbs } from '../shared/Breadcrumbs';
-import { AdSlot } from '../shared/AdSlot';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 interface ContactViewProps {
@@ -93,9 +92,6 @@ export const ContactView: React.FC<ContactViewProps> = ({
             {t('contact.subtitle', 'Have a question, feedback, or a suggestion for a new calculation engine? Our team of engineers and quantitative reviewers is here to help.')}
           </p>
         </div>
-
-        {/* Header Ad Slot */}
-        <AdSlot type="header-banner" />
 
         {/* Main Grid: Form + Contact Channels */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -258,10 +254,6 @@ export const ContactView: React.FC<ContactViewProps> = ({
                 </div>
               </div>
             </div>
-
-            {/* Sidebar Ad Placement */}
-            <AdSlot type="sidebar" />
-
           </div>
 
         </div>

@@ -1,4 +1,9 @@
 import { CalculatorMeta, CalculatorExplanation } from '../types';
+import { FINANCIAL_EXPLANATIONS } from './explanations/financialExplanations';
+import { HEALTH_EXPLANATIONS } from './explanations/healthExplanations';
+import { MATH_EXPLANATIONS } from './explanations/mathExplanations';
+import { BUSINESS_REAL_ESTATE_TAX_EXPLANATIONS } from './explanations/businessRealEstateTaxExplanations';
+import { CONSTRUCTION_ENGINEERING_OTHER_EXPLANATIONS } from './explanations/constructionEngineeringOtherExplanations';
 
 export const CURATED_EXPLANATIONS: Record<string, CalculatorExplanation> = {
   // ==========================================
@@ -46,7 +51,7 @@ export const CURATED_EXPLANATIONS: Record<string, CalculatorExplanation> = {
     examples: [
       {
         title: '30-Year Fixed with 20% Down',
-        scenario: 'A buyer purchases a $500,000 home with an $100,000 (20%) down payment at a 6.5% interest rate for 30 years.',
+        scenario: 'A buyer purchases a $500,000 home with a $100,000 (20%) down payment at a 6.5% interest rate for 30 years.',
         inputs: {
           'Home Price': '$500,000',
           'Down Payment': '$100,000',
@@ -788,7 +793,7 @@ export const CURATED_EXPLANATIONS: Record<string, CalculatorExplanation> = {
         },
         steps: [
           'Use tangent: height = distance * tan(angle)',
-          'In calculator: 50 * tan(30) = 28.86'
+          'In calculator: 50 * tan(30°) = 28.87'
         ],
         result: 'Building Height: 28.87 meters',
         takeaway: 'Ensure the calculator is set to DEG (Degrees) mode for this problem.'
@@ -832,7 +837,7 @@ export const CURATED_EXPLANATIONS: Record<string, CalculatorExplanation> = {
   'date-calculator': {
     introduction: 'Time is our most valuable resource, yet calculating the exact difference between two dates can be surprisingly difficult due to leap years, varying month lengths, and working schedules. Our Date Calculator is designed to solve these complexities instantly. Whether you need to know exactly how many days are left until a project deadline, calculate your precise age in weeks and hours, or determine a future date by adding a specific number of business days, this tool provides a comprehensive chronological breakdown.',
     howItWorks: {
-      summary: 'The tool uses standardized calendar algorithms to measure the elapsed time between two points in the Gregorian calendar. It account for every variable, including UTC offsets and leap years.',
+      summary: 'The tool uses standardized calendar algorithms to measure the elapsed time between two points in the Gregorian calendar. It accounts for every variable, including UTC offsets and leap years.',
       steps: [
         {
           title: '1. Epoch Normalization',
@@ -917,154 +922,187 @@ export const CURATED_EXPLANATIONS: Record<string, CalculatorExplanation> = {
       'Time zone differences are not factored into simple date calculations.',
       'Check if your specific industry defines "Business Days" differently.'
     ]
-  }
+  },
+  ...FINANCIAL_EXPLANATIONS,
+  ...HEALTH_EXPLANATIONS,
+  ...MATH_EXPLANATIONS,
+  ...BUSINESS_REAL_ESTATE_TAX_EXPLANATIONS,
+  ...CONSTRUCTION_ENGINEERING_OTHER_EXPLANATIONS
 };
 
 /**
- * Intelligent dynamic fallback generator to ensure EVERY single calculator
- * has a comprehensive, robust, and highly informative Explanation Section!
+ * Retrieves the curated educational explanation for a calculator, with a
+ * clean, grammatically sound category-aware fallback if a future ID is added.
  */
 export function getCalculatorExplanation(calculator: CalculatorMeta): CalculatorExplanation {
   if (CURATED_EXPLANATIONS[calculator.id]) {
     return CURATED_EXPLANATIONS[calculator.id];
   }
 
-  // Generate dynamic tailored explanation based on category and metadata
   const name = calculator.name;
-  const desc = calculator.description;
-  const formula = calculator.formulaSummary || 'Result = f(Input_1, Input_2, ... Input_n)';
+  const rawSummary = (calculator.shortDescription || calculator.description || '').replace(/\.$/, '');
+  const cleanSummary = rawSummary ? rawSummary.charAt(0).toLowerCase() + rawSummary.slice(1) : 'perform specialized numerical calculations';
+  const formula = calculator.formulaSummary || 'Output = f(Inputs)';
 
-  const categoryContext = {
+  const categoryContext: Record<string, { focus: string; audience: string; benefit1: string; benefit2: string }> = {
     financial: {
-      focus: 'financial and mathematical amortization principles',
+      focus: 'time-value-of-money and amortization mathematics',
       audience: 'Investors, Homeowners, Financial Planners, and Consumers',
-      benefit1: 'Make sound borrowing, investment, and repayment decisions',
-      benefit2: 'Minimize interest costs and maximize financial yields'
+      benefit1: 'Make informed borrowing, investment, and repayment decisions',
+      benefit2: 'Compare interest costs, cash flows, and long-term yields'
     },
     'fitness-health': {
-      focus: 'clinical health metrics and physiological formulas',
+      focus: 'clinical health metrics and physiological equations',
       audience: 'Individuals, Athletes, Fitness Coaches, and Healthcare Practitioners',
-      benefit1: 'Track biometric benchmarks with standardized clinical formulas',
-      benefit2: 'Set realistic nutrition, body composition, and wellness targets'
+      benefit1: 'Track biometric benchmarks using established clinical formulas',
+      benefit2: 'Set realistic nutrition, body composition, and training targets'
     },
     'math-algebra': {
-      focus: 'rigorous algebraic, geometric, and statistical proofs',
+      focus: 'algebraic, geometric, and statistical computation rules',
       audience: 'Students, Educators, Researchers, and Engineers',
-      benefit1: 'Verify complex homework and coursework calculations step-by-step',
-      benefit2: 'Eliminate manual arithmetic error with double-precision computing'
+      benefit1: 'Verify coursework and quantitative analysis step by step',
+      benefit2: 'Eliminate manual arithmetic errors with floating-point precision'
     },
     conversion: {
-      focus: 'standardized international metric and imperial conversion ratios (SI / NIST standards)',
-      audience: 'Travelers, Scientists, Culinary Experts, and Technical Professionals',
-      benefit1: 'Convert between measurement standards instantly with zero rounding error',
-      benefit2: 'Cross-reference global units across engineering, cooking, and science'
+      focus: 'standardized metric and imperial conversion factors',
+      audience: 'Travelers, Scientists, Cooks, and Technical Professionals',
+      benefit1: 'Convert between measurement systems accurately',
+      benefit2: 'Cross-reference units across cooking, science, and engineering'
     },
     'date-time': {
-      focus: 'chronological algorithms, calendar epochs, and time math',
-      audience: 'Project Managers, Event Planners, HR Specialists, and Students',
-      benefit1: 'Determine elapsed milestones and work schedules accurately',
-      benefit2: 'Account for leap years, variable month lengths, and weekend hours'
+      focus: 'Gregorian calendar rules, time offsets, and duration math',
+      audience: 'Project Managers, Event Planners, HR Teams, and Individuals',
+      benefit1: 'Determine exact elapsed days, schedules, and payroll hours',
+      benefit2: 'Account for leap years, time-zone differences, and work weeks'
+    },
+    'real-estate': {
+      focus: 'property valuation, cash-flow, and leverage ratios',
+      audience: 'Real Estate Investors, Landlords, Homebuyers, and Brokers',
+      benefit1: 'Evaluate rental yield, cap rate, and financing break-even points',
+      benefit2: 'Compare holding versus renting or refinancing options'
+    },
+    tax: {
+      focus: 'progressive tax brackets, deductions, and rate conversions',
+      audience: 'Taxpayers, Employees, Freelancers, and Small Business Owners',
+      benefit1: 'Estimate net after-tax proceeds and take-home pay',
+      benefit2: 'Separate taxable subtotals from gross transaction amounts'
+    },
+    business: {
+      focus: 'unit economics, margin accounting, and cash-flow formulas',
+      audience: 'Founders, Operators, E-Commerce Sellers, and Financial Analysts',
+      benefit1: 'Set sustainable prices and track operating efficiency',
+      benefit2: 'Monitor break-even thresholds and cash runway'
+    },
+    construction: {
+      focus: 'surface area, volume, and material-takeoff estimation',
+      audience: 'Contractors, Remodelers, Landscapers, and DIY Builders',
+      benefit1: 'Order accurate lumber, concrete, paint, and flooring quantities',
+      benefit2: 'Factor in practical cut waste without costly mid-job shortages'
+    },
+    engineering: {
+      focus: 'fundamental physics and electrical engineering laws',
+      audience: 'Engineers, Technicians, and STEM Students',
+      benefit1: 'Solve circuit and mechanics relationships consistently',
+      benefit2: 'Convert computed engineering quantities across SI and imperial units'
+    },
+    education: {
+      focus: 'credit-weighted academic grading formulas',
+      audience: 'High School Students, College Students, and Academic Advisors',
+      benefit1: 'Track semester GPA and target exam scores',
+      benefit2: 'Prioritize study effort before final assessments'
+    },
+    cryptocurrency: {
+      focus: 'spot fee accounting, compounding yield, and AMM pool math',
+      audience: 'Crypto Traders, Stakers, and DeFi Liquidity Providers',
+      benefit1: 'Measure net profit after exchange trading fees',
+      benefit2: 'Model DCA accumulation, staking APY, and impermanent loss'
     },
     'construction-other': {
-      focus: 'applied practical estimation formulas and material sizing',
-      audience: 'Contractors, DIY Builders, Students, and Consumers',
-      benefit1: 'Estimate project materials and logistical requirements with precision',
-      benefit2: 'Prevent budget overruns through structured estimations'
+      focus: 'applied everyday estimation and quantitative comparison formulas',
+      audience: 'Professionals, Students, and Everyday Users',
+      benefit1: 'Turn multi-input measurements into clear practical estimates',
+      benefit2: 'Save time while avoiding manual calculation mistakes'
     }
-  }[calculator.category] || {
-    focus: 'standardized computational and mathematical formulas',
-    audience: 'Professionals, Students, and Everyday Users',
-    benefit1: 'Achieve fast, accurate answers for complex calculations',
-    benefit2: 'Save time and eliminate manual calculation errors'
   };
 
+  const ctx = categoryContext[calculator.category] || categoryContext['construction-other'];
+
   return {
-    introduction: `The ${name} is a professional-grade digital tool designed to simplify ${desc.toLowerCase()} Whether you are a student, professional, or everyday user, this calculator provides a reliable way to compute complex results with mathematical precision. By automating the underlying formulas, we help you save time and eliminate the risk of manual arithmetic errors. This resource is tailored for ${categoryContext.audience.toLowerCase()} looking for quick, accurate solutions to real-world problems.`,
+    introduction: `The ${name} is an online tool built to help you compute ${cleanSummary}. Grounded in ${ctx.focus}, it turns your entered values into structured results you can apply immediately.\n\nBy automating each intermediate step, the calculator removes manual arithmetic errors and lets you test how changing key inputs affects the final outcome.`,
     howItWorks: {
-      summary: `The ${name} evaluation process is engineered to handle ${desc.toLowerCase()} It takes your customized numerical inputs, validates parameter boundaries, and executes high-precision algorithms based on ${categoryContext.focus} to deliver instant results.`,
+      summary: `The ${name} applies ${ctx.focus} to the input parameters you provide, computing exact results alongside helpful secondary metrics.`,
       steps: [
         {
-          title: '1. Input Parameter Collection',
-          detail: `Enter your specific values into the interactive fields. Our system validates these in real-time to ensure they fall within acceptable mathematical ranges.`
+          title: '1. Provide Input Values',
+          detail: 'Enter the measurements, rates, or quantities required in the calculator form.'
         },
         {
-          title: '2. Algorithmic Processing',
-          detail: `Once inputs are received, the calculator applies the core principles of ${categoryContext.focus}. We use IEEE 754 double-precision arithmetic to maintain accuracy across all calculation steps.`
+          title: '2. Apply Core Formula',
+          detail: `The engine processes your numbers using established principles of ${ctx.focus}.`
         },
         {
-          title: '3. Multi-Metric Output Generation',
-          detail: `The resulting data is formatted into clear, readable metrics. Depending on the calculator type, you may see primary results, percentage breakdowns, and comparative statistics.`
-        },
-        {
-          title: '4. Result Interpretation & Export',
-          detail: `Analyze your final solution using our "Understanding Your Results" guide below. You can also copy the summary to your clipboard or print the full report for your records.`
+          title: '3. Review Calculated Breakdown',
+          detail: 'Inspect both the primary output and any secondary ratios or summaries returned on screen.'
         }
       ],
       keyAssumptions: [
-        'All inputs are treated as accurate and within standard mathematical bounds.',
-        'Calculations assume a standard context (e.g., base-10 math, standard metric/imperial ratios).',
-        'Rounding is performed at the final step to preserve maximum intermediate precision.'
+        'All entered values are accurate and measured in consistent units.',
+        'Intermediate values retain full floating-point precision before display rounding.'
       ]
     },
     formula: {
-      title: `${name} Computation Formula`,
+      title: `${name} Formula`,
       equation: formula,
       variables: [
-        { symbol: 'Input Variables', name: 'User Parameters', description: 'The numerical values provided by the user in the input form.', unit: 'Variable' },
-        { symbol: 'Resulting Value', name: 'Computed Output', description: 'The final mathematical solution derived from the formula.', unit: 'Standard Output' }
+        { symbol: 'Inputs', name: 'Provided Parameters', description: 'Numerical values and rates entered into the calculator', unit: 'Variable' },
+        { symbol: 'Output', name: 'Calculated Result', description: 'Primary value solved from the underlying equation', unit: 'Standard Output' }
       ],
-      explanation: `The logic behind this tool is rooted in ${categoryContext.focus}. By following these established mathematical rules, the ${name} ensures repeatable and verifiable results for every use case.`
+      explanation: `This tool relies on ${ctx.focus} so every calculation remains consistent and reproducible.`
     },
     examples: [
       {
-        title: `Standard ${name} Example`,
-        scenario: `A typical use case where a user needs to compute ${desc.toLowerCase().replace('.', '')}.`,
+        title: `Applying the ${name}`,
+        scenario: `Enter representative numbers for your scenario to compute ${cleanSummary}.`,
         inputs: {
-          'Baseline Value': '100',
-          'Adjustment Factor': '10'
+          'Input Set': 'Representative values from your scenario'
         },
         steps: [
-          'Enter the baseline parameters into the input fields.',
-          'The calculator identifies the correct mathematical model based on the ${categoryContext.focus}.',
-          'The final result is rendered instantly on the screen.'
+          'Confirm all input units match the labels shown in the form.',
+          `Evaluate the equation (${formula}) using those inputs.`,
+          'Compare the returned summary against alternative scenarios.'
         ],
-        result: `Formatted Numerical Result`,
-        takeaway: `This example demonstrates how the ${name} provides immediate clarity for standard tasks.`
+        result: 'Computed result shown directly in the calculator summary card.',
+        takeaway: `Adjust one input at a time to test how sensitive the ${name} output is to each parameter.`
       }
     ],
-    understandingResults: `When reviewing your results from the ${name}, it is important to consider the context of your inputs. The final value represents a mathematically derived solution based on the parameters you provided. If the results seem unexpected, double-check your input units (e.g., Metric vs. Imperial) and ensure all values are within realistic ranges. These results are designed to assist in ${categoryContext.benefit1.toLowerCase()} and should be used as a primary reference point for your planning or analysis.`,
+    understandingResults: `Review your ${name} output alongside the assumptions and units used in the calculation. If a number looks higher or lower than expected, verify unit selections and input formatting first. These outputs are designed to support ${ctx.benefit1.toLowerCase()} and ${ctx.benefit2.toLowerCase()}.`,
     useCases: [
       {
-        title: `Planning & Projections`,
-        description: `Model different scenarios and outcomes before committing to a specific course of action.`,
-        targetAudience: categoryContext.audience,
-        benefits: [categoryContext.benefit1, categoryContext.benefit2, 'Instant scenario modeling']
+        title: 'Scenario Comparison & Planning',
+        description: `Compare alternative inputs before committing to a financial, technical, or everyday decision.`,
+        targetAudience: ctx.audience,
+        benefits: [ctx.benefit1, ctx.benefit2, 'Fast scenario testing']
       },
       {
-        title: `Quality Assurance & Verification`,
-        description: `Use the tool to double-check manual calculations found in paperwork, textbooks, or professional quotes.`,
+        title: 'Verification of Manual Estimates',
+        description: 'Cross-check hand calculations or spreadsheets quickly.',
         targetAudience: 'Professionals and Students',
-        benefits: ['Eliminate human arithmetic errors', 'Save time on repetitive math', 'Structured results for documentation']
+        benefits: ['Reduces arithmetic errors', 'Consistent unit handling', 'Easy copyable summaries']
       }
     ],
     faqs: calculator.faqs || [
       {
-        question: `How reliable are the calculations from the ${name}?`,
-        answer: `Our calculators are built using industry-standard mathematical models and clinical formulas. We use high-precision floating point arithmetic to ensure that the results are as accurate as possible based on the data you provide.`
+        question: `How accurate are calculations from the ${name}?`,
+        answer: `Calculations follow standard formulas for ${ctx.focus} and depend directly on the accuracy of the numbers you enter.`
       },
       {
-        question: `Can I use these results for official or legal documentation?`,
-        answer: `While the ${name} is highly accurate, it is intended for educational and informational purposes. For high-stakes decisions—especially in finance, health, or law—we always recommend consulting with a certified professional.`
-      },
-      {
-        question: `Does this calculator support both Metric and Imperial units?`,
-        answer: `Where applicable, our tools provide toggles to switch between different unit systems, ensuring compatibility with global standards.`
+        question: 'Can I copy or print my results?',
+        answer: 'Yes. Most calculators provide a copy button for quick notes as well as a printable report view.'
       }
     ],
     importantNotes: [
-      `Accuracy is dependent on the precision of the user's inputs.`,
-      `The results are theoretical and may vary slightly in real-world applications due to external variables.`,
-      `This tool should be used as a guide and not as the sole basis for critical decision-making.`
+      'Output accuracy depends on entering values in matching units.',
+      'Use results as an informational guide alongside domain-specific professional verification where required.'
     ]
   };
 }

@@ -21,7 +21,6 @@ import {
   Info
 } from 'lucide-react';
 import { Breadcrumbs } from '../shared/Breadcrumbs';
-import { AdSlot } from '../shared/AdSlot';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 export type LegalTab = 'privacy' | 'terms' | 'disclaimer';
@@ -992,8 +991,6 @@ export const LegalView: React.FC<LegalViewProps> = ({
             </button>
           </div>
         </article>
-
-        <AdSlot type="footer-banner" />
       </div>
     </main>
   );
