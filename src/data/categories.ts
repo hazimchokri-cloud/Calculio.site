@@ -10,7 +10,7 @@ export const CATEGORIES: CategoryMeta[] = [
     color: 'orange',
     badgeBg: 'bg-orange-50 text-orange-700 border-orange-200',
     badgeText: 'Finance & Money',
-    calculatorsCount: 23
+    calculatorsCount: 22
   },
   {
     id: 'fitness-health',
@@ -65,7 +65,7 @@ export const CATEGORIES: CategoryMeta[] = [
     color: 'sky',
     badgeBg: 'bg-sky-50 text-sky-700 border-sky-200',
     badgeText: 'Commerce & Strategy',
-    calculatorsCount: 8
+    calculatorsCount: 7
   },
   {
     id: 'construction',
@@ -120,7 +120,7 @@ export const CATEGORIES: CategoryMeta[] = [
     color: 'orange',
     badgeBg: 'bg-orange-50 text-orange-700 border-orange-200',
     badgeText: 'Unit Converters',
-    calculatorsCount: 1
+    calculatorsCount: 2
   },
   {
     id: 'date-time',
@@ -131,7 +131,7 @@ export const CATEGORIES: CategoryMeta[] = [
     color: 'indigo',
     badgeBg: 'bg-indigo-50 text-indigo-700 border-indigo-200',
     badgeText: 'Date & Time',
-    calculatorsCount: 2
+    calculatorsCount: 3
   },
   {
     id: 'construction-other',

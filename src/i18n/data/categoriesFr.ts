@@ -10,7 +10,7 @@ export const CATEGORIES_FR: CategoryMeta[] = [
     color: 'orange',
     badgeBg: 'bg-orange-50 text-orange-700 border-orange-200',
     badgeText: 'Finance & Argent',
-    calculatorsCount: 15
+    calculatorsCount: 22
   },
   {
     id: 'fitness-health',
@@ -21,7 +21,7 @@ export const CATEGORIES_FR: CategoryMeta[] = [
     color: 'rose',
     badgeBg: 'bg-rose-50 text-rose-700 border-rose-200',
     badgeText: 'Santé & Corps',
-    calculatorsCount: 11
+    calculatorsCount: 17
   },
   {
     id: 'math-algebra',
@@ -32,7 +32,7 @@ export const CATEGORIES_FR: CategoryMeta[] = [
     color: 'blue',
     badgeBg: 'bg-blue-50 text-blue-700 border-blue-200',
     badgeText: 'Maths & Sciences',
-    calculatorsCount: 11
+    calculatorsCount: 17
   },
   {
     id: 'real-estate',
@@ -43,7 +43,7 @@ export const CATEGORIES_FR: CategoryMeta[] = [
     color: 'indigo',
     badgeBg: 'bg-indigo-50 text-indigo-700 border-indigo-200',
     badgeText: 'Immobilier & Investissement',
-    calculatorsCount: 4
+    calculatorsCount: 6
   },
   {
     id: 'tax',
@@ -54,7 +54,7 @@ export const CATEGORIES_FR: CategoryMeta[] = [
     color: 'teal',
     badgeBg: 'bg-teal-50 text-teal-700 border-teal-200',
     badgeText: 'Impôts & Déductions',
-    calculatorsCount: 3
+    calculatorsCount: 5
   },
   {
     id: 'business',
@@ -65,7 +65,7 @@ export const CATEGORIES_FR: CategoryMeta[] = [
     color: 'sky',
     badgeBg: 'bg-sky-50 text-sky-700 border-sky-200',
     badgeText: 'Commerce & Stratégie',
-    calculatorsCount: 3
+    calculatorsCount: 7
   },
   {
     id: 'construction',
@@ -76,7 +76,7 @@ export const CATEGORIES_FR: CategoryMeta[] = [
     color: 'orange',
     badgeBg: 'bg-orange-50 text-orange-700 border-orange-200',
     badgeText: 'Bâtiment & Rénovation',
-    calculatorsCount: 3
+    calculatorsCount: 6
   },
   {
     id: 'engineering',
@@ -87,7 +87,7 @@ export const CATEGORIES_FR: CategoryMeta[] = [
     color: 'violet',
     badgeBg: 'bg-violet-50 text-violet-700 border-violet-200',
     badgeText: 'Circuits & Physique',
-    calculatorsCount: 2
+    calculatorsCount: 5
   },
   {
     id: 'education',
@@ -98,7 +98,7 @@ export const CATEGORIES_FR: CategoryMeta[] = [
     color: 'orange',
     badgeBg: 'bg-orange-50 text-orange-700 border-orange-200',
     badgeText: 'Notes & Scolarité',
-    calculatorsCount: 2
+    calculatorsCount: 1
   },
   {
     id: 'cryptocurrency',
@@ -109,7 +109,7 @@ export const CATEGORIES_FR: CategoryMeta[] = [
     color: 'orange',
     badgeBg: 'bg-orange-50 text-orange-700 border-orange-200',
     badgeText: 'Crypto & Web3',
-    calculatorsCount: 2
+    calculatorsCount: 4
   },
   {
     id: 'conversion',
@@ -120,7 +120,7 @@ export const CATEGORIES_FR: CategoryMeta[] = [
     color: 'orange',
     badgeBg: 'bg-orange-50 text-orange-700 border-orange-200',
     badgeText: 'Convertisseurs d\'Unités',
-    calculatorsCount: 1
+    calculatorsCount: 2
   },
   {
     id: 'date-time',
@@ -131,7 +131,7 @@ export const CATEGORIES_FR: CategoryMeta[] = [
     color: 'indigo',
     badgeBg: 'bg-indigo-50 text-indigo-700 border-indigo-200',
     badgeText: 'Date & Heure',
-    calculatorsCount: 1
+    calculatorsCount: 3
   },
   {
     id: 'construction-other',
@@ -142,6 +142,6 @@ export const CATEGORIES_FR: CategoryMeta[] = [
     color: 'purple',
     badgeBg: 'bg-purple-50 text-purple-700 border-purple-200',
     badgeText: 'Utilitaires & Quotidien',
-    calculatorsCount: 2
+    calculatorsCount: 5
   }
 ];

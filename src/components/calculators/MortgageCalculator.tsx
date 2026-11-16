@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { formatCurrency, formatNumber, downloadCsv, copyToClipboard } from '../../utils/formatters';
 import { DollarSign, Percent, Calendar, ShieldCheck, Home, FileSpreadsheet, Copy, Check, Sparkles, PieChart, Layers } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { DecimalInput } from '../shared/DecimalInput';
 
 interface MortgageCalculatorProps {
   currencySymbol?: string;
@@ -290,13 +291,10 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 text-base font-semibold">{currencySymbol}</span>
-                <input
+                <DecimalInput
                   id="home-price-input"
-                  type="number"
-                  min="0"
-                  step="1000"
                   value={homePrice}
-                  onChange={(e) => setHomePrice(e.target.value === '' ? '' : Number(e.target.value))}
+                  onValueChange={setHomePrice}
                   placeholder="e.g. 400000"
                   className="w-40 pl-8 pr-3 py-2 text-right font-mono-numbers font-semibold text-base border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-slate-50/50"
                 />
@@ -323,14 +321,10 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
               <div className="flex items-center gap-2">
                 <span className="text-sm text-slate-700 font-mono-numbers font-medium">{formatCurrency(downPaymentAmount, currencySymbol)}</span>
                 <div className="relative">
-                  <input
+                  <DecimalInput
                     id="down-payment-input"
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="1"
                     value={downPaymentPercent}
-                    onChange={(e) => setDownPaymentPercent(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={setDownPaymentPercent}
                     placeholder="20"
                     className="w-24 pr-7 pl-3 py-2 text-right font-mono-numbers font-semibold text-base border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-slate-50/50"
                   />
@@ -411,11 +405,11 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
                 <label className="text-sm font-medium text-slate-700 mb-1 block">Property Tax (Annual)</label>
                 <div className="relative">
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-700 text-sm font-semibold">{currencySymbol}</span>
-                  <input
-                    type="number"
+                  <DecimalInput
                     value={propertyTaxAnnual}
-                    onChange={(e) => setPropertyTaxAnnual(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={setPropertyTaxAnnual}
                     placeholder="0"
+                    aria-label="Property Tax (Annual)"
                     className="w-full pl-7 pr-3 py-2 text-sm font-mono-numbers border border-slate-200 rounded-lg focus:ring-2 focus:ring-orange-500 bg-slate-50/40"
                   />
                 </div>
@@ -425,11 +419,11 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
                 <label className="text-sm font-medium text-slate-700 mb-1 block">Home Insurance (Annual)</label>
                 <div className="relative">
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-700 text-sm font-semibold">{currencySymbol}</span>
-                  <input
-                    type="number"
+                  <DecimalInput
                     value={homeInsuranceAnnual}
-                    onChange={(e) => setHomeInsuranceAnnual(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={setHomeInsuranceAnnual}
                     placeholder="0"
+                    aria-label="Home Insurance (Annual)"
                     className="w-full pl-7 pr-3 py-2 text-sm font-mono-numbers border border-slate-200 rounded-lg focus:ring-2 focus:ring-orange-500 bg-slate-50/40"
                   />
                 </div>
@@ -439,11 +433,11 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
                 <label className="text-sm font-medium text-slate-700 mb-1 block">HOA / Condo Fee (Monthly)</label>
                 <div className="relative">
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-700 text-sm font-semibold">{currencySymbol}</span>
-                  <input
-                    type="number"
+                  <DecimalInput
                     value={hoaMonthly}
-                    onChange={(e) => setHoaMonthly(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={setHoaMonthly}
                     placeholder="0"
+                    aria-label="HOA / Condo Fee (Monthly)"
                     className="w-full pl-7 pr-3 py-2 text-sm font-mono-numbers border border-slate-200 rounded-lg focus:ring-2 focus:ring-orange-500 bg-slate-50/40"
                   />
                 </div>
@@ -453,11 +447,11 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
                 <label className="text-sm font-medium text-orange-800 mb-1 block">Extra Monthly Principal</label>
                 <div className="relative">
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-orange-700 text-sm font-semibold">{currencySymbol}</span>
-                  <input
-                    type="number"
+                  <DecimalInput
                     value={extraMonthlyPayment}
-                    onChange={(e) => setExtraMonthlyPayment(e.target.value === '' ? '' : Number(e.target.value))}
+                    onValueChange={setExtraMonthlyPayment}
                     placeholder="0"
+                    aria-label="Extra Monthly Principal"
                     className="w-full pl-7 pr-3 py-2 text-sm font-mono-numbers border border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-500 bg-orange-50/30"
                   />
                 </div>

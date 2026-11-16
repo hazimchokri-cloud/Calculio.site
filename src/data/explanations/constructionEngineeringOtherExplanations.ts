@@ -275,18 +275,17 @@ export const CONSTRUCTION_ENGINEERING_OTHER_EXPLANATIONS: Record<string, Calcula
         },
         {
           title: '3. Estimate Screws & Joint Compound',
-          detail: 'Estimates roughly 32 screws per sheet and ~0.05 gallons of pre-mixed joint compound per sheet (rounded up).'
+          detail: 'Estimates 32 screws per 4×8 sheet (48 per 4×12 sheet) and ~0.004 gallons of joint compound per adjusted sq ft (rounded up).'
         }
       ],
       keyAssumptions: [
-        '4×8 sheets cover 32 sq ft; 4×12 sheets cover 48 sq ft.',
-        'Estimated ~32 screws per 4×8 sheet on 16-inch on-center framing.',
-        'Joint compound estimate covers standard Level 3/4 taping and three-coat finishing.'
+        '4×8 sheets cover 32 sq ft (32 screws); 4×12 sheets cover 48 sq ft (48 screws).',
+        'Joint compound is estimated at ~0.004 gallons per adjusted square foot (~1 gallon per 250 sq ft) for taping and three-coat finishing.'
       ]
     },
     formula: {
       title: 'Drywall Panel & Supplies Formula',
-      equation: 'Sheets = ⌈ [Area × (1 + Waste%)] / Sheet Sq Ft ⌉ | Screws ≈ Sheets × 32',
+      equation: 'Sheets = ⌈ [Area × (1 + Waste%)] / Sheet Sq Ft ⌉ | Mud (gal) = ⌈ Area_adj × 0.004 ⌉',
       variables: [
         { symbol: 'Area', name: 'Wall + Ceiling Area', description: 'Total surface square footage to be drywalled', unit: 'sq ft' },
         { symbol: 'Sheet Sq Ft', name: 'Panel Coverage', description: '32 sq ft (4×8) or 48 sq ft (4×12)', unit: 'sq ft' },
@@ -308,10 +307,10 @@ export const CONSTRUCTION_ENGINEERING_OTHER_EXPLANATIONS: Record<string, Calcula
           'Adjusted Area = 800 × 1.10 = 880 sq ft',
           'Sheets Needed = ⌈ 880 / 32 ⌉ = ⌈ 27.5 ⌉ = 28 sheets',
           'Estimated Screws = 28 × 32 = 896 screws (1 box of 1,000)',
-          'Joint Compound = ⌈ 28 × 0.05 ⌉ = 2 gallons'
+          'Joint Compound = ⌈ 880 × 0.004 ⌉ = ⌈ 3.52 ⌉ = 4 gallons'
         ],
-        result: '28 Sheets | ~896 Screws | 2 Gallons Joint Compound',
-        takeaway: 'Buying one 1,000-count box of 1-1/4" coarse-thread drywall screws and 2 gallons (or a 4.5-gal bucket) of mud covers the room completely.'
+        result: '28 Sheets | ~896 Screws | 4 Gallons Joint Compound',
+        takeaway: 'Buying one 1,000-count box of 1-1/4" coarse-thread drywall screws and one 4.5-gallon bucket of joint compound covers the entire room cleanly.'
       }
     ],
     understandingResults:

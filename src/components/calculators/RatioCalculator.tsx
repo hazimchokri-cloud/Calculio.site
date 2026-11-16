@@ -238,7 +238,11 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
                   <label className="text-xs font-bold text-slate-700">Left Ratio (A : B)</label>
                   <div className="flex items-center gap-2">
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
+                      lang="en"
+                      dir="ltr"
+                      aria-label="Ratio value A"
                       placeholder="A"
                       value={valA}
                       onChange={(e) => setValA(e.target.value)}
@@ -246,7 +250,11 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
                     />
                     <span className="font-bold text-slate-400">:</span>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
+                      lang="en"
+                      dir="ltr"
+                      aria-label="Ratio value B"
                       placeholder="B"
                       value={valB}
                       onChange={(e) => setValB(e.target.value)}
@@ -259,7 +267,11 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
                   <label className="text-xs font-bold text-slate-700">Right Ratio (C : D)</label>
                   <div className="flex items-center gap-2">
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
+                      lang="en"
+                      dir="ltr"
+                      aria-label="Ratio value C"
                       placeholder="C"
                       value={valC}
                       onChange={(e) => setValC(e.target.value)}
@@ -267,7 +279,11 @@ export const RatioCalculator: React.FC<RatioCalculatorProps> = ({ onSaveCalculat
                     />
                     <span className="font-bold text-slate-400">:</span>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
+                      lang="en"
+                      dir="ltr"
+                      aria-label="Ratio value D"
                       placeholder="D (Empty for X)"
                       value={valD}
                       onChange={(e) => setValD(e.target.value)}

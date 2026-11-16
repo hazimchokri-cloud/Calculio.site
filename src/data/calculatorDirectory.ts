@@ -281,6 +281,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Activity',
     popular: true,
     tags: ['body fat', 'navy method', 'lean mass', 'fat mass', 'fitness'],
+    metaDescription: 'Free U.S. Navy body fat percentage calculator. Estimate body fat %, fat mass, and lean body mass from waist, neck, and hip measurements.',
     formulaSummary: 'U.S. Navy Method: Men %BF = 86.010×log10(waist - neck) - 70.041×log10(height) + 36.76.'
   },
   {
@@ -294,6 +295,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['calorie', 'tdee', 'bmr', 'macros', 'protein', 'weight loss', 'deficit', 'nutrition'],
+    metaDescription: 'Calculate your daily calorie needs (TDEE) and BMR for weight loss, maintenance, or muscle gain with personalized macro targets.',
     formulaSummary: 'TDEE = BMR × Activity Factor, where Mifflin-St Jeor BMR = 10W + 6.25H - 5A + s.'
   },
   {
@@ -307,6 +309,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: false,
     tags: ['bmr', 'basal metabolic rate', 'calories', 'metabolism', 'mifflin'],
+    metaDescription: 'Free BMR calculator using Mifflin-St Jeor, Harris-Benedict, and Katch-McArdle equations to find calories burned at complete rest.',
     formulaSummary: 'Mifflin-St Jeor: BMR = 10×Weight(kg) + 6.25×Height(cm) - 5×Age + (+5 Men / -161 Women).'
   },
   {
@@ -320,6 +323,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: false,
     tags: ['ideal weight', 'ibw', 'healthy weight', 'devine', 'hamwi', 'weight loss'],
+    metaDescription: 'Find your ideal body weight range using Devine, Robinson, Miller, and Hamwi clinical formulas alongside healthy BMI targets.',
     formulaSummary: 'Devine: Men = 50 kg + 2.3 kg/in over 5 ft; Women = 45.5 kg + 2.3 kg/in over 5 ft.'
   },
   {
@@ -333,6 +337,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['pregnancy', 'due date', 'gestation', 'trimester', 'baby', 'conception'],
+    metaDescription: 'Free pregnancy calculator to track gestational age in weeks and days, current trimester milestones, and estimated delivery date.',
     formulaSummary: 'Naegele’s Rule: EDD = LMP + 280 days (40 weeks); Gestational Age = Today - LMP.'
   },
   {
@@ -346,6 +351,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: false,
     tags: ['due date', 'edd', 'pregnancy', 'ultrasound', 'ivf', 'conception'],
+    metaDescription: 'Estimate your baby’s due date accurately using Last Menstrual Period (LMP), conception date, ultrasound scan, or IVF transfer.',
     formulaSummary: 'LMP: +280 days (cycle adjusted); Conception: +266 days; IVF: +266 days - embryo age.'
   },
   {
@@ -359,6 +365,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: false,
     tags: ['ovulation', 'fertility', 'fertile window', 'menstrual cycle', 'conception'],
+    metaDescription: 'Predict your peak ovulation day, 6-day fertile window, and upcoming menstrual cycles with our free ovulation and fertility calendar.',
     formulaSummary: 'Estimated Ovulation = LMP Start + (Cycle Length - 14 days); Fertile Window = Ovulation -5 to +1 days.'
   },
   {
@@ -372,6 +379,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: false,
     tags: ['water', 'hydration', 'fluid', 'glasses', 'oz', 'liters', 'exercise'],
+    metaDescription: 'Calculate your optimal daily water intake in liters, fluid ounces, and glasses based on body weight, exercise, and climate.',
     formulaSummary: 'Daily Fluid (oz) = 0.5 × Weight(lbs) + 12 oz per 30 min exercise + climate adjustment.'
   },
   {
@@ -385,6 +393,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: false,
     tags: ['macros', 'macronutrients', 'protein', 'carbs', 'fats', 'keto', 'diet'],
+    metaDescription: 'Calculate daily protein, carbohydrate, and fat grams tailored to fat loss, lean muscle gain, keto, or balanced nutrition plans.',
     formulaSummary: 'Protein = (Cal × %P)/4; Carbs = (Cal × %C)/4; Fat = (Cal × %F)/9.'
   },
   {
@@ -398,6 +407,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['heart rate', 'cardio', 'zones', 'zone 2', 'vo2 max', 'karvonen', 'bpm'],
+    metaDescription: 'Free target heart rate calculator for Zones 1–5 cardio training using the Karvonen Heart Rate Reserve and Tanaka max HR formulas.',
     formulaSummary: 'Tanaka HRmax = 208 - 0.7×Age; Karvonen Target HR = (HRmax - HRrest) × Intensity% + HRrest.'
   },
 
@@ -415,6 +425,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['percentage', 'percent', 'discount', 'percent change', 'increase', 'decrease', 'math'],
+    metaDescription: 'Solve percentages fast: find X% of Y, what percent X is of Y, percentage increase or decrease, and percentage difference.',
     formulaSummary: 'Value = (P / 100) × Total; % Change = [(New - Old) / Old] × 100.'
   },
   {
@@ -429,6 +440,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     featured: false,
     recentlyAdded: true,
     tags: ['fraction', 'math', 'simplify', 'numerator', 'denominator', 'gcd', 'lcm'],
+    metaDescription: 'Add, subtract, multiply, and divide fractions and mixed numbers with automatic GCD simplification and clear step-by-step work.',
     formulaSummary: '(a/b) ± (c/d) = (ad ± bc) / bd; (a/b) × (c/d) = ac / bd; simplified by GCD.'
   },
   {
@@ -442,6 +454,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: false,
     tags: ['decimal', 'fraction', 'percentage', 'rounding', 'precision', 'math'],
+    metaDescription: 'Convert decimals to reduced fractions and percentages, round numbers to custom decimal places, and check exact decimal operations.',
     formulaSummary: 'Decimal d with n fractional digits converts to fraction (d × 10^n) / 10^n reduced by GCD.'
   },
   {
@@ -455,6 +468,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['scientific', 'calculator', 'trigonometry', 'sin', 'cos', 'tan', 'log', 'ln', 'square root', 'math'],
+    metaDescription: 'Free online scientific calculator featuring trigonometry (sin, cos, tan), logarithms, exponents, factorials, DEG/RAD modes, and history.',
     formulaSummary: 'Evaluates expressions via PEMDAS/BODMAS with DEG/RAD trig, log₁₀, ln, powers, and n!.'
   },
   {
@@ -468,6 +482,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: false,
     tags: ['ratio', 'proportion', 'simplify ratio', 'scale', 'math'],
+    metaDescription: 'Solve A:B = C:D proportions, simplify ratios to lowest terms using GCD, and split quantities proportionally with instant results.',
     formulaSummary: 'A : B = C : D ⇔ A × D = B × C; Simplified Ratio = (A / GCD) : (B / GCD).'
   },
   {
@@ -481,6 +496,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: false,
     tags: ['average', 'mean', 'median', 'mode', 'weighted average', 'geometric mean'],
+    metaDescription: 'Free average calculator for arithmetic, geometric, and harmonic mean, plus median, mode, range, and weighted grade calculations.',
     formulaSummary: 'Arithmetic Mean = (Σx_i)/n; Geometric = (Πx_i)^(1/n); Harmonic = n / Σ(1/x_i).'
   },
   {
@@ -494,6 +510,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: false,
     tags: ['probability', 'odds', 'permutations', 'combinations', 'dice', 'coin', 'stats'],
+    metaDescription: 'Compute single and joint event probabilities P(A ∩ B), unions P(A ∪ B), odds in favor or against, permutations (nPr), and combinations.',
     formulaSummary: 'P(A ∩ B) = P(A)×P(B); P(A ∪ B) = P(A)+P(B)-P(A ∩ B); nCr = n! / [r!(n-r)!].'
   },
   {
@@ -506,6 +523,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'BarChart2',
     popular: true,
     tags: ['statistics', 'mean', 'median', 'mode', 'standard deviation', 'variance', 'sample', 'population'],
+    metaDescription: 'Calculate mean, median, mode, sample and population standard deviation, variance, and range from any comma-separated dataset.',
     formulaSummary: 'Sample SD s = √[Σ(x_i - x̄)² / (n - 1)]; Population SD σ = √[Σ(x_i - μ)² / N].'
   },
   {
@@ -518,6 +536,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Zap',
     popular: false,
     tags: ['exponent', 'power', 'base', 'scientific notation', 'algebra', 'math'],
+    metaDescription: 'Free exponent calculator supporting positive, negative, and fractional powers with automatic scientific notation for large numbers.',
     formulaSummary: 'y = b^x, where b^-n = 1/b^n and b^(p/q) = (q√b)^p.'
   },
   {
@@ -531,6 +550,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: false,
     tags: ['square root', 'cube root', 'nth root', 'radicals', 'simplify radical', 'math'],
+    metaDescription: 'Find square roots, cube roots, and nth roots of any real number and simplify square roots into exact a√b radical form.',
     formulaSummary: 'n-th Root = x^(1/n); Exact Radical Simplification: √x = a√b.'
   },
   {
@@ -544,6 +564,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['geometry', 'area', 'perimeter', 'volume', 'surface area', 'circle', 'triangle', 'sphere', 'cone'],
+    metaDescription: 'Calculate area, perimeter, circumference, volume, and surface area for 2D shapes and 3D solids including circles, cones, and spheres.',
     formulaSummary: 'Circle A = πr²; Triangle A = ½bh; Sphere V = (4/3)πr³; Cylinder V = πr²h.'
   },
 
@@ -561,6 +582,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['convert', 'unit converter', 'length', 'weight', 'temperature', 'meters', 'feet', 'celsius', 'fahrenheit', 'kg', 'lbs'],
+    metaDescription: 'Fast online unit converter for length, weight, temperature, volume, area, speed, time, pressure, and digital storage units.',
     formulaSummary: 'Target Value = (Source Value × Base Factor_from) / Base Factor_to; °F = °C×9/5 + 32.'
   },
 
@@ -578,6 +600,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['date', 'days between', 'calendar', 'business days', 'work days', 'age', 'weeks', 'time'],
+    metaDescription: 'Count exact days, weeks, months, years, and weekday business days between two calendar dates or add/subtract days from any date.',
     formulaSummary: 'Total Days = |Date_End - Date_Start| / 86,400,000 ms; Business Days exclude Sat & Sun.'
   },
 
@@ -595,6 +618,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['real estate', 'rental', 'roi', 'cap rate', 'cash flow', 'property', 'investment'],
+    metaDescription: 'Analyze rental property deals with monthly cash flow, NOI, Cap Rate, Cash-on-Cash return, Gross Rent Multiplier, and expense ratios.',
     formulaSummary: 'Cap Rate = (Annual NOI / Purchase Price) * 100; Cash-on-Cash = (Annual Cash Flow / Total Cash Invested) * 100.'
   },
   {
@@ -607,6 +631,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Building2',
     popular: false,
     tags: ['cap rate', 'noi', 'valuation', 'real estate', 'commercial property'],
+    metaDescription: 'Free capitalization rate (Cap Rate) calculator for real estate investors. Compute NOI, property yield, and market valuation quickly.',
     formulaSummary: 'Cap Rate = (Annual NOI / Property Price) × 100, where NOI = Gross Income - Operating Expenses.'
   },
 
@@ -624,6 +649,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['tax', 'income tax', 'paycheck', 'take-home', 'federal tax', 'fica', 'deductions'],
+    metaDescription: 'Estimate 2025 federal income tax, Social Security and Medicare (FICA), state tax, and monthly or bi-weekly take-home paycheck pay.',
     formulaSummary: 'Taxable Income = Gross Income - Pre-tax Deductions - Standard Deduction.'
   },
   {
@@ -636,6 +662,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Tag',
     popular: false,
     tags: ['sales tax', 'tax rate', 'vat', 'checkout', 'receipt', 'price'],
+    metaDescription: 'Free sales tax calculator to find checkout tax and total price or reverse-calculate the pre-tax item price from a final receipt.',
     formulaSummary: 'Total Price = Pre-Tax × (1 + Tax Rate); Pre-Tax Price = Total / (1 + Tax Rate).'
   },
 
@@ -653,6 +680,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['business', 'break-even', 'fixed costs', 'margin', 'units', 'pricing', 'revenue'],
+    metaDescription: 'Calculate exact break-even unit volume, break-even sales revenue, and contribution margin from fixed costs, unit price, and variable cost.',
     formulaSummary: 'Break-Even Units = Fixed Costs / (Price per Unit - Variable Cost per Unit).'
   },
   {
@@ -665,6 +693,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'TrendingUp',
     popular: true,
     tags: ['profit margin', 'markup', 'gross margin', 'cost of goods', 'pricing'],
+    metaDescription: 'Calculate gross profit margin, net profit margin, and cost markup percentage to set profitable retail and wholesale prices.',
     formulaSummary: 'Profit Margin % = [(Price - Cost) / Price] × 100; Markup % = [(Price - Cost) / Cost] × 100.'
   },
 
@@ -682,6 +711,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['concrete', 'construction', 'slab', 'footing', 'column', 'cubic yards', 'bags', 'remodel'],
+    metaDescription: 'Estimate cubic yards and cubic meters of concrete for slabs, footings, and columns plus 60-lb or 80-lb pre-mix bags with waste margin.',
     formulaSummary: 'Cubic Yards = (Length ft * Width ft * Depth ft) / 27.'
   },
   {
@@ -694,6 +724,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     iconName: 'Square',
     popular: false,
     tags: ['flooring', 'tile', 'hardwood', 'laminate', 'square feet', 'remodel'],
+    metaDescription: 'Calculate flooring square footage, waste allowance, and exact carton counts for hardwood, vinyl plank, laminate, and ceramic tile.',
     formulaSummary: 'Total Area = (Length × Width) × (1 + Waste%); Boxes = ⌈ Total Area / Box Coverage ⌉.'
   },
 
@@ -711,6 +742,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['ohms law', 'voltage', 'current', 'resistance', 'power', 'watts', 'amps', 'volts', 'engineering'],
+    metaDescription: 'Free Ohm’s Law calculator for DC circuits. Enter any two of voltage, current, resistance, or wattage power to solve the rest instantly.',
     formulaSummary: 'V = I * R; P = V * I = I^2 * R = V^2 / R.'
   },
 
@@ -728,6 +760,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['grade', 'final exam', 'school', 'college', 'exam score', 'target grade', 'academic'],
+    metaDescription: 'Find the exact final exam grade required to reach your target course grade based on your current average and final exam weight.',
     formulaSummary: 'Required Final = (Target - Current * (1 - Weight)) / Weight.'
   },
 
@@ -745,6 +778,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['crypto', 'bitcoin', 'profit', 'roi', 'pnl', 'exchange fee', 'ethereum', 'trading'],
+    metaDescription: 'Calculate net crypto trading profit or loss, ROI %, and exit proceeds after buy and sell exchange fees for Bitcoin and altcoins.',
     formulaSummary: 'Net Profit = (Coins * Sell Price - Sell Fee) - Initial Investment.'
   },
 
@@ -762,6 +796,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['gpa', 'grades', 'college', 'school', 'credits', 'weighted gpa', 'academic'],
+    metaDescription: 'Free college and high school GPA calculator on a 4.0 scale. Compute semester and cumulative GPA using course letter grades and credit hours.',
     formulaSummary: 'GPA = Σ(Grade Points_i × Credits_i) / Σ(Credits_i).'
   },
   {
@@ -775,6 +810,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['gas', 'fuel', 'mpg', 'trip cost', 'mileage', 'road trip', 'split cost'],
+    metaDescription: 'Calculate road trip fuel cost, gallons or liters needed, and cost per passenger using distance, MPG, and local gas prices.',
     formulaSummary: 'Gallons = Distance / MPG; Total Fuel Cost = Gallons × Gas Price; Per Person = Cost / Passengers.'
   },
 
@@ -792,6 +828,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['loan comparison', 'compare loans', 'mortgage', 'interest rate', 'finance'],
+    metaDescription: 'Compare two loans side-by-side by loan amount, APR, and term length to see monthly payment, total interest, and lifetime savings.',
     formulaSummary: 'Compares PMT = (r*PV)/(1 - (1+r)^-n) for Loan A vs Loan B.'
   },
   {
@@ -805,6 +842,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['car lease', 'lease vs buy', 'auto loan', 'money factor', 'residual value'],
+    metaDescription: 'Free car lease calculator to break down monthly lease payments, depreciation, finance charge, money factor APR, and total lease cost.',
     formulaSummary: 'Monthly Lease = (Cap Cost - Residual)/Term + (Cap Cost + Residual) * Money Factor.'
   },
   {
@@ -818,6 +856,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['down payment', 'savings', 'home buying', 'mortgage', 'goal'],
+    metaDescription: 'Estimate how many months or years it takes to save a home or car down payment based on target percentage, savings, and monthly deposits.',
     formulaSummary: 'Months Needed = (Target Down Payment - Current Savings) / Monthly Savings.'
   },
   {
@@ -831,6 +870,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['emergency fund', 'savings', 'safety net', 'budget', 'personal finance'],
+    metaDescription: 'Calculate your ideal emergency fund goal for 3 to 12 months of essential expenses and track how quickly monthly savings build your cushion.',
     formulaSummary: 'Target Fund = Essential Monthly Expenses * Desired Months of Coverage.'
   },
   {
@@ -844,6 +884,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['cd', 'certificate of deposit', 'bank', 'apy', 'fixed rate', 'interest'],
+    metaDescription: 'Free Certificate of Deposit (CD) calculator to forecast interest earned and total maturity balance across fixed terms and compounding rates.',
     formulaSummary: 'Maturity Value = Principal * (1 + APY/Compounding)^(Compounding * Term).'
   },
   {
@@ -857,6 +898,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['401k match', 'employer match', 'retirement', 'salary deferral', 'investing'],
+    metaDescription: 'Calculate your employee deferral, full employer 401(k) matching contribution, and combined annual retirement savings so no match is left behind.',
     formulaSummary: 'Employer Match = Min(Your Contribution %, Match Cap %) * Match Rate * Salary.'
   },
 
@@ -874,6 +916,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['running', 'pace', 'marathon', '5k', '10k', 'splits', 'fitness', 'cardio'],
+    metaDescription: 'Calculate running pace per mile or kilometer and estimate 5K, 10K, half marathon, and marathon finish times from your split speed.',
     formulaSummary: 'Pace = Total Time / Total Distance.'
   },
   {
@@ -887,6 +930,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['1rm', 'one rep max', 'bench press', 'squat', 'deadlift', 'strength', 'gym'],
+    metaDescription: 'Estimate your one-rep max (1RM) lift weight with Epley and Brzycki formulas plus training load percentages for squat, bench, and deadlift.',
     formulaSummary: 'Epley: 1RM = Weight * (1 + Reps/30); Brzycki: 1RM = Weight * (36 / (37 - Reps)).'
   },
   {
@@ -900,6 +944,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['whr', 'waist to hip', 'body composition', 'health risk', 'cardiovascular'],
+    metaDescription: 'Free waist-to-hip ratio (WHR) calculator to check central fat distribution and WHO cardiovascular risk categories for men and women.',
     formulaSummary: 'WHR = Waist Circumference / Hip Circumference.'
   },
   {
@@ -913,6 +958,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['sleep', 'sleep cycle', 'bedtime', 'rem cycle', 'circadian rhythm', 'wake up'],
+    metaDescription: 'Find the best bedtimes and wake-up times aligned with 90-minute REM sleep cycles so you wake refreshed between deep sleep stages.',
     formulaSummary: 'Cycle Duration = 90 minutes + 15 minutes average sleep latency.'
   },
   {
@@ -926,6 +972,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['alcohol', 'calories', 'beer', 'wine', 'cocktails', 'diet', 'nutrition'],
+    metaDescription: 'Count total alcohol calories, pure ethanol grams, and standard drinks consumed across beer, wine, and spirits for nutrition tracking.',
     formulaSummary: 'Calories = Grams of pure ethanol * 7 kcal/g + Carbohydrate calories.'
   },
   {
@@ -939,6 +986,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['lean body mass', 'lbm', 'muscle mass', 'body fat', 'boer', 'james'],
+    metaDescription: 'Estimate Lean Body Mass (LBM) and fat mass using the clinical Boer, James, and Hume equations from height, weight, and biological sex.',
     formulaSummary: 'Boer Formula: Men LBM = 0.407*W + 0.267*H - 19.2; Women LBM = 0.252*W + 0.473*H - 48.3.'
   },
 
@@ -956,6 +1004,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['quadratic', 'algebra', 'roots', 'discriminant', 'parabola', 'polynomial', 'math'],
+    metaDescription: 'Solve any quadratic equation ax² + bx + c = 0 instantly, finding real or complex roots, the discriminant Δ, and parabola vertex coordinates.',
     formulaSummary: 'x = (-b ± √(b² - 4ac)) / 2a.'
   },
   {
@@ -969,6 +1018,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['pythagorean', 'geometry', 'triangle', 'hypotenuse', 'right triangle', 'math'],
+    metaDescription: 'Calculate the missing hypotenuse or leg of a right triangle with the Pythagorean theorem, plus triangle area and perimeter.',
     formulaSummary: 'a² + b² = c².'
   },
   {
@@ -982,6 +1032,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['lcm', 'gcd', 'gcf', 'factors', 'multiples', 'divisors', 'integers', 'math'],
+    metaDescription: 'Find the Least Common Multiple (LCM) and Greatest Common Divisor (GCD / GCF) of integers quickly using the Euclidean algorithm.',
     formulaSummary: 'LCM(a, b) = (|a * b|) / GCD(a, b).'
   },
   {
@@ -995,6 +1046,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['logarithm', 'log', 'natural log', 'ln', 'exponent', 'algebra', 'math'],
+    metaDescription: 'Free logarithm calculator for natural log (ln), base-10 log, binary log₂, and any custom base log_b(x) using the change-of-base rule.',
     formulaSummary: 'log_b(x) = ln(x) / ln(b).'
   },
   {
@@ -1008,6 +1060,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['factorial', 'permutations', 'combinations', 'ncr', 'npr', 'combinatorics', 'math'],
+    metaDescription: 'Calculate exact factorials (n!), permutations (nPr), and combinations (nCr) for statistics, discrete math, and probability counts.',
     formulaSummary: 'nPr = n! / (n - r)!; nCr = n! / [r! * (n - r)!].'
   },
   {
@@ -1021,6 +1074,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['matrix', 'determinant', 'inverse matrix', 'linear algebra', 'math'],
+    metaDescription: 'Compute the determinant, trace, and inverse matrix A⁻¹ of any 2×2 square matrix instantly for linear algebra and homework.',
     formulaSummary: 'det(A) = ad - bc; A⁻¹ = (1/det) * [[d, -b], [-c, a]].'
   },
 
@@ -1038,6 +1092,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['rent vs buy', 'real estate', 'home ownership', 'mortgage', 'renting'],
+    metaDescription: 'Compare the net multi-year cost of renting versus buying a home, factoring mortgage P&I, taxes, maintenance, rent growth, and home equity.',
     formulaSummary: 'Net Buy Cost = Total Outflows (PITI + Maintenance) - Built Equity (Appreciation).'
   },
   {
@@ -1051,6 +1106,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['refinance', 'mortgage', 'interest rate', 'breakeven', 'closing costs'],
+    metaDescription: 'Calculate monthly mortgage refinance savings and exact break-even months required to recover closing costs on a lower-rate loan.',
     formulaSummary: 'Breakeven Months = Refinance Closing Costs / Monthly Payment Savings.'
   },
   {
@@ -1064,6 +1120,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['cash on cash', 'coc return', 'rental property', 'real estate roi', 'investing'],
+    metaDescription: 'Free Cash-on-Cash return calculator for rental properties. Divide pre-tax annual cash flow by down payment, closing, and rehab costs.',
     formulaSummary: 'CoC Return % = (Annual Pre-Tax Cash Flow / Total Cash Invested) * 100.'
   },
   {
@@ -1077,6 +1134,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['grm', 'gross rent multiplier', 'real estate', 'valuation', 'rental income'],
+    metaDescription: 'Calculate the Gross Rent Multiplier (GRM) of a residential or commercial property to screen asking prices against annual gross rent.',
     formulaSummary: 'GRM = Property Purchase Price / Gross Annual Rental Income.'
   },
 
@@ -1094,6 +1152,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['capital gains', 'tax', 'stocks', 'crypto tax', 'profit', 'irs brackets'],
+    metaDescription: 'Estimate short-term and long-term federal capital gains taxes and net after-tax sale proceeds on stocks, crypto, or real estate.',
     formulaSummary: 'Capital Gain = Selling Price - Cost Basis; Tax = Gain * Tax Bracket %.'
   },
   {
@@ -1107,6 +1166,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['tip', 'bill split', 'restaurant', 'gratuity', 'dining', 'everyday'],
+    metaDescription: 'Free restaurant tip calculator and group bill splitter. Choose 15%–25% tip presets and see exact gratuity and total cost per person.',
     formulaSummary: 'Per Person = (Bill Total * (1 + Tip %)) / Number of People.'
   },
   {
@@ -1120,6 +1180,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['vat', 'gst', 'sales tax', 'value added tax', 'gross price', 'net price'],
+    metaDescription: 'Add Value Added Tax (VAT/GST) to net invoice amounts or reverse-calculate pre-tax net prices from gross tax-inclusive totals.',
     formulaSummary: 'Add VAT: Gross = Net * (1 + Rate); Remove VAT: Net = Gross / (1 + Rate).'
   },
 
@@ -1137,6 +1198,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['cac', 'ltv', 'saas metrics', 'unit economics', 'marketing roi', 'business'],
+    metaDescription: 'Calculate Customer Acquisition Cost (CAC), Customer Lifetime Value (LTV), and LTV:CAC ratio to benchmark SaaS and marketing efficiency.',
     formulaSummary: 'CAC = Spend / Customers; LTV = ARPU * Gross Margin % * (1 / Churn Rate).'
   },
   {
@@ -1150,6 +1212,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['markup', 'margin', 'pricing', 'profit', 'retail', 'wholesale', 'business'],
+    metaDescription: 'Convert between cost markup percentage and gross profit margin percentage with unit profit from product cost and selling price.',
     formulaSummary: 'Markup % = (Price - Cost)/Cost * 100; Margin % = (Price - Cost)/Price * 100.'
   },
   {
@@ -1163,6 +1226,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['inventory turnover', 'dsi', 'supply chain', 'cogs', 'operations', 'business'],
+    metaDescription: 'Calculate annual inventory turnover ratio, average inventory level, and Days Sales of Inventory (DSI) from COGS and stock balances.',
     formulaSummary: 'Turnover = COGS / Average Inventory; DSI = 365 / Turnover.'
   },
   {
@@ -1176,6 +1240,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['ebitda', 'operating income', 'ebit', 'financial analysis', 'corporate finance'],
+    metaDescription: 'Compute EBITDA, operating income (EBIT), gross profit, and EBITDA margin % from company revenue, COGS, OPEX, and D&A figures.',
     formulaSummary: 'EBITDA = Operating Profit (EBIT) + Depreciation + Amortization.'
   },
   {
@@ -1189,6 +1254,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['burn rate', 'runway', 'startup', 'cash flow', 'venture capital', 'founder'],
+    metaDescription: 'Calculate startup gross burn, net monthly cash burn rate, and remaining runway in months from bank cash, expenses, and revenue.',
     formulaSummary: 'Runway Months = Cash Balance / (Monthly Expenses - Monthly Revenue).'
   },
 
@@ -1206,6 +1272,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['paint', 'coverage', 'gallons', 'home improvement', 'walls', 'remodel'],
+    metaDescription: 'Estimate gallons of interior wall paint required from room dimensions, door and window deductions, and desired number of coats.',
     formulaSummary: 'Gallons = (Net Wall Area sq ft * Number of Coats) / 350 sq ft/gal.'
   },
   {
@@ -1219,6 +1286,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['drywall', 'sheetrock', 'gypsum', 'construction', 'remodel', 'screws'],
+    metaDescription: 'Free drywall calculator for 4×8 and 4×12 sheet counts, waste allowance, drywall screws, and joint compound mud gallons.',
     formulaSummary: 'Sheets = (Total Area sq ft * (1 + Waste %)) / Sheet sq ft (32 or 48).'
   },
   {
@@ -1232,6 +1300,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['mulch', 'gravel', 'landscaping', 'cubic yards', 'garden', 'soil'],
+    metaDescription: 'Convert landscape square footage and inch depth into bulk cubic yards, cubic feet, 2-cu-ft mulch bags, and estimated gravel tonnage.',
     formulaSummary: 'Cubic Yards = (Area sq ft * (Depth inches / 12)) / 27.'
   },
   {
@@ -1245,6 +1314,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['decking', 'lumber', 'board footage', 'patio', 'carpentry', 'construction'],
+    metaDescription: 'Estimate total deck square footage, linear feet of lumber, and 16-ft deck board counts with 10% cut waste for patio builds.',
     formulaSummary: 'Linear Feet = Deck Area sq ft / (Board Width inches / 12).'
   },
 
@@ -1262,6 +1332,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['density', 'mass', 'volume', 'physics', 'chemistry', 'engineering'],
+    metaDescription: 'Solve for density, mass, or volume using ρ = m / V and view automatic conversions between g/cm³ and kg/m³ for physics and lab work.',
     formulaSummary: 'Density ρ = Mass / Volume.'
   },
   {
@@ -1275,6 +1346,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['energy', 'kinetic energy', 'potential energy', 'physics', 'joules'],
+    metaDescription: 'Calculate translational kinetic energy (½mv²), gravitational potential energy (mgh), and total mechanical energy in Joules.',
     formulaSummary: 'KE = 0.5 * m * v²; PE = m * g * h.'
   },
   {
@@ -1288,6 +1360,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['pressure', 'force', 'pascals', 'psi', 'bar', 'atm', 'physics'],
+    metaDescription: 'Calculate mechanical pressure P = F / A from force and contact area, converted into Pascals (Pa), kPa, PSI, Bar, and Atmospheres.',
     formulaSummary: 'Pressure P = Force F / Area A.'
   },
   {
@@ -1301,6 +1374,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['speed of sound', 'mach', 'acoustics', 'aerodynamics', 'physics'],
+    metaDescription: 'Calculate the speed of sound in dry air at any temperature in m/s, km/h, and mph, and convert aircraft speed into Mach numbers.',
     formulaSummary: 'c = 331.3 * √(1 + T_c / 273.15) m/s; Mach = Speed / c.'
   },
 
@@ -1318,6 +1392,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['time card', 'work hours', 'timesheet', 'payroll', 'overtime', 'wages'],
+    metaDescription: 'Calculate daily clocked work hours, unpaid break deductions, 1.5× weekly overtime hours, and gross paycheck totals cleanly.',
     formulaSummary: 'Gross Pay = (Regular Hours * Rate) + (Overtime Hours * 1.5 * Rate).'
   },
   {
@@ -1331,6 +1406,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['age', 'birthday', 'exact age', 'days lived', 'seconds lived', 'date of birth'],
+    metaDescription: 'Find your exact age broken down into total days, hours, minutes, seconds lived, and days remaining until your next birthday.',
     formulaSummary: 'Elapsed Time = Current Timestamp - Date of Birth Timestamp.'
   },
   {
@@ -1344,6 +1420,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['time zone', 'world clock', 'meeting planner', 'utc', 'est', 'pst', 'gmt'],
+    metaDescription: 'Convert meeting times across UTC, EST, PST, CET, GST, IST, JST, and AEST with automatic next-day or previous-day rollover.',
     formulaSummary: 'Target Time = Origin Time + (Target UTC Offset - Origin UTC Offset).'
   },
   {
@@ -1357,6 +1434,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['net worth', 'assets', 'liabilities', 'financial planning', 'wealth'],
+    metaDescription: 'Calculate your personal net worth by summing cash, investments, and property assets minus mortgage, auto, and debt liabilities.',
     formulaSummary: 'Net Worth = Total Assets - Total Liabilities.'
   },
   {
@@ -1370,6 +1448,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['dog age', 'dog years', 'pets', 'puppy', 'veterinary', 'human age'],
+    metaDescription: 'Convert your dog’s age into equivalent human years using size-adjusted small, medium, large, and giant breed aging curves.',
     formulaSummary: 'AVMA size-adjusted model: Year 1 = 15 yrs, Year 2 = +9 yrs, subsequent years +4 to +7 yrs by size.'
   },
   {
@@ -1383,6 +1462,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['cooking', 'baking', 'cups to grams', 'tablespoons', 'kitchen converter', 'recipe'],
+    metaDescription: 'Convert kitchen measurements between cups, tablespoons, teaspoons, fluid ounces, milliliters, and density-adjusted grams for baking.',
     formulaSummary: '1 Cup = 16 Tbsp = 48 Tsp = 8 fl oz = Density-dependent Grams.'
   },
   {
@@ -1396,6 +1476,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['crypto dca', 'dollar cost averaging', 'bitcoin', 'ethereum', 'investing strategy'],
+    metaDescription: 'Simulate weekly or monthly cryptocurrency Dollar Cost Averaging (DCA) portfolio growth, total contributions, and ROI over custom horizons.',
     formulaSummary: 'Compounded DCA accumulation portfolio formula with monthly deposits.'
   },
   {
@@ -1409,6 +1490,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     recentlyAdded: true,
     tags: ['staking', 'apy', 'crypto rewards', 'proof of stake', 'solana', 'ethereum'],
+    metaDescription: 'Forecast daily-compounded proof-of-stake cryptocurrency staking rewards, APY token yields, and ending staked balance over custom periods.',
     formulaSummary: 'Ending Balance = Staked Amount * (1 + APY / 365)^Days.'
   },
   {
@@ -1422,6 +1504,7 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: false,
     recentlyAdded: true,
     tags: ['impermanent loss', 'amm', 'liquidity pool', 'uniswap', 'defi', 'yield farming'],
+    metaDescription: 'Calculate AMM liquidity pool impermanent loss percentage and net LP value vs. holding 50/50 tokens across token price ratio changes.',
     formulaSummary: 'IL = (2 * √k) / (1 + k) - 1, where k is the price ratio change.'
   }
 ];

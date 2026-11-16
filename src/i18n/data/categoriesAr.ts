@@ -10,7 +10,7 @@ export const CATEGORIES_AR: CategoryMeta[] = [
     color: 'orange',
     badgeBg: 'bg-orange-50 text-orange-700 border-orange-200',
     badgeText: 'المال والتمويل',
-    calculatorsCount: 15
+    calculatorsCount: 22
   },
   {
     id: 'fitness-health',
@@ -21,7 +21,7 @@ export const CATEGORIES_AR: CategoryMeta[] = [
     color: 'rose',
     badgeBg: 'bg-rose-50 text-rose-700 border-rose-200',
     badgeText: 'الصحة والجسم',
-    calculatorsCount: 11
+    calculatorsCount: 17
   },
   {
     id: 'math-algebra',
@@ -32,7 +32,7 @@ export const CATEGORIES_AR: CategoryMeta[] = [
     color: 'blue',
     badgeBg: 'bg-blue-50 text-blue-700 border-blue-200',
     badgeText: 'الرياضيات والعلوم',
-    calculatorsCount: 11
+    calculatorsCount: 17
   },
   {
     id: 'real-estate',
@@ -43,7 +43,7 @@ export const CATEGORIES_AR: CategoryMeta[] = [
     color: 'indigo',
     badgeBg: 'bg-indigo-50 text-indigo-700 border-indigo-200',
     badgeText: 'العقارات والاستثمار',
-    calculatorsCount: 4
+    calculatorsCount: 6
   },
   {
     id: 'tax',
@@ -54,7 +54,7 @@ export const CATEGORIES_AR: CategoryMeta[] = [
     color: 'teal',
     badgeBg: 'bg-teal-50 text-teal-700 border-teal-200',
     badgeText: 'الضرائب والدخل',
-    calculatorsCount: 3
+    calculatorsCount: 5
   },
   {
     id: 'business',
@@ -65,7 +65,7 @@ export const CATEGORIES_AR: CategoryMeta[] = [
     color: 'sky',
     badgeBg: 'bg-sky-50 text-sky-700 border-sky-200',
     badgeText: 'التجارة والأعمال',
-    calculatorsCount: 3
+    calculatorsCount: 7
   },
   {
     id: 'construction',
@@ -76,7 +76,7 @@ export const CATEGORIES_AR: CategoryMeta[] = [
     color: 'orange',
     badgeBg: 'bg-orange-50 text-orange-700 border-orange-200',
     badgeText: 'البناء والترميم',
-    calculatorsCount: 3
+    calculatorsCount: 6
   },
   {
     id: 'engineering',
@@ -87,7 +87,7 @@ export const CATEGORIES_AR: CategoryMeta[] = [
     color: 'violet',
     badgeBg: 'bg-violet-50 text-violet-700 border-violet-200',
     badgeText: 'الدوائر والفيزياء',
-    calculatorsCount: 2
+    calculatorsCount: 5
   },
   {
     id: 'education',
@@ -98,7 +98,7 @@ export const CATEGORIES_AR: CategoryMeta[] = [
     color: 'orange',
     badgeBg: 'bg-orange-50 text-orange-700 border-orange-200',
     badgeText: 'التعليم والدرجات',
-    calculatorsCount: 2
+    calculatorsCount: 1
   },
   {
     id: 'cryptocurrency',
@@ -109,7 +109,7 @@ export const CATEGORIES_AR: CategoryMeta[] = [
     color: 'orange',
     badgeBg: 'bg-orange-50 text-orange-700 border-orange-200',
     badgeText: 'العملات المشفرة',
-    calculatorsCount: 2
+    calculatorsCount: 4
   },
   {
     id: 'conversion',
@@ -120,7 +120,7 @@ export const CATEGORIES_AR: CategoryMeta[] = [
     color: 'orange',
     badgeBg: 'bg-orange-50 text-orange-700 border-orange-200',
     badgeText: 'محولات الوحدات',
-    calculatorsCount: 1
+    calculatorsCount: 2
   },
   {
     id: 'date-time',
@@ -131,7 +131,7 @@ export const CATEGORIES_AR: CategoryMeta[] = [
     color: 'indigo',
     badgeBg: 'bg-indigo-50 text-indigo-700 border-indigo-200',
     badgeText: 'التاريخ والوقت',
-    calculatorsCount: 1
+    calculatorsCount: 3
   },
   {
     id: 'construction-other',
@@ -142,6 +142,6 @@ export const CATEGORIES_AR: CategoryMeta[] = [
     color: 'purple',
     badgeBg: 'bg-purple-50 text-purple-700 border-purple-200',
     badgeText: 'الأدوات اليومية',
-    calculatorsCount: 2
+    calculatorsCount: 5
   }
 ];

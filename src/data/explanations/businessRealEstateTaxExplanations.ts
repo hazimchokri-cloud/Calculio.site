@@ -240,11 +240,12 @@ export const BUSINESS_REAL_ESTATE_TAX_EXPLANATIONS: Record<string, CalculatorExp
         },
         steps: [
           'Monthly mortgage P&I on $320,000 loan = $2,022.62 ($24,271/yr)',
-          'Estimated annual taxes/insurance (1.5% = $6,000) + maintenance (1% = $4,000) = $10,000/yr',
-          '7-year cumulative rent (at 3% escalation) ≈ $202,380',
-          '7-year cumulative buy cash outlay ($80,000 down + 7 × $34,271) ≈ $319,897, offset by ~$220,000 projected equity → Net Buy Cost ≈ $99,897'
+          'Estimated annual taxes/insurance (1.5% = $6,000) + maintenance (1% = $4,000) = $10,000/yr ($34,271/yr total)',
+          '7-year cumulative rent (at 3% escalation) = $202,289',
+          'Year 7 home value = $491,950 | Remaining loan balance = $289,332 → Amortized equity = $202,618',
+          '7-year buy cash outlay ($80,000 down + 7 × $34,271) = $319,900, minus $202,618 equity → Net Buy Cost = $117,282'
         ],
-        result: 'Buying wins by ~$102,483 over 7 years (before selling commissions)',
+        result: 'Buying wins by ~$85,007 over 7 years (before selling commissions)',
         takeaway: 'Staying 7+ years gives home appreciation and principal reduction enough time to outweigh upfront down payment and ownership expenses.'
       }
     ],
@@ -548,7 +549,7 @@ export const BUSINESS_REAL_ESTATE_TAX_EXPLANATIONS: Record<string, CalculatorExp
         },
         {
           title: '3. Calculate FICA Payroll & State Tax',
-          detail: 'Computes Social Security (6.2% up to $168,600) and Medicare (1.45% on all gross wages), plus your estimated state tax rate applied to taxable income.'
+          detail: 'Computes Social Security (6.2% up to $176,100) and Medicare (1.45% on all gross wages), plus your estimated state tax rate applied to taxable income.'
         },
         {
           title: '4. Derive Net Take-Home Pay',
@@ -556,8 +557,8 @@ export const BUSINESS_REAL_ESTATE_TAX_EXPLANATIONS: Record<string, CalculatorExp
         }
       ],
       keyAssumptions: [
-        'Uses estimated 2026 standard deductions ($15,000 Single, $30,000 Married Joint, $22,500 Head) and standard progressive federal brackets.',
-        'FICA Social Security cap is modeled at $168,600 (6.2% SS + 1.45% Medicare).',
+        'Uses 2025 IRS standard deductions ($15,000 Single, $30,000 Married Joint, $22,500 Head of Household) and progressive federal brackets.',
+        'FICA Social Security wage cap is $176,100 for 2025 (6.2% SS + 1.45% Medicare).',
         'Pre-tax deductions reduce federal and state taxable income, while FICA applies to gross wages.'
       ]
     },
