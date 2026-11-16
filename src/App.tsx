@@ -6,18 +6,20 @@ import { FeaturedCalculators } from './components/home/FeaturedCalculators';
 import { CategoryGrid } from './components/home/CategoryGrid';
 import { TrustAndFaqSection } from './components/home/TrustAndFaqSection';
 
-// Lazy-loaded Views for Route-Level Code Splitting
-const CategoryView = React.lazy(() => import('./components/views/CategoryView').then(m => ({ default: m.CategoryView })));
-const CalculatorDetailView = React.lazy(() => import('./components/views/CalculatorDetailView').then(m => ({ default: m.CalculatorDetailView })));
-const BlogListView = React.lazy(() => import('./components/views/BlogListView').then(m => ({ default: m.BlogListView })));
-const BlogPostView = React.lazy(() => import('./components/views/BlogPostView').then(m => ({ default: m.BlogPostView })));
-const AboutView = React.lazy(() => import('./components/views/AboutView').then(m => ({ default: m.AboutView })));
-const ContactView = React.lazy(() => import('./components/views/ContactView').then(m => ({ default: m.ContactView })));
-const SitemapView = React.lazy(() => import('./components/views/SitemapView').then(m => ({ default: m.SitemapView })));
-const AllCalculatorsView = React.lazy(() => import('./components/views/AllCalculatorsView').then(m => ({ default: m.AllCalculatorsView })));
-const LegalView = React.lazy(() => import('./components/views/LegalView').then(m => ({ default: m.LegalView })));
-const QuickSearchModal = React.lazy(() => import('./components/shared/QuickSearchModal').then(m => ({ default: m.QuickSearchModal })));
-const SavedHistoryDrawer = React.lazy(() => import('./components/shared/SavedHistoryDrawer').then(m => ({ default: m.SavedHistoryDrawer })));
+import { lazyWithRetry, attemptChunkReload } from './utils/lazyWithRetry';
+
+// Lazy-loaded Views for Route-Level Code Splitting (with automatic retry & stale-chunk recovery)
+const CategoryView = lazyWithRetry(() => import('./components/views/CategoryView').then(m => ({ default: m.CategoryView })));
+const CalculatorDetailView = lazyWithRetry(() => import('./components/views/CalculatorDetailView').then(m => ({ default: m.CalculatorDetailView })));
+const BlogListView = lazyWithRetry(() => import('./components/views/BlogListView').then(m => ({ default: m.BlogListView })));
+const BlogPostView = lazyWithRetry(() => import('./components/views/BlogPostView').then(m => ({ default: m.BlogPostView })));
+const AboutView = lazyWithRetry(() => import('./components/views/AboutView').then(m => ({ default: m.AboutView })));
+const ContactView = lazyWithRetry(() => import('./components/views/ContactView').then(m => ({ default: m.ContactView })));
+const SitemapView = lazyWithRetry(() => import('./components/views/SitemapView').then(m => ({ default: m.SitemapView })));
+const AllCalculatorsView = lazyWithRetry(() => import('./components/views/AllCalculatorsView').then(m => ({ default: m.AllCalculatorsView })));
+const LegalView = lazyWithRetry(() => import('./components/views/LegalView').then(m => ({ default: m.LegalView })));
+const QuickSearchModal = lazyWithRetry(() => import('./components/shared/QuickSearchModal').then(m => ({ default: m.QuickSearchModal })));
+const SavedHistoryDrawer = lazyWithRetry(() => import('./components/shared/SavedHistoryDrawer').then(m => ({ default: m.SavedHistoryDrawer })));
 
 import { NotFoundView } from './components/common/NotFoundView';
 import type { LegalTab } from './components/views/LegalView';
@@ -225,6 +227,17 @@ function AppContent() {
       }
     } catch (_) {}
   }, [routeFromPath]);
+
+  // Recover cleanly from Vite CSS/module preload errors after deployments
+  useEffect(() => {
+    const handlePreloadError = (event: Event) => {
+      if (attemptChunkReload()) {
+        event.preventDefault();
+      }
+    };
+    window.addEventListener('vite:preloadError', handlePreloadError);
+    return () => window.removeEventListener('vite:preloadError', handlePreloadError);
+  }, []);
 
   // Update URL history state helper
   const navigateUrl = (url: string) => {
@@ -512,7 +525,7 @@ function AppContent() {
 
       {/* Main Content Area */}
       <main className="flex-1">
-        <ErrorBoundary>
+        <ErrorBoundary resetKeys={[viewMode, selectedCategoryId, selectedCalculatorId, selectedBlogSlug]}>
         {/* VIEW 1: Home View */}
         {viewMode === 'home' && (
           <div>

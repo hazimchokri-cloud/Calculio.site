@@ -30,12 +30,6 @@ export default defineConfig(() => {
             if (id.includes('node_modules/lucide-react') || id.includes('node_modules/motion') || id.includes('node_modules/canvas-confetti')) {
               return 'ui';
             }
-            if (id.includes('src/components/calculators/')) {
-              return 'calculators';
-            }
-            if (id.includes('src/components/views/Blog') || id.includes('src/data/blogPosts') || id.includes('blogPostsFr') || id.includes('blogPostsAr')) {
-              return 'blog';
-            }
           },
         },
       },

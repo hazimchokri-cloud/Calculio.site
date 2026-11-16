@@ -18,119 +18,130 @@ import { ErrorBoundary } from '../shared/ErrorBoundary';
 import { CalculatorLoadingSkeleton } from '../shared/CalculatorLoadingSkeleton';
 import { useLanguage } from '../../i18n/LanguageContext';
 
-// Lazy-loaded Calculator components for optimal performance and small bundle chunks
-const MortgageCalculator = React.lazy(() => import('../calculators/MortgageCalculator').then(m => ({ default: m.MortgageCalculator })));
-const LoanCalculator = React.lazy(() => import('../calculators/LoanCalculator').then(m => ({ default: m.LoanCalculator })));
-const AutoLoanCalculator = React.lazy(() => import('../calculators/AutoLoanCalculator').then(m => ({ default: m.AutoLoanCalculator })));
-const PersonalLoanCalculator = React.lazy(() => import('../calculators/PersonalLoanCalculator').then(m => ({ default: m.PersonalLoanCalculator })));
-const InterestCalculator = React.lazy(() => import('../calculators/InterestCalculator').then(m => ({ default: m.InterestCalculator })));
-const CompoundInterestCalculator = React.lazy(() => import('../calculators/CompoundInterestCalculator').then(m => ({ default: m.CompoundInterestCalculator })));
-const InvestmentCalculator = React.lazy(() => import('../calculators/InvestmentCalculator').then(m => ({ default: m.InvestmentCalculator })));
-const SavingsCalculator = React.lazy(() => import('../calculators/SavingsCalculator').then(m => ({ default: m.SavingsCalculator })));
-const RetirementCalculator = React.lazy(() => import('../calculators/RetirementCalculator').then(m => ({ default: m.RetirementCalculator })));
-const InflationCalculator = React.lazy(() => import('../calculators/InflationCalculator').then(m => ({ default: m.InflationCalculator })));
-const CreditCardCalculator = React.lazy(() => import('../calculators/CreditCardCalculator').then(m => ({ default: m.CreditCardCalculator })));
-const DebtPayoffCalculator = React.lazy(() => import('../calculators/DebtPayoffCalculator').then(m => ({ default: m.DebtPayoffCalculator })));
-const AprCalculator = React.lazy(() => import('../calculators/AprCalculator').then(m => ({ default: m.AprCalculator })));
-const AmortizationCalculator = React.lazy(() => import('../calculators/AmortizationCalculator').then(m => ({ default: m.AmortizationCalculator })));
-const RoiCalculator = React.lazy(() => import('../calculators/RoiCalculator').then(m => ({ default: m.RoiCalculator })));
-const SalaryCalculator = React.lazy(() => import('../calculators/SalaryCalculator').then(m => ({ default: m.SalaryCalculator })));
+import { MortgageCalculator } from '../calculators/MortgageCalculator';
+import { LoanCalculator } from '../calculators/LoanCalculator';
+import { AutoLoanCalculator } from '../calculators/AutoLoanCalculator';
+import { PersonalLoanCalculator } from '../calculators/PersonalLoanCalculator';
+import { InterestCalculator } from '../calculators/InterestCalculator';
+import { CompoundInterestCalculator } from '../calculators/CompoundInterestCalculator';
+import { InvestmentCalculator } from '../calculators/InvestmentCalculator';
+import { SavingsCalculator } from '../calculators/SavingsCalculator';
+import { RetirementCalculator } from '../calculators/RetirementCalculator';
+import { InflationCalculator } from '../calculators/InflationCalculator';
+import { CreditCardCalculator } from '../calculators/CreditCardCalculator';
+import { DebtPayoffCalculator } from '../calculators/DebtPayoffCalculator';
+import { AprCalculator } from '../calculators/AprCalculator';
+import { AmortizationCalculator } from '../calculators/AmortizationCalculator';
+import { RoiCalculator } from '../calculators/RoiCalculator';
+import { SalaryCalculator } from '../calculators/SalaryCalculator';
 
 // Health & Fitness
-const BmiCalculator = React.lazy(() => import('../calculators/BmiCalculator').then(m => ({ default: m.BmiCalculator })));
-const BodyFatCalculator = React.lazy(() => import('../calculators/BodyFatCalculator').then(m => ({ default: m.BodyFatCalculator })));
-const CalorieTdeeCalculator = React.lazy(() => import('../calculators/CalorieTdeeCalculator').then(m => ({ default: m.CalorieTdeeCalculator })));
-const BmrCalculator = React.lazy(() => import('../calculators/BmrCalculator').then(m => ({ default: m.BmrCalculator })));
-const IdealWeightCalculator = React.lazy(() => import('../calculators/IdealWeightCalculator').then(m => ({ default: m.IdealWeightCalculator })));
-const PregnancyCalculator = React.lazy(() => import('../calculators/PregnancyCalculator').then(m => ({ default: m.PregnancyCalculator })));
-const DueDateCalculator = React.lazy(() => import('../calculators/DueDateCalculator').then(m => ({ default: m.DueDateCalculator })));
-const OvulationCalculator = React.lazy(() => import('../calculators/OvulationCalculator').then(m => ({ default: m.OvulationCalculator })));
-const WaterIntakeCalculator = React.lazy(() => import('../calculators/WaterIntakeCalculator').then(m => ({ default: m.WaterIntakeCalculator })));
-const HeartRateCalculator = React.lazy(() => import('../calculators/HeartRateCalculator').then(m => ({ default: m.HeartRateCalculator })));
+import { BmiCalculator } from '../calculators/BmiCalculator';
+import { BodyFatCalculator } from '../calculators/BodyFatCalculator';
+import { CalorieTdeeCalculator } from '../calculators/CalorieTdeeCalculator';
+import { BmrCalculator } from '../calculators/BmrCalculator';
+import { IdealWeightCalculator } from '../calculators/IdealWeightCalculator';
+import { PregnancyCalculator } from '../calculators/PregnancyCalculator';
+import { DueDateCalculator } from '../calculators/DueDateCalculator';
+import { OvulationCalculator } from '../calculators/OvulationCalculator';
+import { WaterIntakeCalculator } from '../calculators/WaterIntakeCalculator';
+import { HeartRateCalculator } from '../calculators/HeartRateCalculator';
 
 // Math, Unit, Time, Lifestyle
-const ScientificCalculator = React.lazy(() => import('../calculators/ScientificCalculator').then(m => ({ default: m.ScientificCalculator })));
-const PercentageCalculator = React.lazy(() => import('../calculators/PercentageCalculator').then(m => ({ default: m.PercentageCalculator })));
-const FractionCalculator = React.lazy(() => import('../calculators/FractionCalculator').then(m => ({ default: m.FractionCalculator })));
-const DecimalCalculator = React.lazy(() => import('../calculators/DecimalCalculator').then(m => ({ default: m.DecimalCalculator })));
-const RatioCalculator = React.lazy(() => import('../calculators/RatioCalculator').then(m => ({ default: m.RatioCalculator })));
-const AverageCalculator = React.lazy(() => import('../calculators/AverageCalculator').then(m => ({ default: m.AverageCalculator })));
-const ProbabilityCalculator = React.lazy(() => import('../calculators/ProbabilityCalculator').then(m => ({ default: m.ProbabilityCalculator })));
-const StatisticsCalculator = React.lazy(() => import('../calculators/StatisticsCalculator').then(m => ({ default: m.StatisticsCalculator })));
-const ExponentCalculator = React.lazy(() => import('../calculators/ExponentCalculator').then(m => ({ default: m.ExponentCalculator })));
-const SquareRootCalculator = React.lazy(() => import('../calculators/SquareRootCalculator').then(m => ({ default: m.SquareRootCalculator })));
-const GeometryCalculator = React.lazy(() => import('../calculators/GeometryCalculator').then(m => ({ default: m.GeometryCalculator })));
-const UnitConverter = React.lazy(() => import('../calculators/UnitConverter').then(m => ({ default: m.UnitConverter })));
-const DateCalculator = React.lazy(() => import('../calculators/DateCalculator').then(m => ({ default: m.DateCalculator })));
-const GpaCalculator = React.lazy(() => import('../calculators/GpaCalculator').then(m => ({ default: m.GpaCalculator })));
-const GasMileageCalculator = React.lazy(() => import('../calculators/GasMileageCalculator').then(m => ({ default: m.GasMileageCalculator })));
+import { ScientificCalculator } from '../calculators/ScientificCalculator';
+import { PercentageCalculator } from '../calculators/PercentageCalculator';
+import { FractionCalculator } from '../calculators/FractionCalculator';
+import { DecimalCalculator } from '../calculators/DecimalCalculator';
+import { RatioCalculator } from '../calculators/RatioCalculator';
+import { AverageCalculator } from '../calculators/AverageCalculator';
+import { ProbabilityCalculator } from '../calculators/ProbabilityCalculator';
+import { StatisticsCalculator } from '../calculators/StatisticsCalculator';
+import { ExponentCalculator } from '../calculators/ExponentCalculator';
+import { SquareRootCalculator } from '../calculators/SquareRootCalculator';
+import { GeometryCalculator } from '../calculators/GeometryCalculator';
+import { UnitConverter } from '../calculators/UnitConverter';
+import { DateCalculator } from '../calculators/DateCalculator';
+import { GpaCalculator } from '../calculators/GpaCalculator';
+import { GasMileageCalculator } from '../calculators/GasMileageCalculator';
 
 // Expansion Calculators
-const ConcreteCalculator = React.lazy(() => import('../calculators/ConcreteCalculator').then(m => ({ default: m.ConcreteCalculator })));
-const FlooringCalculator = React.lazy(() => import('../calculators/FlooringCalculator').then(m => ({ default: m.FlooringCalculator })));
-const RentalRoiCalculator = React.lazy(() => import('../calculators/RentalRoiCalculator').then(m => ({ default: m.RentalRoiCalculator })));
-const CapRateCalculator = React.lazy(() => import('../calculators/CapRateCalculator').then(m => ({ default: m.CapRateCalculator })));
-const BreakEvenCalculator = React.lazy(() => import('../calculators/BreakEvenCalculator').then(m => ({ default: m.BreakEvenCalculator })));
-const ProfitMarginCalculator = React.lazy(() => import('../calculators/ProfitMarginCalculator').then(m => ({ default: m.ProfitMarginCalculator })));
-const FinalGradeCalculator = React.lazy(() => import('../calculators/FinalGradeCalculator').then(m => ({ default: m.FinalGradeCalculator })));
-const OhmsLawCalculator = React.lazy(() => import('../calculators/OhmsLawCalculator').then(m => ({ default: m.OhmsLawCalculator })));
-const IncomeTaxCalculator = React.lazy(() => import('../calculators/IncomeTaxCalculator').then(m => ({ default: m.IncomeTaxCalculator })));
-const SalesTaxCalculator = React.lazy(() => import('../calculators/SalesTaxCalculator').then(m => ({ default: m.SalesTaxCalculator })));
-const CryptoProfitCalculator = React.lazy(() => import('../calculators/CryptoProfitCalculator').then(m => ({ default: m.CryptoProfitCalculator })));
-const GenericConfigurableCalculator = React.lazy(() => import('../calculators/GenericConfigurableCalculator').then(m => ({ default: m.GenericConfigurableCalculator })));
+import { ConcreteCalculator } from '../calculators/ConcreteCalculator';
+import { FlooringCalculator } from '../calculators/FlooringCalculator';
+import { RentalRoiCalculator } from '../calculators/RentalRoiCalculator';
+import { CapRateCalculator } from '../calculators/CapRateCalculator';
+import { BreakEvenCalculator } from '../calculators/BreakEvenCalculator';
+import { ProfitMarginCalculator } from '../calculators/ProfitMarginCalculator';
+import { FinalGradeCalculator } from '../calculators/FinalGradeCalculator';
+import { OhmsLawCalculator } from '../calculators/OhmsLawCalculator';
+import { IncomeTaxCalculator } from '../calculators/IncomeTaxCalculator';
+import { SalesTaxCalculator } from '../calculators/SalesTaxCalculator';
+import { CryptoProfitCalculator } from '../calculators/CryptoProfitCalculator';
+import { GenericConfigurableCalculator } from '../calculators/GenericConfigurableCalculator';
 
-const LoanComparisonCalculator = React.lazy(() => import('../calculators/FinancialExpansionCalculators').then(m => ({ default: m.LoanComparisonCalculator })));
-const CarLeaseCalculator = React.lazy(() => import('../calculators/FinancialExpansionCalculators').then(m => ({ default: m.CarLeaseCalculator })));
-const DownPaymentCalculator = React.lazy(() => import('../calculators/FinancialExpansionCalculators').then(m => ({ default: m.DownPaymentCalculator })));
-const EmergencyFundCalculator = React.lazy(() => import('../calculators/FinancialExpansionCalculators').then(m => ({ default: m.EmergencyFundCalculator })));
-const CdCalculator = React.lazy(() => import('../calculators/FinancialExpansionCalculators').then(m => ({ default: m.CdCalculator })));
-const FourZeroOneKMatchCalculator = React.lazy(() => import('../calculators/FinancialExpansionCalculators').then(m => ({ default: m.FourZeroOneKMatchCalculator })));
+import {
+  LoanComparisonCalculator,
+  CarLeaseCalculator,
+  DownPaymentCalculator,
+  EmergencyFundCalculator,
+  CdCalculator,
+  FourZeroOneKMatchCalculator
+} from '../calculators/FinancialExpansionCalculators';
 
-const PaceCalculator = React.lazy(() => import('../calculators/HealthExpansionCalculators').then(m => ({ default: m.PaceCalculator })));
-const OneRepMaxCalculator = React.lazy(() => import('../calculators/HealthExpansionCalculators').then(m => ({ default: m.OneRepMaxCalculator })));
-const WaistToHipCalculator = React.lazy(() => import('../calculators/HealthExpansionCalculators').then(m => ({ default: m.WaistToHipCalculator })));
-const SleepCycleCalculator = React.lazy(() => import('../calculators/HealthExpansionCalculators').then(m => ({ default: m.SleepCycleCalculator })));
-const AlcoholCalorieCalculator = React.lazy(() => import('../calculators/HealthExpansionCalculators').then(m => ({ default: m.AlcoholCalorieCalculator })));
-const LeanBodyMassCalculator = React.lazy(() => import('../calculators/HealthExpansionCalculators').then(m => ({ default: m.LeanBodyMassCalculator })));
+import {
+  PaceCalculator,
+  OneRepMaxCalculator,
+  WaistToHipCalculator,
+  SleepCycleCalculator,
+  AlcoholCalorieCalculator,
+  LeanBodyMassCalculator
+} from '../calculators/HealthExpansionCalculators';
 
-const QuadraticSolverCalculator = React.lazy(() => import('../calculators/MathExpansionCalculators').then(m => ({ default: m.QuadraticSolverCalculator })));
-const PythagoreanCalculator = React.lazy(() => import('../calculators/MathExpansionCalculators').then(m => ({ default: m.PythagoreanCalculator })));
-const LcmGcdCalculator = React.lazy(() => import('../calculators/MathExpansionCalculators').then(m => ({ default: m.LcmGcdCalculator })));
-const LogarithmCalculator = React.lazy(() => import('../calculators/MathExpansionCalculators').then(m => ({ default: m.LogarithmCalculator })));
-const FactorialPermutationsCalculator = React.lazy(() => import('../calculators/MathExpansionCalculators').then(m => ({ default: m.FactorialPermutationsCalculator })));
-const MatrixCalculator = React.lazy(() => import('../calculators/MathExpansionCalculators').then(m => ({ default: m.MatrixCalculator })));
+import {
+  QuadraticSolverCalculator,
+  PythagoreanCalculator,
+  LcmGcdCalculator,
+  LogarithmCalculator,
+  FactorialPermutationsCalculator,
+  MatrixCalculator
+} from '../calculators/MathExpansionCalculators';
 
-const RentVsBuyCalculator = React.lazy(() => import('../calculators/RealEstateTaxExpansionCalculators').then(m => ({ default: m.RentVsBuyCalculator })));
-const RefinanceCalculator = React.lazy(() => import('../calculators/RealEstateTaxExpansionCalculators').then(m => ({ default: m.RefinanceCalculator })));
-const CashOnCashCalculator = React.lazy(() => import('../calculators/RealEstateTaxExpansionCalculators').then(m => ({ default: m.CashOnCashCalculator })));
-const GrmCalculator = React.lazy(() => import('../calculators/RealEstateTaxExpansionCalculators').then(m => ({ default: m.GrmCalculator })));
-const CapitalGainsCalculator = React.lazy(() => import('../calculators/RealEstateTaxExpansionCalculators').then(m => ({ default: m.CapitalGainsCalculator })));
-const TipCalculator = React.lazy(() => import('../calculators/RealEstateTaxExpansionCalculators').then(m => ({ default: m.TipCalculator })));
-const VatCalculator = React.lazy(() => import('../calculators/RealEstateTaxExpansionCalculators').then(m => ({ default: m.VatCalculator })));
+import {
+  RentVsBuyCalculator,
+  RefinanceCalculator,
+  CashOnCashCalculator,
+  GrmCalculator,
+  CapitalGainsCalculator,
+  TipCalculator,
+  VatCalculator
+} from '../calculators/RealEstateTaxExpansionCalculators';
 
-const CacLtvCalculator = React.lazy(() => import('../calculators/BusinessConstructionExpansionCalculators').then(m => ({ default: m.CacLtvCalculator })));
-const MarkupMarginCalculator = React.lazy(() => import('../calculators/BusinessConstructionExpansionCalculators').then(m => ({ default: m.MarkupMarginCalculator })));
-const InventoryTurnoverCalculator = React.lazy(() => import('../calculators/BusinessConstructionExpansionCalculators').then(m => ({ default: m.InventoryTurnoverCalculator })));
-const EbitdaCalculator = React.lazy(() => import('../calculators/BusinessConstructionExpansionCalculators').then(m => ({ default: m.EbitdaCalculator })));
-const BurnRateCalculator = React.lazy(() => import('../calculators/BusinessConstructionExpansionCalculators').then(m => ({ default: m.BurnRateCalculator })));
-const PaintCalculator = React.lazy(() => import('../calculators/BusinessConstructionExpansionCalculators').then(m => ({ default: m.PaintCalculator })));
-const DrywallCalculator = React.lazy(() => import('../calculators/BusinessConstructionExpansionCalculators').then(m => ({ default: m.DrywallCalculator })));
-const MulchGravelCalculator = React.lazy(() => import('../calculators/BusinessConstructionExpansionCalculators').then(m => ({ default: m.MulchGravelCalculator })));
-const DeckLumberCalculator = React.lazy(() => import('../calculators/BusinessConstructionExpansionCalculators').then(m => ({ default: m.DeckLumberCalculator })));
+import {
+  CacLtvCalculator,
+  MarkupMarginCalculator,
+  InventoryTurnoverCalculator,
+  EbitdaCalculator,
+  BurnRateCalculator,
+  PaintCalculator,
+  DrywallCalculator,
+  MulchGravelCalculator,
+  DeckLumberCalculator
+} from '../calculators/BusinessConstructionExpansionCalculators';
 
-const DensityCalculator = React.lazy(() => import('../calculators/ScienceEverydayExpansionCalculators').then(m => ({ default: m.DensityCalculator })));
-const EnergyCalculator = React.lazy(() => import('../calculators/ScienceEverydayExpansionCalculators').then(m => ({ default: m.EnergyCalculator })));
-const PressureCalculator = React.lazy(() => import('../calculators/ScienceEverydayExpansionCalculators').then(m => ({ default: m.PressureCalculator })));
-const SpeedOfSoundCalculator = React.lazy(() => import('../calculators/ScienceEverydayExpansionCalculators').then(m => ({ default: m.SpeedOfSoundCalculator })));
-const TimeCardCalculator = React.lazy(() => import('../calculators/ScienceEverydayExpansionCalculators').then(m => ({ default: m.TimeCardCalculator })));
-const ExactAgeCalculator = React.lazy(() => import('../calculators/ScienceEverydayExpansionCalculators').then(m => ({ default: m.ExactAgeCalculator })));
-const TimeZoneCalculator = React.lazy(() => import('../calculators/ScienceEverydayExpansionCalculators').then(m => ({ default: m.TimeZoneCalculator })));
-const NetWorthCalculator = React.lazy(() => import('../calculators/ScienceEverydayExpansionCalculators').then(m => ({ default: m.NetWorthCalculator })));
-const DogAgeCalculator = React.lazy(() => import('../calculators/ScienceEverydayExpansionCalculators').then(m => ({ default: m.DogAgeCalculator })));
-const CookingConverterCalculator = React.lazy(() => import('../calculators/ScienceEverydayExpansionCalculators').then(m => ({ default: m.CookingConverterCalculator })));
-const CryptoDcaCalculator = React.lazy(() => import('../calculators/ScienceEverydayExpansionCalculators').then(m => ({ default: m.CryptoDcaCalculator })));
-const StakingRewardsCalculator = React.lazy(() => import('../calculators/ScienceEverydayExpansionCalculators').then(m => ({ default: m.StakingRewardsCalculator })));
-const ImpermanentLossCalculator = React.lazy(() => import('../calculators/ScienceEverydayExpansionCalculators').then(m => ({ default: m.ImpermanentLossCalculator })));
+import {
+  DensityCalculator,
+  EnergyCalculator,
+  PressureCalculator,
+  SpeedOfSoundCalculator,
+  TimeCardCalculator,
+  ExactAgeCalculator,
+  TimeZoneCalculator,
+  NetWorthCalculator,
+  DogAgeCalculator,
+  CookingConverterCalculator,
+  CryptoDcaCalculator,
+  StakingRewardsCalculator,
+  ImpermanentLossCalculator
+} from '../calculators/ScienceEverydayExpansionCalculators';
 
 interface CalculatorDetailProps {
   calculator: CalculatorMeta;
@@ -580,6 +591,7 @@ export const CalculatorDetailView: React.FC<CalculatorDetailProps> = ({
         {/* Left Column (8 cols): Comprehensive Explanation Section */}
         <div className="lg:col-span-8 space-y-10">
           <CalculatorExplanationSection 
+            key={calculator.id}
             calculator={localizedCalc} 
             currencySymbol={currencySymbol} 
           />
