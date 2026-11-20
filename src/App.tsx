@@ -26,6 +26,10 @@ import type { LegalTab } from './components/views/LegalView';
 import { CALCULATORS } from './data/calculatorDirectory';
 import { CATEGORIES } from './data/categories';
 import { BLOG_POSTS } from './data/blogPosts';
+import {
+  PERCENTAGE_CALCULATOR_FAQ_SCHEMA,
+  PERCENTAGE_CALCULATOR_ARTICLE_SCHEMA
+} from './data/percentageCalculatorArticle';
 import { 
   CurrencyCode, 
   SavedCalculation, 
@@ -405,12 +409,21 @@ function AppContent() {
         { name: currentCalculator.name, url: `${origin}${getCalculatorUrl(currentCalculator)}` }
       ]);
 
+      const schemas: Record<string, any>[] = [calcSchema, breadcrumbSchema];
+      if (currentCalculator.id === 'percentage-calculator') {
+        schemas.push(PERCENTAGE_CALCULATOR_ARTICLE_SCHEMA, PERCENTAGE_CALCULATOR_FAQ_SCHEMA);
+      }
+
       updateDocumentSeo({
-        title: `${currentCalculator.name} - ${t('seo.calcSuffix', 'Free Online Calculator | Calculio')}`,
+        title: (language === 'en' && currentCalculator.seoTitle)
+          ? currentCalculator.seoTitle
+          : `${currentCalculator.name} - ${t('seo.calcSuffix', 'Free Online Calculator | Calculio')}`,
         description: currentCalculator.metaDescription || currentCalculator.description,
         keywords: currentCalculator.metaKeywords || currentCalculator.tags,
         canonicalUrl: getCalculatorUrl(currentCalculator),
-        schema: [calcSchema, breadcrumbSchema]
+        ogType: currentCalculator.ogType || 'website',
+        ogImage: currentCalculator.ogImage,
+        schema: schemas
       });
     } else if (viewMode === 'blog-post') {
       const articleSchema = buildArticleSchema(currentBlogPost, origin);

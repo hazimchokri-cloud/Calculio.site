@@ -4,13 +4,18 @@ import { generateSitemapEntries } from '../src/utils/sitemapGenerator';
 import { CALCULATORS } from '../src/data/calculatorDirectory';
 import { CATEGORIES } from '../src/data/categories';
 import { BLOG_POSTS } from '../src/data/blogPosts';
+import {
+  PERCENTAGE_CALCULATOR_FAQ_SCHEMA,
+  PERCENTAGE_CALCULATOR_ARTICLE_SCHEMA
+} from '../src/data/percentageCalculatorArticle';
 import { 
   CATEGORY_URL_PREFIX, 
   getCalculatorUrl, 
   getCategoryUrl, 
   getBlogPostUrl,
   buildCalculatorSchema,
-  buildArticleSchema
+  buildArticleSchema,
+  buildBreadcrumbSchema
 } from '../src/utils/seo';
 
 const BASE_URL = 'https://calculio.site';
@@ -28,7 +33,10 @@ interface RouteConfig {
   routePath: string; // e.g. "/about" or "/financial-calculators/mortgage-calculator"
   title: string;
   description: string;
+  keywords?: string[];
   canonicalUrl: string;
+  ogType?: 'website' | 'article' | 'profile';
+  ogImage?: string;
   schema?: Record<string, any> | Record<string, any>[];
 }
 
@@ -54,9 +62,32 @@ function buildRoutes(): RouteConfig[] {
       return calcUrl === cleanPath || c.id === cleanPath;
     });
 
+    let routeTitle = entry.title;
+    let keywords: string[] | undefined = undefined;
+    let ogType: 'website' | 'article' | 'profile' | undefined = undefined;
+    let ogImage: string | undefined = undefined;
+
     if (calc) {
+      if (calc.seoTitle) {
+        routeTitle = calc.seoTitle;
+      }
       description = calc.metaDescription || calc.description;
-      schema = buildCalculatorSchema(calc, BASE_URL);
+      keywords = calc.metaKeywords;
+      ogType = calc.ogType;
+      ogImage = calc.ogImage
+        ? (calc.ogImage.startsWith('http') ? calc.ogImage : `${BASE_URL}${calc.ogImage.startsWith('/') ? calc.ogImage : `/${calc.ogImage}`}`)
+        : undefined;
+      const calcSchema = buildCalculatorSchema(calc, BASE_URL);
+      const cat = CATEGORIES.find(c => c.id === calc.category);
+      const breadcrumbSchema = buildBreadcrumbSchema([
+        { name: 'Home', url: BASE_URL },
+        { name: cat ? cat.name : 'Calculators', url: `${BASE_URL}${getCategoryUrl(cat || calc.category)}` },
+        { name: calc.name, url: `${BASE_URL}${getCalculatorUrl(calc)}` }
+      ]);
+      schema =
+        calc.id === 'percentage-calculator'
+          ? [calcSchema, breadcrumbSchema, PERCENTAGE_CALCULATOR_ARTICLE_SCHEMA, PERCENTAGE_CALCULATOR_FAQ_SCHEMA]
+          : calcSchema;
     } else {
       // Check if category
       const cat = CATEGORIES.find(c => {
@@ -96,9 +127,12 @@ function buildRoutes(): RouteConfig[] {
 
     routes.push({
       routePath: `/${cleanPath}`,
-      title: entry.title,
+      title: routeTitle,
       description,
+      keywords,
       canonicalUrl: entry.loc,
+      ogType,
+      ogImage,
       schema
     });
   }
@@ -110,10 +144,27 @@ function buildRoutes(): RouteConfig[] {
     if (directPath !== canonicalPath) {
       routes.push({
         routePath: directPath,
-        title: `${calc.name} - Free Online Calculator | Calculio`,
+        title: calc.seoTitle || `${calc.name} - Free Online Calculator | Calculio`,
         description: calc.metaDescription || calc.description,
+        keywords: calc.metaKeywords,
         canonicalUrl: `${BASE_URL}${canonicalPath}`,
-        schema: buildCalculatorSchema(calc, BASE_URL)
+        ogType: calc.ogType,
+        ogImage: calc.ogImage
+          ? (calc.ogImage.startsWith('http') ? calc.ogImage : `${BASE_URL}${calc.ogImage.startsWith('/') ? calc.ogImage : `/${calc.ogImage}`}`)
+          : undefined,
+        schema:
+          calc.id === 'percentage-calculator'
+            ? [
+                buildCalculatorSchema(calc, BASE_URL),
+                buildBreadcrumbSchema([
+                  { name: 'Home', url: BASE_URL },
+                  { name: 'Math & Algebra', url: `${BASE_URL}/math-calculators` },
+                  { name: calc.name, url: `${BASE_URL}${canonicalPath}` }
+                ]),
+                PERCENTAGE_CALCULATOR_ARTICLE_SCHEMA,
+                PERCENTAGE_CALCULATOR_FAQ_SCHEMA
+              ]
+            : buildCalculatorSchema(calc, BASE_URL)
       });
     }
   }
@@ -221,6 +272,22 @@ function run() {
       );
     }
 
+    // Update Keywords (only when explicitly configured)
+    if (r.keywords && r.keywords.length > 0) {
+      const kwContent = escapeHtml(r.keywords.join(', '));
+      if (customizedHtml.match(/<meta\s+name=["']keywords["'][^>]*>/i)) {
+        customizedHtml = customizedHtml.replace(
+          /<meta\s+name=["']keywords["'][^>]*>/i,
+          `<meta name="keywords" content="${kwContent}" />`
+        );
+      } else {
+        customizedHtml = customizedHtml.replace(
+          /<\/head>/i,
+          `  <meta name="keywords" content="${kwContent}" />\n  </head>`
+        );
+      }
+    }
+
     // Update Open Graph tags
     customizedHtml = customizedHtml.replace(
       /<meta\s+property=["']og:title["'][^>]*>/i,
@@ -230,10 +297,44 @@ function run() {
       /<meta\s+property=["']og:description["'][^>]*>/i,
       `<meta property="og:description" content="${escapeHtml(r.description)}" />`
     );
-    customizedHtml = customizedHtml.replace(
-      /<meta\s+property=["']og:url["'][^>]*>/i,
-      `<meta property="og:url" content="${r.canonicalUrl}" />`
-    );
+    if (r.ogType) {
+      customizedHtml = customizedHtml.replace(
+        /<meta\s+property=["']og:type["'][^>]*>/i,
+        `<meta property="og:type" content="${r.ogType}" />`
+      );
+    }
+    if (customizedHtml.match(/<meta\s+property=["']og:url["'][^>]*>/i)) {
+      customizedHtml = customizedHtml.replace(
+        /<meta\s+property=["']og:url["'][^>]*>/i,
+        `<meta property="og:url" content="${r.canonicalUrl}" />`
+      );
+    } else {
+      customizedHtml = customizedHtml.replace(
+        /<\/head>/i,
+        `  <meta property="og:url" content="${r.canonicalUrl}" />\n  </head>`
+      );
+    }
+    if (r.ogImage) {
+      if (customizedHtml.match(/<meta\s+property=["']og:image["'][^>]*>/i)) {
+        customizedHtml = customizedHtml.replace(
+          /<meta\s+property=["']og:image["'][^>]*>/i,
+          `<meta property="og:image" content="${r.ogImage}" />`
+        );
+      } else {
+        customizedHtml = customizedHtml.replace(
+          /<\/head>/i,
+          `  <meta property="og:image" content="${r.ogImage}" />\n  </head>`
+        );
+      }
+
+      const twitterTags = [
+        `<meta name="twitter:card" content="summary_large_image" />`,
+        `<meta name="twitter:title" content="${escapeHtml(r.title)}" />`,
+        `<meta name="twitter:description" content="${escapeHtml(r.description)}" />`,
+        `<meta name="twitter:image" content="${r.ogImage}" />`
+      ].join('\n  ');
+      customizedHtml = customizedHtml.replace(/<\/head>/i, `  ${twitterTags}\n  </head>`);
+    }
 
     // Inject JSON-LD Schema if present
     if (r.schema) {

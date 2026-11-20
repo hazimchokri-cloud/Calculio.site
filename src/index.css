@@ -184,6 +184,48 @@
   margin-bottom: 0.65rem;
 }
 
+.rich-text-content > h2:first-child {
+  margin-top: 0;
+}
+
+.rich-text-content figure svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 1rem;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 16px rgb(15 23 42 / 0.06);
+}
+
+.rich-text-content .cta {
+  background-color: #FFF7ED;
+  border: 1px solid #FDBA74;
+  border-left: 4px solid #F97316;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  border-radius: 0.75rem;
+  color: #0F172A;
+}
+
+.rich-text-content .cta a {
+  color: #C2410C;
+}
+
+.rich-text-content .cta a:hover {
+  color: #9A3412;
+}
+
+.rich-text-content .formula {
+  background-color: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.75rem;
+  padding: 0.875rem 1.125rem;
+  font-weight: 700;
+  color: #0F172A;
+  overflow-x: auto;
+}
+
 @theme {
   --color-page: #F8FAFC;
   --color-surface: #FFFFFF;

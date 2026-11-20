@@ -425,7 +425,19 @@ export const CALCULATORS: CalculatorMeta[] = [
     popular: true,
     featured: true,
     tags: ['percentage', 'percent', 'discount', 'percent change', 'increase', 'decrease', 'math'],
-    metaDescription: 'Solve percentages fast: find X% of Y, what percent X is of Y, percentage increase or decrease, and percentage difference.',
+    seoTitle: 'Percentage Calculator: Formulas, Examples & Free Tool',
+    metaDescription: 'Free percentage calculator: find X% of Y, percentage change, difference and error. Clear formulas, step-by-step examples and common mistakes.',
+    metaKeywords: [
+      'percentage calculator',
+      'percent calculator',
+      'percentage increase calculator',
+      'percentage change calculator',
+      'percentage difference calculator',
+      'percent error formula',
+      'how to calculate percentage'
+    ],
+    ogType: 'article',
+    ogImage: '/assets/calculio-percentage-cover.webp',
     formulaSummary: 'Value = (P / 100) × Total; % Change = [(New - Old) / Old] × 100.'
   },
   {

@@ -69,8 +69,11 @@ export interface CalculatorMeta {
   featured?: boolean;
   recentlyAdded?: boolean;
   tags: string[];
+  seoTitle?: string;
   metaDescription?: string;
   metaKeywords?: string[];
+  ogType?: 'website' | 'article' | 'profile';
+  ogImage?: string;
   formulaSummary?: string;
   explanation?: CalculatorExplanation;
   faqs?: { question: string; answer: string }[];

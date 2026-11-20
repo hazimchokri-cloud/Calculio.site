@@ -6,10 +6,12 @@ import {
   Check,
   ShieldAlert,
   Info,
-  ArrowRight
+  ArrowRight,
+  BookOpen
 } from 'lucide-react';
 import { Breadcrumbs } from '../shared/Breadcrumbs';
 import { CalculatorExplanationSection } from '../shared/CalculatorExplanationSection';
+import { PERCENTAGE_CALCULATOR_ARTICLE_HTML } from '../../data/percentageCalculatorArticle';
 import { RelatedCalculators } from '../shared/RelatedCalculators';
 import { ShareModal } from '../shared/ShareModal';
 import { PrintReportHeader } from '../shared/PrintReportHeader';
@@ -588,13 +590,51 @@ export const CalculatorDetailView: React.FC<CalculatorDetailProps> = ({
       {/* Main Two Column Layout: Detailed Explanation Section & Sidebar */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-4">
         
-        {/* Left Column (8 cols): Comprehensive Explanation Section */}
-        <div className="lg:col-span-8 space-y-10">
-          <CalculatorExplanationSection 
-            key={calculator.id}
-            calculator={localizedCalc} 
-            currencySymbol={currencySymbol} 
-          />
+        {/* Left Column (8 cols): Comprehensive Explanation / Article Section */}
+        <div className="lg:col-span-8 min-w-0 space-y-10">
+          {calculator.id === 'percentage-calculator' ? (
+            <article
+              id="percentage-calculator-article"
+              aria-label="Percentage Calculator Guide and Formulas"
+              className="bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 shadow-xs"
+            >
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#F97316] mb-3">
+                <BookOpen className="w-4 h-4" />
+                <span>{t('calcView.guideTitle', 'Educational Guide')}</span>
+              </div>
+              <div
+                className="rich-text-content text-base text-[#475569] leading-relaxed"
+                onClick={(e) => {
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                  const anchor = (e.target as HTMLElement).closest('a');
+                  if (!anchor) return;
+                  const href = anchor.getAttribute('href') || '';
+                  if (
+                    href === 'https://calculio.site/math-calculators/percentage-calculator' ||
+                    href === '/math-calculators/percentage-calculator'
+                  ) {
+                    e.preventDefault();
+                    document
+                      .getElementById('calculator-interactive-container')
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    return;
+                  }
+                  const match = href.match(/^\/[a-z-]+-calculators\/([a-z0-9-]+)$/);
+                  if (match) {
+                    e.preventDefault();
+                    onSelectCalculator(match[1]);
+                  }
+                }}
+                dangerouslySetInnerHTML={{ __html: PERCENTAGE_CALCULATOR_ARTICLE_HTML }}
+              />
+            </article>
+          ) : (
+            <CalculatorExplanationSection 
+              key={calculator.id}
+              calculator={localizedCalc} 
+              currencySymbol={currencySymbol} 
+            />
+          )}
 
           {/* Related Calculators Component (Grid format at bottom of main content) */}
           <div className="pt-6 border-t border-[#E2E8F0]">
