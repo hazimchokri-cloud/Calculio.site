@@ -22,11 +22,12 @@ import { PrintReportFooter } from '../shared/PrintReportFooter';
 import { useLanguage } from '../../i18n/LanguageContext';
 import DOMPurify from 'dompurify';
 
-// Configure DOMPurify to allow data URLs for images and IDs for TOC anchor links
+// Configure DOMPurify to preserve inline SVGs, data URLs for images, and IDs for TOC anchor links
 const purifyConfig = {
-  ADD_ATTR: ['target', 'rel', 'id'],
-  ADD_TAGS: ['iframe'], 
-  ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel|data):|[^a-z0-9+.-])/i,
+  USE_PROFILES: { html: true, svg: true },
+  ADD_ATTR: ['target', 'rel', 'id', 'role', 'aria-label'],
+  ADD_TAGS: ['iframe'],
+  ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
 };
 
 const HEADING_2_LIST = [
@@ -279,14 +280,14 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
         </header>
 
         {/* Featured Image */}
-        <div className={`w-full max-w-4xl rounded-3xl overflow-hidden shadow-md border border-[#E2E8F0] relative ${localizedPost.coverImage.includes('bmi-cover') ? 'bg-[#FFFFFF]' : 'bg-[#F1F5F9] aspect-[16/9]'}`}>
+        <div className={`w-full max-w-4xl rounded-3xl overflow-hidden shadow-md border border-[#E2E8F0] relative ${localizedPost.coverImage.includes('bmi-cover') || localizedPost.coverImage.includes('calculio-percentage-cover') ? 'bg-[#FFFFFF]' : 'bg-[#F1F5F9] aspect-[16/9]'}`}>
           <img
             src={localizedPost.coverImage}
             alt={localizedPost.imageAlt || localizedPost.title}
             width={1200}
-            height={localizedPost.coverImage.includes('bmi-cover') ? 630 : 675}
+            height={localizedPost.coverImage.includes('bmi-cover') || localizedPost.coverImage.includes('calculio-percentage-cover') ? 630 : 675}
             fetchPriority="high"
-            className={`w-full ${localizedPost.coverImage.includes('bmi-cover') ? 'h-auto object-contain' : 'h-full object-cover'}`}
+            className={`w-full ${localizedPost.coverImage.includes('bmi-cover') || localizedPost.coverImage.includes('calculio-percentage-cover') ? 'h-auto object-contain' : 'h-full object-cover'}`}
             referrerPolicy="no-referrer"
             onError={(e) => {
               const target = e.currentTarget;
@@ -295,7 +296,7 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
               }
             }}
           />
-          {!localizedPost.coverImage.includes('bmi-cover') && !localizedPost.coverImage.includes('compound-interest-hero') && (
+          {!localizedPost.coverImage.includes('bmi-cover') && !localizedPost.coverImage.includes('calculio-percentage-cover') && !localizedPost.coverImage.includes('compound-interest-hero') && (
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
           )}
         </div>
@@ -304,7 +305,7 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 max-w-7xl">
           
           {/* Main Article Content Column (8 cols) */}
-          <div className="lg:col-span-8 space-y-8">
+          <div className="lg:col-span-8 min-w-0 space-y-8">
             
             {/* Key Takeaways Card */}
             {localizedPost.keyTakeaways && localizedPost.keyTakeaways.length > 0 && (
@@ -359,12 +360,14 @@ export const BlogPostView: React.FC<BlogPostViewProps> = ({
                   {/* Content (HTML or Paragraphs) */}
                   {section.htmlContent ? (
                     <div 
-                      className="rich-text-content text-base sm:text-[17px] text-[#475569] leading-relaxed font-normal"
+                      className="rich-text-content min-w-0 text-base sm:text-[17px] text-[#475569] leading-relaxed font-normal"
                       onClick={(e) => {
                         const anchor = (e.target as HTMLElement).closest('a');
                         if (!anchor) return;
-                        const href = anchor.getAttribute('href');
-                        if (!href || href.startsWith('http') || href.startsWith('#')) return;
+                        const rawHref = anchor.getAttribute('href');
+                        if (!rawHref || rawHref.startsWith('#')) return;
+                        const href = rawHref.replace(/^https?:\/\/(?:www\.)?calculio\.site/i, '');
+                        if (href.startsWith('http')) return;
                         const clean = href.replace(/^\/+|\/+$/g, '');
                         const parts = clean.split('/');
                         if (parts[0] === 'blog' && parts[1]) {

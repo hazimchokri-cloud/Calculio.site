@@ -1,7 +1,46 @@
 import { BlogPost } from '../../types';
 import { BLOG_AUTHORS } from '../blogAuthors';
+import { PERCENTAGE_CALCULATOR_ARTICLE_BODY_HTML } from '../percentageCalculatorArticle';
 
 export const MATH_POSTS: BlogPost[] = [
+  {
+    slug: 'percentage-calculator-formulas-examples',
+    title: 'Percentage Calculator: Formulas, Examples & Free Tool',
+    excerpt: 'Free percentage calculator: find X% of Y, percentage change, difference and error. Clear formulas, step-by-step examples and common mistakes.',
+    coverImage: '/assets/calculio-percentage-cover.webp',
+    imageAlt: 'Percentage calculator cover showing 20% of 150 equals 30',
+    category: 'math',
+    categoryLabel: 'Math',
+    author: BLOG_AUTHORS.calculioEditorial,
+    publishedAt: '2026-11-20',
+    updatedAt: '2026-11-20',
+    readTimeMinutes: 12,
+    featured: false,
+    tags: ['Percentage Calculator', 'Percent Calculator', 'Percentages', 'Percentage Change', 'Percentage Difference', 'Percent Error'],
+    relatedCalculatorIds: ['percentage-calculator', 'fraction-calculator', 'decimal-calculator', 'sales-tax-calculator'],
+    relatedBlogSlugs: ['how-to-calculate-a-percentage-step-by-step-guide', 'how-to-calculate-percentage-increase-and-decrease'],
+    metaDescription: 'Free percentage calculator: find X% of Y, percentage change, difference and error. Clear formulas, step-by-step examples and common mistakes.',
+    metaKeywords: [
+      'percentage calculator',
+      'percent calculator',
+      'percentage increase calculator',
+      'percentage change calculator',
+      'percentage difference calculator',
+      'percent error formula',
+      'how to calculate percentage',
+      'percentage'
+    ],
+    keyTakeaways: [],
+    faqs: [],
+    sections: [
+      {
+        id: 'main-content',
+        title: '',
+        content: [],
+        htmlContent: PERCENTAGE_CALCULATOR_ARTICLE_BODY_HTML
+      }
+    ]
+  },
   {
     slug: 'how-to-calculate-a-percentage-step-by-step-guide',
     title: 'How to Calculate a Percentage: Step-by-Step Mathematical Guide',

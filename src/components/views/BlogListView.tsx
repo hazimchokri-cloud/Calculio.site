@@ -56,11 +56,27 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
         post.title.toLowerCase().includes(q) ||
         post.excerpt.toLowerCase().includes(q) ||
         post.tags.some(t => t.toLowerCase().includes(q)) ||
+        (post.metaKeywords || []).some(k => k.toLowerCase().includes(q)) ||
         (post.author?.name || '').toLowerCase().includes(q);
       
       return matchCat && matchQuery;
     });
   }, [blogPosts, searchQuery, selectedCatFilter]);
+
+  const categoryCounts = useMemo(() => {
+    const countFor = (matcher: (cat: string) => boolean) =>
+      blogPosts.filter(p => matcher(p.category)).length;
+    return {
+      finance: countFor(c => c === 'finance' || c === 'financial'),
+      healthFitness: countFor(c => c === 'health-fitness' || c === 'fitness-health'),
+      math: countFor(c => c === 'math' || c === 'math-algebra'),
+      conversions: countFor(c => c === 'conversions' || c === 'conversion'),
+      realEstate: countFor(c => c === 'real-estate'),
+      business: countFor(c => c === 'business'),
+      education: countFor(c => c === 'education'),
+      generalCalculations: countFor(c => c === 'general-calculations'),
+    };
+  }, [blogPosts]);
 
   const breadcrumbs = [
     { label: t('blog.title', 'Blog & Educational Guides'), active: true }
@@ -218,7 +234,7 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
                   : 'bg-[#FFFFFF] text-[#475569] hover:bg-[#FFF7ED] border border-[#E2E8F0]'
               }`}
             >
-              {t('categories.finance', 'Finance')}
+              {t('categories.finance', 'Finance')} ({categoryCounts.finance})
             </button>
             <button
               onClick={() => setSelectedCatFilter('health-fitness')}
@@ -228,7 +244,7 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
                   : 'bg-[#FFFFFF] text-[#475569] hover:bg-[#FFF7ED] border border-[#E2E8F0]'
               }`}
             >
-              {t('categories.health', 'Health & Fitness')}
+              {t('categories.health', 'Health & Fitness')} ({categoryCounts.healthFitness})
             </button>
             <button
               onClick={() => setSelectedCatFilter('math')}
@@ -238,7 +254,7 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
                   : 'bg-[#FFFFFF] text-[#475569] hover:bg-[#FFF7ED] border border-[#E2E8F0]'
               }`}
             >
-              {t('categories.math', 'Math')}
+              {t('categories.math', 'Math')} ({categoryCounts.math})
             </button>
             <button
               onClick={() => setSelectedCatFilter('conversions')}
@@ -248,7 +264,7 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
                   : 'bg-[#FFFFFF] text-[#475569] hover:bg-[#FFF7ED] border border-[#E2E8F0]'
               }`}
             >
-              {t('categories.conversions', 'Conversions')}
+              {t('categories.conversions', 'Conversions')} ({categoryCounts.conversions})
             </button>
             <button
               onClick={() => setSelectedCatFilter('real-estate')}
@@ -258,7 +274,7 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
                   : 'bg-[#FFFFFF] text-[#475569] hover:bg-[#FFF7ED] border border-[#E2E8F0]'
               }`}
             >
-              {t('categories.realEstate', 'Real Estate')}
+              {t('categories.realEstate', 'Real Estate')} ({categoryCounts.realEstate})
             </button>
             <button
               onClick={() => setSelectedCatFilter('business')}
@@ -268,7 +284,7 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
                   : 'bg-[#FFFFFF] text-[#475569] hover:bg-[#FFF7ED] border border-[#E2E8F0]'
               }`}
             >
-              {t('categories.business', 'Business')}
+              {t('categories.business', 'Business')} ({categoryCounts.business})
             </button>
             <button
               onClick={() => setSelectedCatFilter('education')}
@@ -278,7 +294,7 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
                   : 'bg-[#FFFFFF] text-[#475569] hover:bg-[#FFF7ED] border border-[#E2E8F0]'
               }`}
             >
-              {t('categories.education', 'Education')}
+              {t('categories.education', 'Education')} ({categoryCounts.education})
             </button>
             <button
               onClick={() => setSelectedCatFilter('general-calculations')}
@@ -288,7 +304,7 @@ export const BlogListView: React.FC<BlogListViewProps> = ({
                   : 'bg-[#FFFFFF] text-[#475569] hover:bg-[#FFF7ED] border border-[#E2E8F0]'
               }`}
             >
-              {t('categories.generalCalculations', 'General Calculations')}
+              {t('categories.generalCalculations', 'General Calculations')} ({categoryCounts.generalCalculations})
             </button>
           </div>
 

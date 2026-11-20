@@ -84,30 +84,15 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_SCHEMA = {
   }
 };
 
-export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
-<h2>Percentage Calculator: Formulas and Practical Examples</h2>
-
-<figure>
-  <img
-    src="/assets/calculio-percentage-cover.webp"
-    alt="Percentage calculator cover showing 20% of 150 equals 30"
-    width="1200"
-    height="630"
-    loading="eager"
-    decoding="async"
-    referrerpolicy="no-referrer"
-    class="border border-[#E2E8F0]"
-  />
-</figure>
-
+export const PERCENTAGE_CALCULATOR_ARTICLE_BODY_HTML = `
 <p>You use a percentage calculator to find a part, express a part as a percentage of a whole, or measure a change against a starting value. Your first step is choosing the base: the amount that represents 100%.</p>
 
-<p>A <a href="https://calculio.site/math-calculators/percentage-calculator">percent calculator</a> handles the arithmetic, while the formula helps you check the result. Finding 20% of 150 gives you 30; finding what percent 30 is of 150 gives you 20%. The numbers are the same, but the questions are different.</p>
+<p>A <a href="/math-calculators/percentage-calculator">percent calculator</a> handles the arithmetic, while the formula helps you check the result. Finding 20% of 150 gives you 30; finding what percent 30 is of 150 gives you 20%. The numbers are the same, but the questions are different.</p>
 
-<div class="cta"><strong>Need a quick answer?</strong> Try the free <a href="https://calculio.site/math-calculators/percentage-calculator">Percentage Calculator on Calculio</a>, then come back to verify the result with the formulas below.</div>
+<div class="cta"><strong>Need a quick answer?</strong> Try the free <a href="/math-calculators/percentage-calculator">Percentage Calculator on Calculio</a>, then come back to verify the result with the formulas below.</div>
 
 <h2>How Do You Calculate Percentages With Calculio?</h2>
-<p>Identify the unknown in your question: the part, the percentage, or the whole. Enter your numbers in the <a href="https://calculio.site/math-calculators/percentage-calculator">Calculio percentage calculator</a>, and keep the matching formula nearby so you can check the arithmetic independently.</p>
+<p>Identify the unknown in your question: the part, the percentage, or the whole. Enter your numbers in the <a href="/math-calculators/percentage-calculator">Calculio percentage calculator</a>, and keep the matching formula nearby so you can check the arithmetic independently.</p>
 
 <h3>What Does a Percentage Represent?</h3>
 <p>A percentage expresses an amount per hundred. 20% means 20 out of every 100, which you can also write as 20/100 or 0.20.</p>
@@ -116,18 +101,18 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 <svg class="w-full max-w-full h-auto block mx-auto" role="img" aria-label="Grid of 100 dots with 20 highlighted, showing that 20 percent means 20 out of every 100" viewBox="0 0 560 288" width="560" font-family="system-ui,Segoe UI,Arial,sans-serif">
 <defs>
 <pattern id="f2g" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="12" cy="12" r="9" fill="#e2e8f0"/></pattern>
-<pattern id="f2c" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="12" cy="12" r="9" fill="#4f46e5"/></pattern>
-<linearGradient id="f2bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef2ff"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>
+<pattern id="f2c" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="12" cy="12" r="9" fill="#f97316"/></pattern>
+<linearGradient id="f2bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff7ed"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>
 </defs>
 <rect width="560" height="288" fill="url(#f2bg)"/>
 <rect x="24" y="24" width="240" height="240" fill="url(#f2g)"/>
 <rect x="24" y="24" width="240" height="48" fill="url(#f2c)"/>
-<text x="300" y="118" font-size="72" font-weight="800" fill="#4f46e5">20%</text>
+<text x="300" y="118" font-size="72" font-weight="800" fill="#ea580c">20%</text>
 <text x="300" y="158" font-size="21" fill="#334155">20 out of every 100</text>
-<rect x="300" y="182" width="96" height="40" rx="20" fill="#e0e7ff"/>
-<text x="348" y="209" font-size="18" font-weight="700" fill="#3730a3" text-anchor="middle">20/100</text>
-<rect x="408" y="182" width="96" height="40" rx="20" fill="#d1fae5"/>
-<text x="456" y="209" font-size="18" font-weight="700" fill="#065f46" text-anchor="middle">0.20</text>
+<rect x="300" y="182" width="96" height="40" rx="20" fill="#ffedd5"/>
+<text x="348" y="209" font-size="18" font-weight="700" fill="#9a3412" text-anchor="middle">20/100</text>
+<rect x="408" y="182" width="96" height="40" rx="20" fill="#f1f5f9"/>
+<text x="456" y="209" font-size="18" font-weight="700" fill="#0f172a" text-anchor="middle">0.20</text>
 </svg>
 <figcaption>20% means 20 parts out of 100, the same as 20/100 or 0.20.</figcaption>
 </figure>
@@ -142,27 +127,27 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 <rect width="720" height="220" fill="#f8fafc"/>
 <g>
 <rect x="18" y="20" width="216" height="180" rx="16" fill="#fff" stroke="#e2e8f0"/>
-<rect x="38" y="40" width="40" height="6" rx="3" fill="#4f46e5"/>
+<rect x="38" y="40" width="40" height="6" rx="3" fill="#f97316"/>
 <text x="38" y="72" font-size="15" font-weight="700" fill="#1e293b">What is X% of Y?</text>
-<text x="38" y="116" font-size="21" font-weight="800" fill="#4f46e5">(X ÷ 100) × Y</text>
+<text x="38" y="116" font-size="21" font-weight="800" fill="#ea580c">(X ÷ 100) × Y</text>
 <line x1="38" y1="138" x2="214" y2="138" stroke="#e2e8f0"/>
-<text x="38" y="170" font-size="14" fill="#475569">20% of 150 → <tspan font-weight="700" fill="#4f46e5">30</tspan></text>
+<text x="38" y="170" font-size="14" fill="#475569">20% of 150 → <tspan font-weight="700" fill="#ea580c">30</tspan></text>
 </g>
 <g>
 <rect x="252" y="20" width="216" height="180" rx="16" fill="#fff" stroke="#e2e8f0"/>
-<rect x="272" y="40" width="40" height="6" rx="3" fill="#059669"/>
+<rect x="272" y="40" width="40" height="6" rx="3" fill="#0f172a"/>
 <text x="272" y="72" font-size="15" font-weight="700" fill="#1e293b">What percent is A of B?</text>
-<text x="272" y="116" font-size="21" font-weight="800" fill="#059669">(A ÷ B) × 100%</text>
+<text x="272" y="116" font-size="21" font-weight="800" fill="#0f172a">(A ÷ B) × 100%</text>
 <line x1="272" y1="138" x2="448" y2="138" stroke="#e2e8f0"/>
-<text x="272" y="170" font-size="14" fill="#475569">30 of 150 → <tspan font-weight="700" fill="#059669">20%</tspan></text>
+<text x="272" y="170" font-size="14" fill="#475569">30 of 150 → <tspan font-weight="700" fill="#0f172a">20%</tspan></text>
 </g>
 <g>
 <rect x="486" y="20" width="216" height="180" rx="16" fill="#fff" stroke="#e2e8f0"/>
 <rect x="506" y="40" width="40" height="6" rx="3" fill="#d97706"/>
 <text x="506" y="72" font-size="15" font-weight="700" fill="#1e293b">A is X% of what?</text>
-<text x="506" y="116" font-size="21" font-weight="800" fill="#d97706">A ÷ (X ÷ 100)</text>
+<text x="506" y="116" font-size="21" font-weight="800" fill="#b45309">A ÷ (X ÷ 100)</text>
 <line x1="506" y1="138" x2="682" y2="138" stroke="#e2e8f0"/>
-<text x="506" y="170" font-size="14" fill="#475569">30 is 20% of → <tspan font-weight="700" fill="#d97706">150</tspan></text>
+<text x="506" y="170" font-size="14" fill="#475569">30 is 20% of → <tspan font-weight="700" fill="#b45309">150</tspan></text>
 </g>
 </svg>
 <figcaption>The three basic percentage questions, each with its formula and a worked result.</figcaption>
@@ -186,7 +171,7 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 <h3>How Do You Calculate X Percent of Y?</h3>
 <p>Divide X by 100, then multiply by Y:</p>
 <p class="formula">Part = (Percentage ÷ 100) × Whole</p>
-<p>For 20% of 150: 20 ÷ 100 = 0.20, then 0.20 × 150 = 30. A quick mental check: 10% of 150 is 15, so 20% is double, or 30. That catches most decimal-entry mistakes. To skip the steps, use the <a href="https://calculio.site/math-calculators/percentage-calculator">percentage of a number calculator</a>.</p>
+<p>For 20% of 150: 20 ÷ 100 = 0.20, then 0.20 × 150 = 30. A quick mental check: 10% of 150 is 15, so 20% is double, or 30. That catches most decimal-entry mistakes. To skip the steps, use the <a href="/math-calculators/percentage-calculator">percentage of a number calculator</a>.</p>
 
 <h3>What Percent Is One Number of Another?</h3>
 <p>Divide the part by the whole, then multiply by 100%:</p>
@@ -199,7 +184,7 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 <p>If 30 is 20% of the total, then 30 ÷ 0.20 = 150. Multiplying 150 by 0.20 returns 30, which confirms it. This method fails for 0%, because it requires dividing by zero.</p>
 
 <h2>How Do You Calculate Percentage Increase and Decrease?</h2>
-<p>Compare the change with the original value. To apply a change, multiply the starting amount by an increase or decrease factor. The <a href="https://calculio.site/math-calculators/percentage-calculator">percentage increase and decrease calculator</a> does both in one step.</p>
+<p>Compare the change with the original value. To apply a change, multiply the starting amount by an increase or decrease factor. The <a href="/math-calculators/percentage-calculator">percentage increase and decrease calculator</a> does both in one step.</p>
 
 <h3>What Is the Percentage Change Between Two Values?</h3>
 <p>For a positive original value, subtract the original from the new amount, then divide by the original:</p>
@@ -209,20 +194,20 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 <svg class="w-full max-w-full h-auto block mx-auto" role="img" aria-label="Bar chart showing a change from 80 to 100, which is a 25 percent increase" viewBox="0 0 560 290" width="560" font-family="system-ui,Segoe UI,Arial,sans-serif">
 <defs>
 <linearGradient id="f4a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cbd5e1"/><stop offset="1" stop-color="#94a3b8"/></linearGradient>
-<linearGradient id="f4b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#059669"/></linearGradient>
-<linearGradient id="f4bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0fdf4"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>
-<marker id="f4m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker>
+<linearGradient id="f4b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/></linearGradient>
+<linearGradient id="f4bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff7ed"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>
+<marker id="f4m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/></marker>
 </defs>
 <rect width="560" height="290" fill="url(#f4bg)"/>
 <line x1="40" y1="240" x2="520" y2="240" stroke="#cbd5e1" stroke-width="2"/>
 <rect x="100" y="80" width="110" height="160" rx="10" fill="url(#f4a)"/>
 <rect x="350" y="40" width="110" height="200" rx="10" fill="url(#f4b)"/>
 <text x="155" y="70" font-size="26" font-weight="800" fill="#334155" text-anchor="middle">80</text>
-<text x="405" y="30" font-size="26" font-weight="800" fill="#065f46" text-anchor="middle">100</text>
+<text x="405" y="30" font-size="26" font-weight="800" fill="#c2410c" text-anchor="middle">100</text>
 <text x="155" y="266" font-size="15" fill="#64748b" text-anchor="middle">Original</text>
 <text x="405" y="266" font-size="15" fill="#64748b" text-anchor="middle">New</text>
-<line x1="226" y1="150" x2="334" y2="150" stroke="#059669" stroke-width="4" stroke-linecap="round" marker-end="url(#f4m)"/>
-<rect x="238" y="102" width="84" height="36" rx="18" fill="#059669"/>
+<line x1="226" y1="150" x2="334" y2="150" stroke="#ea580c" stroke-width="4" stroke-linecap="round" marker-end="url(#f4m)"/>
+<rect x="238" y="102" width="84" height="36" rx="18" fill="#ea580c"/>
 <text x="280" y="127" font-size="18" font-weight="800" fill="#fff" text-anchor="middle">+25%</text>
 <text x="280" y="180" font-size="13" fill="#475569" text-anchor="middle">(100 − 80) ÷ 80</text>
 </svg>
@@ -254,7 +239,7 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 <svg class="w-full max-w-full h-auto block mx-auto" role="img" aria-label="Bar chart: 100 dollars rises 20 percent to 120 dollars, then falls 20 percent to 96 dollars" viewBox="0 0 600 316" width="600" font-family="system-ui,Segoe UI,Arial,sans-serif">
 <defs>
 <linearGradient id="f5a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cbd5e1"/><stop offset="1" stop-color="#94a3b8"/></linearGradient>
-<linearGradient id="f5b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#059669"/></linearGradient>
+<linearGradient id="f5b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/></linearGradient>
 <linearGradient id="f5c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fb7185"/><stop offset="1" stop-color="#e11d48"/></linearGradient>
 <linearGradient id="f5bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff7ed"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>
 </defs>
@@ -265,9 +250,9 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 <rect x="250" y="58" width="100" height="192" rx="10" fill="url(#f5b)"/>
 <rect x="440" y="96.4" width="100" height="153.6" rx="10" fill="url(#f5c)"/>
 <text x="110" y="80" font-size="24" font-weight="800" fill="#334155" text-anchor="middle">$100</text>
-<text x="300" y="48" font-size="24" font-weight="800" fill="#065f46" text-anchor="middle">$120</text>
+<text x="300" y="48" font-size="24" font-weight="800" fill="#c2410c" text-anchor="middle">$120</text>
 <text x="490" y="120" font-size="24" font-weight="800" fill="#fff" text-anchor="middle">$96</text>
-<rect x="165" y="118" width="80" height="34" rx="17" fill="#059669"/>
+<rect x="165" y="118" width="80" height="34" rx="17" fill="#ea580c"/>
 <text x="205" y="141" font-size="17" font-weight="800" fill="#fff" text-anchor="middle">+20%</text>
 <rect x="355" y="118" width="80" height="34" rx="17" fill="#e11d48"/>
 <text x="395" y="141" font-size="17" font-weight="800" fill="#fff" text-anchor="middle">−20%</text>
@@ -330,8 +315,8 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 <defs>
 <linearGradient id="f6a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cbd5e1"/><stop offset="1" stop-color="#94a3b8"/></linearGradient>
 <linearGradient id="f6b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fb7185"/><stop offset="1" stop-color="#e11d48"/></linearGradient>
-<linearGradient id="f6c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#818cf8"/><stop offset="1" stop-color="#4f46e5"/></linearGradient>
-<linearGradient id="f6bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef2ff"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>
+<linearGradient id="f6c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/></linearGradient>
+<linearGradient id="f6bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff7ed"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>
 </defs>
 <rect width="600" height="316" fill="url(#f6bg)"/>
 <line x1="30" y1="250" x2="570" y2="250" stroke="#cbd5e1" stroke-width="2"/>
@@ -340,7 +325,7 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 <rect x="440" y="111.8" width="100" height="138.2" rx="10" fill="url(#f6c)"/>
 <text x="110" y="80" font-size="24" font-weight="800" fill="#334155" text-anchor="middle">$100</text>
 <text x="300" y="112" font-size="24" font-weight="800" fill="#9f1239" text-anchor="middle">$80</text>
-<text x="490" y="102" font-size="24" font-weight="800" fill="#3730a3" text-anchor="middle">$86.40</text>
+<text x="490" y="102" font-size="24" font-weight="800" fill="#c2410c" text-anchor="middle">$86.40</text>
 <rect x="165" y="150" width="80" height="34" rx="17" fill="#e11d48"/>
 <text x="205" y="173" font-size="17" font-weight="800" fill="#fff" text-anchor="middle">−20%</text>
 <rect x="355" y="150" width="80" height="34" rx="17" fill="#d97706"/>
@@ -348,7 +333,7 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 <text x="110" y="275" font-size="14" fill="#64748b" text-anchor="middle">Original</text>
 <text x="300" y="275" font-size="14" fill="#64748b" text-anchor="middle">After discount</text>
 <text x="490" y="275" font-size="14" fill="#64748b" text-anchor="middle">Final price</text>
-<text x="300" y="303" font-size="14" font-weight="600" fill="#3730a3" text-anchor="middle">Tax is charged on $80, not on $100: $80 × 0.08 = $6.40</text>
+<text x="300" y="303" font-size="14" font-weight="600" fill="#9a3412" text-anchor="middle">Tax is charged on $80, not on $100: $80 × 0.08 = $6.40</text>
 </svg>
 <figcaption>Discount first, then tax on the discounted price.</figcaption>
 </figure>
@@ -392,8 +377,8 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 <svg class="w-full max-w-full h-auto block mx-auto" role="img" aria-label="Conversion rate from 20 percent to 25 percent: a gain of 5 percentage points, which is a 25 percent relative increase" viewBox="0 0 560 250" width="560" font-family="system-ui,Segoe UI,Arial,sans-serif">
 <defs>
 <linearGradient id="f7a" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#94a3b8"/><stop offset="1" stop-color="#64748b"/></linearGradient>
-<linearGradient id="f7b" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#059669"/></linearGradient>
-<linearGradient id="f7bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffbeb"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>
+<linearGradient id="f7b" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/></linearGradient>
+<linearGradient id="f7bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff7ed"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>
 </defs>
 <rect width="560" height="250" fill="url(#f7bg)"/>
 <text x="40" y="32" font-size="14" fill="#64748b">Conversion rate (track = 100% of visitors)</text>
@@ -404,11 +389,11 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 <rect x="40" y="102" width="100" height="36" rx="18" fill="url(#f7b)"/>
 <rect x="120" y="102" width="20" height="36" fill="#f59e0b"/>
 <rect x="120" y="102" width="20" height="36" rx="0" fill="#f59e0b"/>
-<text x="456" y="127" font-size="20" font-weight="800" fill="#065f46">25%</text>
+<text x="456" y="127" font-size="20" font-weight="800" fill="#c2410c">25%</text>
 <rect x="40" y="166" width="230" height="38" rx="19" fill="#fef3c7"/>
 <text x="155" y="191" font-size="16" font-weight="800" fill="#92400e" text-anchor="middle">+5 percentage points</text>
-<rect x="284" y="166" width="236" height="38" rx="19" fill="#d1fae5"/>
-<text x="402" y="191" font-size="16" font-weight="800" fill="#065f46" text-anchor="middle">+25% relative (5 ÷ 20)</text>
+<rect x="284" y="166" width="236" height="38" rx="19" fill="#ffedd5"/>
+<text x="402" y="191" font-size="16" font-weight="800" fill="#9a3412" text-anchor="middle">+25% relative (5 ÷ 20)</text>
 <text x="280" y="232" font-size="13" fill="#64748b" text-anchor="middle">Percentage points = the gap between rates. Percent = change relative to the old rate.</text>
 </svg>
 <figcaption>Percentage points and percent describe two different things.</figcaption>
@@ -423,9 +408,9 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 </ul>
 
 <h2>Choose the Right Base for Accurate Percentages</h2>
-<p>Accurate percentages start with knowing what represents 100%: the whole for part–whole questions, the original value for percentage change, and the accepted reference for percent error. Then confirm your answer with Calculio's <a href="https://calculio.site/math-calculators/percentage-calculator">free online percentage calculator</a>.</p>
+<p>Accurate percentages start with knowing what represents 100%: the whole for part–whole questions, the original value for percentage change, and the accepted reference for percent error. Then confirm your answer with Calculio's <a href="/math-calculators/percentage-calculator">free online percentage calculator</a>.</p>
 
-<div class="cta"><strong>Calculate it now:</strong> <a href="https://calculio.site/math-calculators/percentage-calculator">Open the Percentage Calculator →</a></div>
+<div class="cta"><strong>Calculate it now:</strong> <a href="/math-calculators/percentage-calculator">Open the Percentage Calculator →</a></div>
 
 <h2>Percentage Calculator FAQ</h2>
 
@@ -450,3 +435,20 @@ export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
 <h3>What is the difference between percentage points and percent?</h3>
 <p>Percentage points measure the gap between two rates, while percent measures the change relative to the starting rate. Going from 20% to 25% is +5 percentage points, or a 25% relative increase.</p>
 `;
+
+export const PERCENTAGE_CALCULATOR_ARTICLE_HTML = `
+<h2>Percentage Calculator: Formulas and Practical Examples</h2>
+
+<figure>
+  <img
+    src="/assets/calculio-percentage-cover.webp"
+    alt="Percentage calculator cover showing 20% of 150 equals 30"
+    width="1200"
+    height="630"
+    loading="eager"
+    decoding="async"
+    referrerpolicy="no-referrer"
+    class="border border-[#E2E8F0]"
+  />
+</figure>
+${PERCENTAGE_CALCULATOR_ARTICLE_BODY_HTML}`;
